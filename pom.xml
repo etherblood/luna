@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.etherblood.luna</groupId>
+    <artifactId>luna</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1.0</version>
+    <modules>
+        <module>engine</module>
+        <module>application-client</module>
+        <module>data</module>
+        <module>application-client-swing</module>
+        <module>network-api</module>
+        <module>network-server</module>
+        <module>network-client</module>
+        <module>application-server</module>
+        <module>network-sandbox</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
+
+        <version.luna>0.1.0</version.luna>
+        <version.game-tools>cc7c004c9dd590963ec25d58c7e2b2831c391b2c</version.game-tools>
+        <version.auth-token>c7a6c8b4b9d79dac73aec617de4225e17c010405</version.auth-token>
+    </properties>
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.etherblood.luna</groupId>
+                <artifactId>application-client</artifactId>
+                <version>${version.luna}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.etherblood.luna</groupId>
+                <artifactId>engine</artifactId>
+                <version>${version.luna}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.etherblood.luna</groupId>
+                <artifactId>data</artifactId>
+                <version>${version.luna}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.etherblood.luna</groupId>
+                <artifactId>network-api</artifactId>
+                <version>${version.luna}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.etherblood.luna</groupId>
+                <artifactId>network-server</artifactId>
+                <version>${version.luna}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.etherblood.luna</groupId>
+                <artifactId>network-client</artifactId>
+                <version>${version.luna}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.destrostudios.game-tools</groupId>
+                <artifactId>network-server</artifactId>
+                <version>${version.game-tools}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.destrostudios.game-tools</groupId>
+                <artifactId>network-shared</artifactId>
+                <version>${version.game-tools}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.destrostudios.game-tools</groupId>
+                <artifactId>network-client</artifactId>
+                <version>${version.game-tools}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.destrostudios</groupId>
+                <artifactId>auth-token</artifactId>
+                <version>${version.auth-token}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.8.2</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

@@ -1,0 +1,56 @@
+package com.etherblood.luna.engine;
+
+public enum Direction {
+    UP,
+    UP_RIGHT,
+    RIGHT,
+    DOWN_RIGHT,
+    DOWN,
+    DOWN_LEFT,
+    LEFT,
+    UP_LEFT,
+    NONE;
+
+    public Vector2 toLengthVector(int length) {
+        int diagonalSideLength = (int) Math.floor(length * Math.sqrt(0.5));
+        return switch (this) {
+            case UP -> new Vector2(0, length);
+            case DOWN -> new Vector2(0, -length);
+            case RIGHT -> new Vector2(length, 0);
+            case LEFT -> new Vector2(-length, 0);
+            case UP_RIGHT -> new Vector2(diagonalSideLength, diagonalSideLength);
+            case DOWN_RIGHT -> new Vector2(diagonalSideLength, -diagonalSideLength);
+            case UP_LEFT -> new Vector2(-diagonalSideLength, diagonalSideLength);
+            case DOWN_LEFT -> new Vector2(-diagonalSideLength, -diagonalSideLength);
+            case NONE -> new Vector2(0, 0);
+        };
+    }
+
+    public static Direction of(int x, int y) {
+        if (x < 0) {
+            if (y < 0) {
+                return DOWN_LEFT;
+            }
+            if (y > 0) {
+                return UP_LEFT;
+            }
+            return LEFT;
+        }
+        if (x > 0) {
+            if (y < 0) {
+                return DOWN_RIGHT;
+            }
+            if (y > 0) {
+                return UP_RIGHT;
+            }
+            return RIGHT;
+        }
+        if (y < 0) {
+            return DOWN;
+        }
+        if (y > 0) {
+            return UP;
+        }
+        return NONE;
+    }
+}
