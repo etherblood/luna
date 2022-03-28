@@ -18,7 +18,8 @@ public class GameRules {
                         Movebox.class,
                         OwnedBy.class,
                         ActorState.class,
-                        PlayerInput.class
+                        PlayerInput.class,
+                        Direction.class
                 ),
                 List.of(
                         new ApplyActionSystem(),

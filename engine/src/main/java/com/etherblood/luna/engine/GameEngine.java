@@ -4,6 +4,7 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.data.EntityDataImpl;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GameEngine {
 
@@ -23,11 +24,14 @@ public class GameEngine {
         tick = 0;
     }
 
-    public void tick(Map<Integer, PlayerInput> playerActions) {
-        for (Map.Entry<Integer, PlayerInput> entry : playerActions.entrySet()) {
+    public void tick(Map<Integer, Set<Object>> playerActions) {
+        for (Map.Entry<Integer, Set<Object>> entry : playerActions.entrySet()) {
             int player = entry.getKey();
-            PlayerInput actions = entry.getValue();
-            data.set(player, actions);
+            for (Object object : entry.getValue()) {
+                if (object instanceof PlayerInput input) {
+                    data.set(player, input);
+                }
+            }
         }
         tick++;
         for (GameSystem system : systems) {

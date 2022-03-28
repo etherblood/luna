@@ -37,7 +37,7 @@ public class Main {
 
         GameLoop loop = new GameLoop(60, () -> {
             Set<Integer> keyCodes = gui.getPressedKeys();
-            HashMap<Integer, PlayerInput> playerInputs = new HashMap<>();
+            HashMap<Integer, Set<Object>> playerInputs = new HashMap<>();
             int x = 0;
             int y = 0;
             if (keyCodes.contains(KeyEvent.VK_UP)) {
@@ -53,7 +53,7 @@ public class Main {
                 x--;
             }
             PlayerInput input = new PlayerInput(Direction.of(x, y), ActorAction.IDLE);
-            playerInputs.put(player, input);
+            playerInputs.put(player, Set.of(input));
             engine.tick(playerInputs);
             gui.render(createRenderTask(engine));
         });

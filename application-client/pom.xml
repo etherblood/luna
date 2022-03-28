@@ -17,5 +17,9 @@
             <artifactId>ice-tea-engine-core</artifactId>
             <version>9591c4a5b7f5927dc2bd8e0a435dfb58841171a2</version>
         </dependency>
+        <dependency>
+            <groupId>com.etherblood.luna</groupId>
+            <artifactId>engine</artifactId>
+        </dependency>
     </dependencies>
 </project>
