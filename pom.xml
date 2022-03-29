@@ -12,7 +12,6 @@
         <module>engine</module>
         <module>application-client</module>
         <module>data</module>
-        <module>application-client-swing</module>
         <module>network-api</module>
         <module>network-server</module>
         <module>network-client</module>
