@@ -1,5 +1,6 @@
 package com.etherblood.luna.application.client;
 
+import com.destrostudios.gametools.network.client.ToolsClient;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.data.EntityData;
@@ -13,7 +14,6 @@ import com.etherblood.luna.engine.OwnedBy;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
-import com.etherblood.luna.network.api.NetworkModule;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.client.ClientGameModule;
 import com.etherblood.luna.network.client.timestamp.ClientTimestampModule;
@@ -30,12 +30,9 @@ public class Main {
 //        Log.DEBUG();
         Log.info(new Date().toString());// time reference for kryo logs
         Client client = new Client(10_000, 10_000);
-
         ClientTimestampModule timestampModule = new ClientTimestampModule(client, 1000, 500);
-        NetworkModule.addModule(client, timestampModule);
-
         ClientGameModule gameModule = new ClientGameModule(client);
-        NetworkModule.addModule(client, gameModule);
+        ToolsClient toolsClient = new ToolsClient(client, timestampModule, gameModule);
 
         client.start();
         client.connect(10_000, "localhost", NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);

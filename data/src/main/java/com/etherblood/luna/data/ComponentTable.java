@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class ComponentTable<T> {
 
-    private final Map<Integer, T> table = new HashMap<>();
+    private final Map<Integer, T> table = new TreeMap<>();
     private transient Map<T, Set<Integer>> index;
 
     public T get(int entity) {

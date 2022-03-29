@@ -12,7 +12,7 @@ public class PlaybackBuffer {
     private final Map<Long, Set<GameEvent>> events = new HashMap<>();
     private long clearedFrame = -1;
 
-    public boolean buffer(long frame, GameEvent event) {
+    public synchronized boolean buffer(long frame, GameEvent event) {
         if (clearedFrame >= frame) {
             return false;
         }
@@ -20,12 +20,12 @@ public class PlaybackBuffer {
         return true;
     }
 
-    public Set<GameEvent> peek(long frame) {
+    public synchronized Set<GameEvent> peek(long frame) {
         Set<GameEvent> set = events.getOrDefault(frame, Collections.emptySet());
         return Collections.unmodifiableSet(set);
     }
 
-    public void clear(long frame) {
+    public synchronized void clear(long frame) {
         clearedFrame = frame;
         events.keySet().removeIf(key -> key <= frame);
     }

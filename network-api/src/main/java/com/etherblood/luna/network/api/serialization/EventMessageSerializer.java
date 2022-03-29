@@ -1,14 +1,13 @@
 package com.etherblood.luna.network.api.serialization;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 
-public class EventMessageSerializer extends Serializer<EventMessage> {
+public class EventMessageSerializer extends CopySerializer<EventMessage> {
     @Override
     public void write(Kryo kryo, Output output, EventMessage object) {
         output.writeLong(object.seq());

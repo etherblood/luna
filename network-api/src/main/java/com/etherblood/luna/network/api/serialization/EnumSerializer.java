@@ -1,11 +1,10 @@
 package com.etherblood.luna.network.api.serialization;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-public class EnumSerializer<T extends Enum<T>> extends Serializer<T> {
+public class EnumSerializer<T extends Enum<T>> extends CopySerializer<T> {
 
     private final Class<T> enumClass;
 

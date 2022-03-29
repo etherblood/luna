@@ -2,6 +2,7 @@ package com.etherblood.lunia.application.server;
 
 import com.destrostudios.authtoken.JwtService;
 import com.destrostudios.authtoken.NoValidateJwtService;
+import com.destrostudios.gametools.network.server.ToolsServer;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.data.EntityData;
@@ -16,7 +17,6 @@ import com.etherblood.luna.engine.OwnedBy;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
-import com.etherblood.luna.network.api.NetworkModule;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.server.ServerGameModule;
 import com.etherblood.luna.network.server.timestamp.ServerTimestampModule;
@@ -53,13 +53,10 @@ public class Main {
         data.set(character2, Direction.RIGHT);
 
         Server server = new Server(10_0000, 10_000);
-
         ServerTimestampModule timestampModule = new ServerTimestampModule();
-        NetworkModule.addModule(server, timestampModule);
-
         ServerGameModule gameModule = new ServerGameModule(game);
-        NetworkModule.addModule(server, gameModule);
-
+        ToolsServer toolsServer = new ToolsServer(server, timestampModule, gameModule);
+        
         server.start();
         server.bind(NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 

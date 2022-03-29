@@ -1,16 +1,12 @@
 package com.etherblood.luna.network.api.serialization;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Vector2;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,15 +30,7 @@ public class GameEngineSerializerTest {
         data.set(b, new Position(110, 111));
         data.set(b, new Speed(110, 111));
 
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Output out = new Output(stream);
-        kryo.writeObject(out, game);
-        out.flush();
-
-        Input in = new Input(new ByteArrayInputStream(stream.toByteArray()));
-        GameEngine copy = kryo.readObject(in, GameEngine.class);
-
+        GameEngine copy = kryo.copy(game);
 
         assertEquals(game.getFrame(), copy.getFrame());
         assertEquals(game.getStartEpochMillis(), copy.getStartEpochMillis());

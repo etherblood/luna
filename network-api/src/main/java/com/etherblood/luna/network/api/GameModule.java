@@ -1,5 +1,6 @@
 package com.etherblood.luna.network.api;
 
+import com.destrostudios.gametools.network.shared.modules.NetworkModule;
 import com.esotericsoftware.kryo.Kryo;
 import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
@@ -23,8 +24,8 @@ public abstract class GameModule extends NetworkModule {
     public void initialize(Kryo kryo) {
         kryo.register(GameEngine.class, new GameEngineSerializer());
         kryo.register(EventMessage.class, new EventMessageSerializer());
-        kryo.register(GameEvent.class, new RecordSerializer<GameEvent>());
-        kryo.register(PlayerInput.class, new RecordSerializer<PlayerInput>());
+        kryo.register(GameEvent.class, new RecordSerializer<>());
+        kryo.register(PlayerInput.class, new RecordSerializer<>());
 
         kryo.register(OwnedBy.class, new RecordSerializer<>());
         kryo.register(Position.class, new RecordSerializer<>());

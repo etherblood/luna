@@ -13,6 +13,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.destrostudios.game-tools</groupId>
+            <artifactId>network-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.etherblood.luna</groupId>
             <artifactId>network-api</artifactId>
         </dependency>

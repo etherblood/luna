@@ -1,8 +1,6 @@
 package com.etherblood.luna.network.client;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
@@ -10,8 +8,6 @@ import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import com.etherblood.luna.network.api.GameModule;
 import com.etherblood.luna.network.api.PlaybackBuffer;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClientGameModule extends GameModule {
@@ -66,20 +62,10 @@ public class ClientGameModule extends GameModule {
     }
 
     public synchronized GameEngine getStateSnapshot() {
+        Kryo kryo = new Kryo();
+        initialize(kryo);
         GameEngine engine = stateReference.get();
-        if (engine == null) {
-            return null;
-        }
-
-        // dirty hack to copy state
-        Kryo kryo = connection.getEndPoint().getKryo();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Output out = new Output(stream);
-        kryo.writeObject(out, engine);
-        out.flush();
-
-        Input in = new Input(new ByteArrayInputStream(stream.toByteArray()));
-        GameEngine copy = kryo.readObject(in, GameEngine.class);
+        GameEngine copy = kryo.copy(engine);
         return copy;
     }
 }

@@ -37,6 +37,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.vulkan.KHRSurface;
 
 import static org.lwjgl.vulkan.VK10.VK_CULL_MODE_NONE;
 import static org.lwjgl.vulkan.VK10.VK_POLYGON_MODE_LINE;
@@ -55,6 +56,8 @@ public class ApplicationClient extends Application {
     private int frameCount;
 
     public ApplicationClient(GameProxy gameProxy) {
+        super();
+        setPreferredPresentMode(KHRSurface.VK_PRESENT_MODE_FIFO_KHR);
         this.gameProxy = gameProxy;
     }
 
@@ -188,7 +191,7 @@ public class ApplicationClient extends Application {
                 }
             }
         });
-        System.out.println((System.nanoTime() - nanos) / 1_000_000 + "ms");
+        System.out.println("init() in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
     }
 
     @Override
@@ -205,11 +208,13 @@ public class ApplicationClient extends Application {
 
         for (int entity : data.list(ActorState.class)) {
             if (!models.containsKey(entity)) {
+                long nanos = System.nanoTime();
                 // hard coded amara model
                 Node model = (Node) assetManager.loadModel("models/amara/amara.gltf");
                 model.scale(new Vector3f(0.01f, 0.01f, 0.01f));
                 model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
                 models.put(entity, new ModelWrapper(entity, model, List.of("attack1", "attack2", "idle", "walk")));
+                System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
             }
             ModelWrapper wrapper = models.get(entity);
             Position position = data.get(entity, Position.class);

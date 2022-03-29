@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.github.destrostudios.ice-tea-engine</groupId>
             <artifactId>ice-tea-engine-core</artifactId>
-            <version>16d5cd7412aac8934836d8e2a8bc08e7c55b4202</version>
+            <version>676e4e6c204562a71654cb8e7e8efa553b831459</version>
         </dependency>
         <dependency>
             <groupId>com.etherblood.luna</groupId>

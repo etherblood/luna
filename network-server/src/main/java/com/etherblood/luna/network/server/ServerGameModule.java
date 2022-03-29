@@ -50,15 +50,7 @@ public class ServerGameModule extends GameModule {
         }
     }
 
-    public GameEngine getState() {
-        return state;
-    }
-
     public void tick() {
-//        for (ServerInputMessageBuilder builder : builders) {
-//            InputMessage message = builder.build();
-//            connections.apply(builder.player).sendUDP(message);
-//        }
         long frame = state.getFrame();
         Set<GameEvent> events = buffer.peek(frame);
         buffer.clear(frame);
