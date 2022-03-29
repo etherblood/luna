@@ -13,7 +13,6 @@ public class GameRules {
         RULES_MAP = Map.of(DEFAULT_RULES_ID, new GameRules(
                 DEFAULT_RULES_ID,
                 Set.of(
-                        Player.class,
                         Position.class,
                         Speed.class,
                         Movebox.class,

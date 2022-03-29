@@ -1,5 +1,8 @@
 package com.etherblood.luna.network.client;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
@@ -7,6 +10,8 @@ import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import com.etherblood.luna.network.api.GameModule;
 import com.etherblood.luna.network.api.PlaybackBuffer;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClientGameModule extends GameModule {
@@ -23,7 +28,7 @@ public class ClientGameModule extends GameModule {
     }
 
     @Override
-    public void received(Connection connection, Object object) {
+    public synchronized void received(Connection connection, Object object) {
         if (object instanceof GameEngine state) {
             System.out.println("received: " + state);
             stateReference.set(state);
@@ -36,14 +41,14 @@ public class ClientGameModule extends GameModule {
         }
     }
 
-    public void input(GameEvent event) {
+    public synchronized void input(GameEvent event) {
         GameEngine state = stateReference.get();
         if (state != null) {
             builder.enqueueAction(new EventMessagePart(state.getFrame() + delayFrames, event));
         }
     }
 
-    public void run(long servertime, int fps) {
+    public synchronized void run(long servertime, int fps) {
         // TODO: fps should be taken from game settings?
         GameEngine state = stateReference.get();
         if (state != null) {
@@ -60,7 +65,21 @@ public class ClientGameModule extends GameModule {
         }
     }
 
-    public GameEngine getState() {
-        return stateReference.get();
+    public synchronized GameEngine getStateSnapshot() {
+        GameEngine engine = stateReference.get();
+        if (engine == null) {
+            return null;
+        }
+
+        // dirty hack to copy state
+        Kryo kryo = connection.getEndPoint().getKryo();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        Output out = new Output(stream);
+        kryo.writeObject(out, engine);
+        out.flush();
+
+        Input in = new Input(new ByteArrayInputStream(stream.toByteArray()));
+        GameEngine copy = kryo.readObject(in, GameEngine.class);
+        return copy;
     }
 }

@@ -22,7 +22,7 @@ public class RecordSerializer<T extends Record> extends Serializer<T> {
         try {
             for (RecordComponent component : recordComponents) {
                 Method accessor = component.getAccessor();
-                kryo.writeObjectOrNull(output, accessor.invoke(object), kryo.getSerializer(component.getType()));
+                kryo.writeObjectOrNull(output, accessor.invoke(object), component.getType());
             }
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
@@ -35,7 +35,7 @@ public class RecordSerializer<T extends Record> extends Serializer<T> {
         Object[] args = new Object[recordComponents.length];
         for (int i = 0; i < args.length; i++) {
             RecordComponent component = recordComponents[i];
-            args[i] = kryo.readObjectOrNull(input, component.getType(), kryo.getSerializer(component.getType()));
+            args[i] = kryo.readObjectOrNull(input, component.getType());
         }
         try {
             Constructor<T> constructor = type.getConstructor(Stream.of(recordComponents).map(RecordComponent::getType).toArray(Class[]::new));

@@ -8,7 +8,6 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.Movebox;
 import com.etherblood.luna.engine.OwnedBy;
-import com.etherblood.luna.engine.Player;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
@@ -27,7 +26,6 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(GameEvent.class, new RecordSerializer<GameEvent>());
         kryo.register(PlayerInput.class, new RecordSerializer<PlayerInput>());
 
-        kryo.register(Player.class, new RecordSerializer<>());
         kryo.register(OwnedBy.class, new RecordSerializer<>());
         kryo.register(Position.class, new RecordSerializer<>());
         kryo.register(Speed.class, new RecordSerializer<>());

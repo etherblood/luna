@@ -5,7 +5,7 @@ import com.etherblood.luna.engine.PlayerInput;
 
 public interface GameProxy {
 
-    GameEngine getEngine();
+    GameEngine getEngineSnapshot();
 
     void requestInput(PlayerInput input);
 

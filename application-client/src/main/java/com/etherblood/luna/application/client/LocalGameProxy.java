@@ -22,7 +22,7 @@ public class LocalGameProxy implements GameProxy {
     }
 
     @Override
-    public GameEngine getEngine() {
+    public GameEngine getEngineSnapshot() {
         return engine;
     }
 

@@ -19,8 +19,8 @@ public class RemoteGameProxy implements GameProxy {
     }
 
     @Override
-    public GameEngine getEngine() {
-        return gameModule.getState();
+    public GameEngine getEngineSnapshot() {
+        return gameModule.getStateSnapshot();
     }
 
     @Override

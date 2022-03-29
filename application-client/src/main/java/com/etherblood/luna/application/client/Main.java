@@ -23,10 +23,10 @@ import java.util.Date;
 public class Main {
 
     public static void main(String... args) throws IOException {
-        runRemote(1);
+        new ApplicationClient(localProxy()).start();
     }
 
-    private static void runRemote(int player) throws IOException {
+    static GameProxy remoteProxy(int player) throws IOException {
 //        Log.DEBUG();
         Log.info(new Date().toString());// time reference for kryo logs
         Client client = new Client(10_000, 10_000);
@@ -40,11 +40,11 @@ public class Main {
         client.start();
         client.connect(10_000, "localhost", NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 
-        new ApplicationClient(new RemoteGameProxy(timestampModule, gameModule, player)).start();
+        return new RemoteGameProxy(timestampModule, gameModule, player);
 
     }
 
-    private static void runLocal() {
+    static GameProxy localProxy() {
         GameEngine game = GameRules.getDefault().createGame();
 
         EntityData data = game.getData();
@@ -57,6 +57,6 @@ public class Main {
         data.set(character, new ActorState(ActorAction.IDLE, Direction.RIGHT, 0));
         data.set(character, Direction.RIGHT);
 
-        new ApplicationClient(new LocalGameProxy(game, player, 60)).start();
+        return new LocalGameProxy(game, player, 60);
     }
 }
