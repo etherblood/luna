@@ -57,6 +57,6 @@ public class Main {
         data.set(character, new ActorState(ActorAction.IDLE, Direction.RIGHT, 0));
         data.set(character, Direction.RIGHT);
 
-        new ApplicationClient(new LocalGameProxy(game, player)).start();
+        new ApplicationClient(new LocalGameProxy(game, player, 60)).start();
     }
 }

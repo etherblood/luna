@@ -9,13 +9,16 @@ import java.util.stream.Collectors;
 
 public class LocalGameProxy implements GameProxy {
 
+    private static final long MILLIS_PER_SECOND = 1000;
     private final GameEngine engine;
     private final int playerId;
     private final Set<PlayerInput> pendingInputs = new HashSet<>();
+    private final long fps;
 
-    public LocalGameProxy(GameEngine engine, int playerId) {
+    public LocalGameProxy(GameEngine engine, int playerId, long fps) {
         this.engine = engine;
         this.playerId = playerId;
+        this.fps = fps;
     }
 
     @Override
@@ -35,8 +38,9 @@ public class LocalGameProxy implements GameProxy {
 
     @Override
     public void update() {
-        // TODO: check if it is time to tick
-        engine.tick(pendingInputs.stream().map(x -> new GameEvent(x)).collect(Collectors.toSet()));
-        pendingInputs.clear();
+        while (engine.getStartEpochMillis() + MILLIS_PER_SECOND * engine.getFrame() / fps <= System.currentTimeMillis()) {
+            engine.tick(pendingInputs.stream().map(x -> new GameEvent(x)).collect(Collectors.toSet()));
+            pendingInputs.clear();
+        }
     }
 }
