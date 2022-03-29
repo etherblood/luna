@@ -1,35 +1,15 @@
 package com.etherblood.luna.application.client;
 
 import com.etherblood.luna.engine.GameEngine;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.etherblood.luna.engine.PlayerInput;
 
-public class GameProxy {
+public interface GameProxy {
 
-    private final GameEngine engine;
-    private final int playerId;
-    private final Map<Integer, Set<Object>> pendingInputs = new HashMap<>();
+    GameEngine getEngine();
 
-    public GameProxy(GameEngine engine, int playerId) {
-        this.engine = engine;
-        this.playerId = playerId;
-    }
+    void requestInput(PlayerInput input);
 
-    public GameEngine getEngine() {
-        return engine;
-    }
+    int getPlayer();
 
-    public void requestInput(Set<Object> input) {
-        pendingInputs.put(playerId, input);
-    }
-
-    public void tick() {
-        engine.tick(pendingInputs);
-        pendingInputs.clear();
-    }
-
-    public int getPlayer() {
-        return playerId;
-    }
+    void update();
 }

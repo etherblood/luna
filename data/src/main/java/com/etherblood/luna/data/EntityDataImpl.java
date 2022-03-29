@@ -1,9 +1,10 @@
 package com.etherblood.luna.data;
 
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class EntityDataImpl implements EntityData {
@@ -12,13 +13,22 @@ public class EntityDataImpl implements EntityData {
     private int nextEntity;
 
     public EntityDataImpl(Set<Class<?>> types) {
+        this(types, 1);
+    }
+
+    public EntityDataImpl(Set<Class<?>> types, int nextEntity) {
         data = types.stream().collect(Collectors.toMap(t -> t, t -> new ComponentTable<>()));
-        nextEntity = 1;
+        this.nextEntity = nextEntity;
     }
 
     @Override
     public int createEntity() {
         return nextEntity++;
+    }
+
+    @Override
+    public int peekNextEntity() {
+        return nextEntity;
     }
 
     @Override
@@ -48,7 +58,8 @@ public class EntityDataImpl implements EntityData {
 
     @Override
     public Set<Class<?>> getRegisteredClasses() {
-        return Collections.unmodifiableSet(data.keySet());
+        return data.keySet().stream()
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Class::getName))));
     }
 
     @SuppressWarnings("unchecked")

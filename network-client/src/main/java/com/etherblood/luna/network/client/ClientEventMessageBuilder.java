@@ -6,24 +6,24 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClientEventMessageBuilder<T> {
+public class ClientEventMessageBuilder {
 
     private long seq = 0;
     private long ack = -1;
-    private final Map<EventMessagePart<T>, Long> pendingQueue = new HashMap<>();
+    private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
 
-    public void enqueueAction(EventMessagePart<T> part) {
+    public synchronized void enqueueAction(EventMessagePart part) {
         pendingQueue.put(part, seq);
     }
 
-    public void updateAck(EventMessage<T> message) {
+    public synchronized void updateAck(EventMessage message) {
         ack = Math.max(ack, message.seq());
         pendingQueue.values().removeIf(x -> x <= message.ack());
     }
 
-    public EventMessage<T> build() {
-        EventMessage<T> result = new EventMessage<>(seq, ack, pendingQueue.keySet().stream()
+    public synchronized EventMessage build() {
+        EventMessage result = new EventMessage(seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;

@@ -10,9 +10,9 @@ public class UpdateActionSystem implements GameSystem {
             ActorState state = data.get(entity, ActorState.class);
             int player = data.get(entity, OwnedBy.class).player();
             PlayerInput input = data.get(player, PlayerInput.class);
-            if ((input.action() != ActorAction.IDLE && state.action() != input.action() && state.action().isInterruptible())
-                    || (state.action() == input.action() && state.action().isTurnable() && state.direction() != input.direction())) {
-                data.set(entity, new ActorState(input.action(), input.direction(), engine.getTick()));
+            if (input != null && ((input.action() != ActorAction.IDLE && state.action() != input.action() && state.action().isInterruptible())
+                    || (state.action() == input.action() && state.action().isTurnable() && state.direction() != input.direction()))) {
+                data.set(entity, new ActorState(input.action(), input.direction(), engine.getFrame()));
             }
         }
     }

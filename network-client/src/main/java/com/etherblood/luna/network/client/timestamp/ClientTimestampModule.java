@@ -7,6 +7,7 @@ import com.etherblood.luna.network.api.timestamp.TimestampPong;
 
 public class ClientTimestampModule extends SharedTimestampModule {
 
+    private final Connection connection;
     private final Object lock = new Object();
     private final long[] deltas;
     private final int intervalMillis;
@@ -15,7 +16,8 @@ public class ClientTimestampModule extends SharedTimestampModule {
     private long requestMillis = 0;
     private boolean pending = false;
 
-    public ClientTimestampModule(int bufferSize, int intervalMillis) {
+    public ClientTimestampModule(Connection connection, int bufferSize, int intervalMillis) {
+        this.connection = connection;
         this.deltas = new long[bufferSize];
         this.intervalMillis = intervalMillis;
     }
@@ -23,7 +25,7 @@ public class ClientTimestampModule extends SharedTimestampModule {
     /**
      * this should be called regularly, it will ping the server if required
      */
-    public void run(Connection connection) {
+    public void run() {
         if (requestMillis + intervalMillis <= System.currentTimeMillis()) {
             pending = true;
             requestMillis = System.currentTimeMillis();

@@ -2,35 +2,34 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.data.EntityDataImpl;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class GameEngine {
 
     private final GameRules rules;
+    private final long startEpochMillis;
     private long tick;
     private final EntityData data;
     private final List<GameSystem> systems;
 
-    public GameEngine(GameRules rules) {
-        this(rules, new EntityDataImpl(rules.getComponentTypes()), rules.getSystems());
+    public GameEngine(GameRules rules, long startEpochMillis, long tick) {
+        this(rules, startEpochMillis, new EntityDataImpl(rules.getComponentTypes()), tick);
     }
 
-    public GameEngine(GameRules rules, EntityData data, List<GameSystem> systems) {
+    public GameEngine(GameRules rules, long startEpochMillis, EntityData data, long tick) {
         this.rules = rules;
+        this.startEpochMillis = startEpochMillis;
         this.data = data;
-        this.systems = systems;
-        tick = 0;
+        this.systems = rules.getSystems();
+        this.tick = tick;
     }
 
-    public void tick(Map<Integer, Set<Object>> playerActions) {
-        for (Map.Entry<Integer, Set<Object>> entry : playerActions.entrySet()) {
-            int player = entry.getKey();
-            for (Object object : entry.getValue()) {
-                if (object instanceof PlayerInput input) {
-                    data.set(player, input);
-                }
+    public void tick(Collection<GameEvent> events) {
+        for (GameEvent event : events) {
+            if (event.input() != null) {
+                int player = event.input().player();
+                data.set(player, event.input());
             }
         }
         tick++;
@@ -43,11 +42,16 @@ public class GameEngine {
         return rules;
     }
 
-    public long getTick() {
+    public long getFrame() {
         return tick;
     }
 
     public EntityData getData() {
         return data;
     }
+
+    public long getStartEpochMillis() {
+        return startEpochMillis;
+    }
+
 }

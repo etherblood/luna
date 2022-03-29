@@ -2,8 +2,6 @@ package com.etherblood.lunia.application.server;
 
 import com.destrostudios.authtoken.JwtService;
 import com.destrostudios.authtoken.NoValidateJwtService;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.data.EntityData;
@@ -11,6 +9,7 @@ import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.GameLoop;
 import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.Movebox;
 import com.etherblood.luna.engine.OwnedBy;
@@ -18,18 +17,21 @@ import com.etherblood.luna.engine.Player;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
+import com.etherblood.luna.network.api.NetworkModule;
+import com.etherblood.luna.network.api.NetworkUtil;
+import com.etherblood.luna.network.server.ServerGameModule;
+import com.etherblood.luna.network.server.timestamp.ServerTimestampModule;
+import java.io.IOException;
 import java.util.Date;
 
 public class Main {
-    public static void main(String... args) {
-        Log.DEBUG();
+    public static void main(String... args) throws IOException {
+//        Log.DEBUG();
         Log.info(new Date().toString());// time reference for kryo logs
         System.err.println("WARNING: Using jwt service without validation.");
         JwtService jwtService = new NoValidateJwtService();
 
         System.out.println("Unsafe access warnings are a known issue, see: https://github.com/EsotericSoftware/kryonet/issues/154");
-
-        Server kryoServer = new Server(10_000_000, 10_000_000);
 
         GameEngine game = GameRules.getDefault().createGame();
         EntityData data = game.getData();
@@ -42,6 +44,7 @@ public class Main {
         data.set(character1, new Position(0, 0));
         data.set(character1, new Speed(0, 0));
         data.set(character1, new ActorState(ActorAction.IDLE, Direction.RIGHT, 0));
+        data.set(character1, Direction.RIGHT);
 
 
         int player2 = data.createEntity();
@@ -52,23 +55,23 @@ public class Main {
         data.set(character2, new Position(10000, 0));
         data.set(character2, new Speed(0, 0));
         data.set(character2, new ActorState(ActorAction.IDLE, Direction.LEFT, 0));
+        data.set(character2, Direction.RIGHT);
 
-        Server server = new Server();
-        server.addListener(new Listener() {
-            @Override
-            public void connected(Connection connection) {
+        Server server = new Server(10_0000, 10_000);
 
-            }
+        ServerTimestampModule timestampModule = new ServerTimestampModule();
+        NetworkModule.addModule(server, timestampModule);
 
-            @Override
-            public void disconnected(Connection connection) {
+        ServerGameModule gameModule = new ServerGameModule(game);
+        NetworkModule.addModule(server, gameModule);
 
-            }
+        server.start();
+        server.bind(NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 
-            @Override
-            public void received(Connection connection, Object object) {
-
-            }
+        int fps = 60;
+        GameLoop loop = new GameLoop(fps, () -> {
+            gameModule.tick();
         });
+        loop.run();
     }
 }

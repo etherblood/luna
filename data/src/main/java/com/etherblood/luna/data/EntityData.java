@@ -7,6 +7,8 @@ public interface EntityData {
 
     int createEntity();
 
+    int peekNextEntity();
+
     <T> T get(int entity, Class<T> type);
 
     <T> void set(int entity, T value); // type is value.getClass()

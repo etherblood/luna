@@ -13,6 +13,7 @@ public class GameRules {
         RULES_MAP = Map.of(DEFAULT_RULES_ID, new GameRules(
                 DEFAULT_RULES_ID,
                 Set.of(
+                        Player.class,
                         Position.class,
                         Speed.class,
                         Movebox.class,
@@ -47,7 +48,7 @@ public class GameRules {
     }
 
     public GameEngine createGame() {
-        return new GameEngine(this);
+        return new GameEngine(this, System.currentTimeMillis(), 0);
     }
 
     public String getId() {

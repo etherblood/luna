@@ -6,33 +6,33 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerEventMessageBuilder<T> {
+public class ServerEventMessageBuilder {
 
     // TODO: also send latest locked frame index to clients
 
     private long seq = 0;
     private long ack = -1;
-    private final Map<EventMessagePart<T>, Long> pendingQueue = new HashMap<>();
+    private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
-    public void ackAndBroadcast(EventMessage<T> message) {
+    public void ackAndBroadcast(EventMessage message) {
         updateAck(message);
         broadcast(message.parts());
     }
 
-    public void updateAck(EventMessage<T> message) {
+    public synchronized void updateAck(EventMessage message) {
         ack = Math.max(ack, message.seq());
         pendingQueue.values().removeIf(x -> x <= message.ack());
     }
 
     @SafeVarargs
-    public final void broadcast(EventMessagePart<T>... parts) {
-        for (EventMessagePart<T> part : parts) {
+    public synchronized final void broadcast(EventMessagePart... parts) {
+        for (EventMessagePart part : parts) {
             pendingQueue.putIfAbsent(part, seq);
         }
     }
 
-    public EventMessage<T> build() {
-        EventMessage<T> result = new EventMessage<>(seq, ack, pendingQueue.keySet().stream()
+    public synchronized EventMessage build() {
+        EventMessage result = new EventMessage(seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;

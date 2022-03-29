@@ -1,4 +1,4 @@
-package com.etherblood.luna.network.api;
+package com.etherblood.luna.network.api.serialization;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;

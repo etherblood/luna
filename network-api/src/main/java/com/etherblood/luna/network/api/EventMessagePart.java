@@ -1,7 +1,9 @@
 package com.etherblood.luna.network.api;
 
-public record EventMessagePart<T>(
+import com.etherblood.luna.engine.GameEvent;
+
+public record EventMessagePart(
         long frame,
-        T event
+        GameEvent event
 ) {
 }

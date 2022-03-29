@@ -251,7 +251,6 @@ public class ApplicationClient extends Application {
             Direction direction = data.get(character, Direction.class);
             if (direction != null) {
                 float angle1 = directionToAngle(direction);
-//                System.out.println(angle1);
                 AxisAngle4f angle = new AxisAngle4f(angle1, 0, 1, 0);
                 nodeAmara.setLocalRotation(new Quaternionf(angle));
             }
@@ -267,8 +266,8 @@ public class ApplicationClient extends Application {
             AnimationControl a = (AnimationControl) nodeAmara.getControls().iterator().next();
             a.play(nextAnimation);
         }
-        gameProxy.requestInput(toInput(pressedKeys));
-        gameProxy.tick();// TODO: this needs to happen at a fixed framerate and should be taken care of externally
+        gameProxy.requestInput(toInput(player, pressedKeys));
+        gameProxy.update();
 
         long frameSecond = Math.floorDiv(System.nanoTime(), 1_000_000_000L);
         if (runningFrameSecond != frameSecond) {
@@ -285,11 +284,11 @@ public class ApplicationClient extends Application {
     }
 
     private Vector3f convert(Vector2 vector) {
-        float milli = 0.0001f;
+        float milli = 0.001f;
         return new Vector3f(vector.x() * milli, 0, vector.y() * milli);
     }
 
-    private static Set<Object> toInput(Set<Integer> keyCodes) {
+    private static PlayerInput toInput(int player, Set<Integer> keyCodes) {
         int x = 0;
         int y = 0;
         if (keyCodes.contains(GLFW.GLFW_KEY_UP)) {
@@ -304,7 +303,7 @@ public class ApplicationClient extends Application {
         if (keyCodes.contains(GLFW.GLFW_KEY_LEFT)) {
             x--;
         }
-        return Set.of(new PlayerInput(Direction.of(x, y), ActorAction.IDLE));
+        return new PlayerInput(player, Direction.of(x, y), ActorAction.IDLE);
     }
 
 }
