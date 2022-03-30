@@ -8,13 +8,18 @@ import java.util.Map;
 
 public class ClientEventMessageBuilder {
 
+    private long lockFrame = -1;
     private long seq = 0;
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
 
     public synchronized void enqueueAction(EventMessagePart part) {
+        if (part.frame() < lockFrame) {
+            throw new IllegalStateException();
+        }
         pendingQueue.put(part, seq);
+        lockFrame = part.frame();
     }
 
     public synchronized void updateAck(EventMessage message) {
@@ -23,7 +28,7 @@ public class ClientEventMessageBuilder {
     }
 
     public synchronized EventMessage build() {
-        EventMessage result = new EventMessage(seq, ack, pendingQueue.keySet().stream()
+        EventMessage result = new EventMessage(lockFrame, seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;

@@ -10,6 +10,7 @@ public class ServerEventMessageBuilder {
 
     // TODO: also send latest locked frame index to clients
 
+    private long lockFrame = -1;
     private long seq = 0;
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
@@ -24,15 +25,23 @@ public class ServerEventMessageBuilder {
         pendingQueue.values().removeIf(x -> x <= message.ack());
     }
 
-    @SafeVarargs
-    public synchronized final void broadcast(EventMessagePart... parts) {
+    public synchronized void broadcast(EventMessagePart... parts) {
         for (EventMessagePart part : parts) {
-            pendingQueue.putIfAbsent(part, seq);
+            if (part.frame() >= lockFrame) {
+                pendingQueue.putIfAbsent(part, seq);
+            }
         }
     }
 
+    public synchronized void lockFrame(long lockFrame) {
+        if (lockFrame < this.lockFrame) {
+            throw new IllegalArgumentException();
+        }
+        this.lockFrame = lockFrame;
+    }
+
     public synchronized EventMessage build() {
-        EventMessage result = new EventMessage(seq, ack, pendingQueue.keySet().stream()
+        EventMessage result = new EventMessage(lockFrame, seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;

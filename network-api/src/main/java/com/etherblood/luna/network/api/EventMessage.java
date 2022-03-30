@@ -3,6 +3,7 @@ package com.etherblood.luna.network.api;
 import java.util.Arrays;
 
 public record EventMessage(
+        long lockFrame,
         long seq,
         long ack,
         EventMessagePart[] parts
@@ -10,7 +11,8 @@ public record EventMessage(
     @Override
     public String toString() {
         return "EventMessage{" +
-                "seq=" + seq +
+                "lockFrame=" + lockFrame +
+                ", seq=" + seq +
                 ", ack=" + ack +
                 ", parts=" + Arrays.toString(parts) +
                 '}';
@@ -21,10 +23,15 @@ public record EventMessage(
         if (this == o) {
             return true;
         }
-        if (!(o instanceof EventMessage that)) {
+        if (!(o instanceof EventMessage)) {
             return false;
         }
 
+        EventMessage that = (EventMessage) o;
+
+        if (lockFrame != that.lockFrame) {
+            return false;
+        }
         if (seq != that.seq) {
             return false;
         }
@@ -36,7 +43,8 @@ public record EventMessage(
 
     @Override
     public int hashCode() {
-        int result = Long.hashCode(seq);
+        int result = Long.hashCode(lockFrame);
+        result = 31 * result + Long.hashCode(seq);
         result = 31 * result + Long.hashCode(ack);
         result = 31 * result + Arrays.hashCode(parts);
         return result;

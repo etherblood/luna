@@ -8,12 +8,12 @@ import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import com.etherblood.luna.network.api.GameModule;
 import com.etherblood.luna.network.api.PlaybackBuffer;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ClientGameModule extends GameModule {
 
     public static final int MILLIS_PER_SECOND = 1000;
-    private AtomicReference<GameEngine> stateReference = new AtomicReference<>(null);
+    private GameEngine state = null;
+    private long serverFrame = -1;
     private final ClientEventMessageBuilder builder = new ClientEventMessageBuilder();
     private final PlaybackBuffer buffer = new PlaybackBuffer();
     private final int delayFrames = 2;
@@ -27,45 +27,43 @@ public class ClientGameModule extends GameModule {
     public synchronized void received(Connection connection, Object object) {
         if (object instanceof GameEngine state) {
             System.out.println("received: " + state);
-            stateReference.set(state);
+            this.state = state;
         } else if (object instanceof EventMessage message) {
             builder.updateAck(message);
             for (EventMessagePart part : message.parts()) {
                 buffer.buffer(part.frame(), part.event());
             }
-            // TODO: apply latest locked frame/clear frame
+            for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
+                state.tick(buffer.peek(frame));
+                buffer.clear(frame);
+            }
         }
     }
 
     public synchronized void input(GameEvent event) {
-        GameEngine state = stateReference.get();
-        if (state != null) {
-            builder.enqueueAction(new EventMessagePart(state.getFrame() + delayFrames, event));
-        }
+        builder.enqueueAction(new EventMessagePart(serverFrame + delayFrames, event));
     }
 
     public synchronized void run(long servertime, int fps) {
-        // TODO: fps should be taken from game settings?
-        GameEngine state = stateReference.get();
-        if (state != null) {
-            boolean stepped = false;
-            while (state.getStartEpochMillis() + MILLIS_PER_SECOND * state.getFrame() / fps <= servertime) {
-                long frame = state.getFrame();
-                state.tick(buffer.peek(frame));
-                buffer.clear(frame);
-                stepped = true;
-            }
-            if (stepped) {
-                connection.sendUDP(builder.build());
-            }
+        long nextFrame = (servertime - state.getStartEpochMillis()) * fps / MILLIS_PER_SECOND;
+        if (nextFrame != serverFrame) {
+            serverFrame = nextFrame;
+            connection.sendUDP(builder.build());
         }
     }
 
     public synchronized GameEngine getStateSnapshot() {
+        if (state == null) {
+            return null;
+        }
         Kryo kryo = new Kryo();
+        kryo.setReferences(false);
+        kryo.setCopyReferences(false);
         initialize(kryo);
-        GameEngine engine = stateReference.get();
-        GameEngine copy = kryo.copy(engine);
+        GameEngine copy = kryo.copy(state);
+        for (long frame = state.getFrame(); frame < serverFrame; frame++) {
+            copy.tick(buffer.peek(frame));
+        }
         return copy;
     }
 }

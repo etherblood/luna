@@ -58,6 +58,7 @@ public class ServerGameModule extends GameModule {
         for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
             Connection connection = connections.get(entry.getKey());
             ServerEventMessageBuilder builder = builders.get(entry.getKey());
+            builder.lockFrame(frame);
             connection.sendUDP(builder.build());
         }
     }

@@ -10,6 +10,7 @@ import com.etherblood.luna.network.api.EventMessagePart;
 public class EventMessageSerializer extends CopySerializer<EventMessage> {
     @Override
     public void write(Kryo kryo, Output output, EventMessage object) {
+        output.writeLong(object.lockFrame());
         output.writeLong(object.seq());
         output.writeLong(object.ack());
         output.writeInt(object.parts().length);
@@ -22,6 +23,7 @@ public class EventMessageSerializer extends CopySerializer<EventMessage> {
 
     @Override
     public EventMessage read(Kryo kryo, Input input, Class type) {
+        long lockFrame = input.readLong();
         long seq = input.readLong();
         long ack = input.readLong();
         int length = input.readInt();
@@ -30,6 +32,6 @@ public class EventMessageSerializer extends CopySerializer<EventMessage> {
         for (int i = 0; i < length; i++) {
             parts[i] = new EventMessagePart(input.readLong(), kryo.readObject(input, GameEvent.class));
         }
-        return new EventMessage(seq, ack, parts);
+        return new EventMessage(lockFrame, seq, ack, parts);
     }
 }
