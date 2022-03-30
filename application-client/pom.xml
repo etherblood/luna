@@ -11,6 +11,14 @@
 
     <artifactId>application-client</artifactId>
 
+    <profiles>
+        <profile>
+            <id>lwjgl-natives-windows-amd64</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <plugin>
