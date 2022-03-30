@@ -23,7 +23,7 @@ public class Main {
         }
         new ApplicationClient(remoteProxy("destrostudios.com", args[0])).start();
     }
-    
+
     static GameProxy remoteProxy(String host, String jwt) throws IOException {
 //        Log.DEBUG();
         Log.info(new Date().toString());// time reference for kryo logs
