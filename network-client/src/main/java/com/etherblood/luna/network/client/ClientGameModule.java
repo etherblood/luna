@@ -32,7 +32,8 @@ public class ClientGameModule extends GameModule {
             builder.updateAck(message);
             for (EventMessagePart part : message.parts()) {
                 if (!buffer.buffer(part.frame(), part.event())) {
-                    //TODO
+                    //TODO can this even happen?
+                    System.out.println("event dropped on frame " + part.frame());
                 }
             }
             for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {

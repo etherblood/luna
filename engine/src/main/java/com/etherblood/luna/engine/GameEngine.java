@@ -26,6 +26,7 @@ public class GameEngine {
     }
 
     public void tick(Collection<GameEvent> events) {
+        // TODO: make sure order of events does not matter!
         for (GameEvent event : events) {
             if (event.input() != null) {
                 long player = event.input().player();

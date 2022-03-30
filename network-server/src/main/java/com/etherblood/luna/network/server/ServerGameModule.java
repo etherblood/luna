@@ -50,13 +50,20 @@ public class ServerGameModule extends GameModule {
                         other.broadcast(new EventMessagePart(part.frame(), part.event()));
                     }
                 } else {
-                    // TODO
+                    // TODO better solution for late inputs...
+                    int skips = 1;
+                    while (!buffer.buffer(part.frame() + skips, part.event())) {
+                        skips++;
+                    }
+                    for (ServerEventMessageBuilder other : builders.values()) {
+                        other.broadcast(new EventMessagePart(part.frame() + skips, part.event()));
+                    }
                 }
             }
         }
         if (object instanceof Login login) {
             JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt).user;
-            int joinDelay = 120;
+            int joinDelay = 60;
             long frame = state.getFrame() + joinDelay;
             GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
             buffer.buffer(frame, event);
