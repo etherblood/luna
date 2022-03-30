@@ -1,5 +1,6 @@
 package com.etherblood.luna.application.client;
 
+import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
@@ -10,9 +11,9 @@ public class RemoteGameProxy implements GameProxy {
 
     private final ClientTimestampModule timestampModule;
     private final ClientGameModule gameModule;
-    private final int player;
+    private final JwtAuthenticationUser player;
 
-    public RemoteGameProxy(ClientTimestampModule timestampModule, ClientGameModule gameModule, int player) {
+    public RemoteGameProxy(ClientTimestampModule timestampModule, ClientGameModule gameModule, JwtAuthenticationUser player) {
         this.timestampModule = timestampModule;
         this.gameModule = gameModule;
         this.player = player;
@@ -25,11 +26,11 @@ public class RemoteGameProxy implements GameProxy {
 
     @Override
     public void requestInput(PlayerInput input) {
-        gameModule.input(new GameEvent(input));
+        gameModule.input(new GameEvent(input, null));
     }
 
     @Override
-    public int getPlayer() {
+    public JwtAuthenticationUser getPlayer() {
         return player;
     }
 
@@ -39,5 +40,10 @@ public class RemoteGameProxy implements GameProxy {
 
         long approxServerTime = timestampModule.getApproxServerTime();
         gameModule.run(approxServerTime, 60);
+    }
+
+    @Override
+    public long getLatency() {
+        return timestampModule.getLatency();
     }
 }

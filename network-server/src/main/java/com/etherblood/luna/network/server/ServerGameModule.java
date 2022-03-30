@@ -1,8 +1,12 @@
 package com.etherblood.luna.network.server;
 
+import com.destrostudios.authtoken.JwtAuthenticationUser;
+import com.destrostudios.authtoken.NoValidateJwtService;
+import com.destrostudios.gametools.network.shared.modules.jwt.messages.Login;
 import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
+import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import com.etherblood.luna.network.api.GameModule;
@@ -45,7 +49,19 @@ public class ServerGameModule extends GameModule {
                     for (ServerEventMessageBuilder other : builders.values()) {
                         other.broadcast(new EventMessagePart(part.frame(), part.event()));
                     }
+                } else {
+                    // TODO
                 }
+            }
+        }
+        if (object instanceof Login login) {
+            JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt).user;
+            int joinDelay = 120;
+            long frame = state.getFrame() + joinDelay;
+            GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
+            buffer.buffer(frame, event);
+            for (ServerEventMessageBuilder builder : builders.values()) {
+                builder.broadcast(new EventMessagePart(frame, event));
             }
         }
     }

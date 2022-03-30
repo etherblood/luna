@@ -28,8 +28,37 @@ public class GameEngine {
     public void tick(Collection<GameEvent> events) {
         for (GameEvent event : events) {
             if (event.input() != null) {
-                int player = event.input().player();
-                data.set(player, event.input());
+                long player = event.input().player();
+                for (int entity : data.findByValue(new OwnedBy(player))) {
+                    data.set(entity, event.input());
+                }
+            }
+            if (event.join() != null) {
+                if (event.join().enter()) {
+                    if (data.findByValue(new PlayerId(event.join().playerId())).isEmpty()) {
+                        int player = data.createEntity();
+                        data.set(player, new PlayerId(event.join().playerId()));
+                        data.set(player, new PlayerName(event.join().playerName()));
+                        int character = data.createEntity();
+                        data.set(character, new OwnedBy(event.join().playerId()));
+                        data.set(character, new Movebox(new Rectangle(-250, -250, 500, 500)));
+                        data.set(character, new Position(0, 0));
+                        data.set(character, new Speed(0, 0));
+                        data.set(character, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
+                        data.set(character, Direction.RIGHT);
+                    }
+                } else {
+//                    List<Integer> playerEntities = data.findByValue(new PlayerId(event.join().playerId()));
+//                    List<Integer> characterEntities = data.findByValue(new OwnedBy(event.join().playerId()));
+//                    for (Class<?> component : data.getRegisteredClasses()) {
+//                        for (Integer entity : playerEntities) {
+//                            data.remove(entity, component);
+//                        }
+//                        for (Integer entity : characterEntities) {
+//                            data.remove(entity, component);
+//                        }
+//                    }
+                }
             }
         }
         tick++;

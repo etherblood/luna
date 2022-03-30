@@ -1,5 +1,6 @@
 package com.etherblood.luna.application.client;
 
+import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
@@ -11,13 +12,13 @@ public class LocalGameProxy implements GameProxy {
 
     private static final long MILLIS_PER_SECOND = 1000;
     private final GameEngine engine;
-    private final int playerId;
+    private final JwtAuthenticationUser player;
     private final Set<PlayerInput> pendingInputs = new HashSet<>();
     private final long fps;
 
-    public LocalGameProxy(GameEngine engine, int playerId, long fps) {
+    public LocalGameProxy(GameEngine engine, JwtAuthenticationUser player, long fps) {
         this.engine = engine;
-        this.playerId = playerId;
+        this.player = player;
         this.fps = fps;
     }
 
@@ -32,15 +33,20 @@ public class LocalGameProxy implements GameProxy {
     }
 
     @Override
-    public int getPlayer() {
-        return playerId;
+    public JwtAuthenticationUser getPlayer() {
+        return player;
     }
 
     @Override
     public void update() {
         while (engine.getStartEpochMillis() + MILLIS_PER_SECOND * engine.getFrame() / fps <= System.currentTimeMillis()) {
-            engine.tick(pendingInputs.stream().map(x -> new GameEvent(x)).collect(Collectors.toSet()));
+            engine.tick(pendingInputs.stream().map(x -> new GameEvent(x, null)).collect(Collectors.toSet()));
             pendingInputs.clear();
         }
+    }
+
+    @Override
+    public long getLatency() {
+        return 0;
     }
 }

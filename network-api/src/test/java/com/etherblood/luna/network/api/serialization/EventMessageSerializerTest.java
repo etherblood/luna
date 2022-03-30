@@ -21,8 +21,8 @@ public class EventMessageSerializerTest {
         kryo.register(PlayerInput.class, new RecordSerializer<PlayerInput>());
 
         EventMessage message = new EventMessage(9, 15, 25, new EventMessagePart[]{
-                new EventMessagePart(19, new GameEvent(null)),
-                new EventMessagePart(20, new GameEvent(new PlayerInput(13, Direction.DOWN_LEFT, ActorAction.DASH)))
+                new EventMessagePart(19, new GameEvent(null, null)),
+                new EventMessagePart(20, new GameEvent(new PlayerInput(13, Direction.DOWN_LEFT, ActorAction.DASH), null))
         });
 
         EventMessage copy = kryo.copy(message);

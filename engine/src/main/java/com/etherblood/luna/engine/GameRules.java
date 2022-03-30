@@ -19,7 +19,9 @@ public class GameRules {
                         OwnedBy.class,
                         ActorState.class,
                         PlayerInput.class,
-                        Direction.class
+                        Direction.class,
+                        PlayerId.class,
+                        PlayerName.class
                 ),
                 List.of(
                         new ApplyActionSystem(),

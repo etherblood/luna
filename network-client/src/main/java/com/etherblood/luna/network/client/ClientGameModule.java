@@ -31,7 +31,9 @@ public class ClientGameModule extends GameModule {
         } else if (object instanceof EventMessage message) {
             builder.updateAck(message);
             for (EventMessagePart part : message.parts()) {
-                buffer.buffer(part.frame(), part.event());
+                if (!buffer.buffer(part.frame(), part.event())) {
+                    //TODO
+                }
             }
             for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
                 state.tick(buffer.peek(frame));

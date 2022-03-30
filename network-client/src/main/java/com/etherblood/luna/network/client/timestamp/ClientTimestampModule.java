@@ -15,6 +15,7 @@ public class ClientTimestampModule extends SharedTimestampModule {
     private long requestId = 0;
     private long requestMillis = 0;
     private boolean pending = false;
+    private long latency = 0;
 
     public ClientTimestampModule(Connection connection, int bufferSize, int intervalMillis) {
         this.connection = connection;
@@ -59,13 +60,18 @@ public class ClientTimestampModule extends SharedTimestampModule {
         if (object instanceof TimestampPong pong) {
             if (pending && pong.requestId() == requestId) {
                 pending = false;
-                long delta = pong.timestamp() - (System.currentTimeMillis() + requestMillis) / 2;
+                long currentTimeMillis = System.currentTimeMillis();
+                long delta = pong.timestamp() - (currentTimeMillis + requestMillis) / 2;
                 synchronized (lock) {
                     deltas[deltaCount % deltas.length] = delta;
                     deltaCount++;
+                    latency = currentTimeMillis - requestMillis;
                 }
             }
         }
     }
 
+    public long getLatency() {
+        return latency;
+    }
 }

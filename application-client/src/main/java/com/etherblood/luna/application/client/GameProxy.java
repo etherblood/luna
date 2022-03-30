@@ -1,5 +1,6 @@
 package com.etherblood.luna.application.client;
 
+import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.PlayerInput;
 
@@ -9,7 +10,9 @@ public interface GameProxy {
 
     void requestInput(PlayerInput input);
 
-    int getPlayer();
+    JwtAuthenticationUser getPlayer();
 
     void update();
+
+    long getLatency();
 }

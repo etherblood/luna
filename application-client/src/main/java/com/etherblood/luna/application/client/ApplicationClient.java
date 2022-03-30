@@ -6,6 +6,8 @@ import com.destrostudios.icetea.core.camera.systems.CameraKeyMoveSystem;
 import com.destrostudios.icetea.core.camera.systems.CameraMouseRotateSystem;
 import com.destrostudios.icetea.core.collision.CollisionResult;
 import com.destrostudios.icetea.core.collision.Ray;
+import com.destrostudios.icetea.core.font.BitmapFont;
+import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
 import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Box;
@@ -20,7 +22,10 @@ import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.OwnedBy;
+import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
+import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Vector2;
@@ -50,10 +55,12 @@ public class ApplicationClient extends Application {
     private Geometry geometryBounds;
     private Node nodeCollisions;
     private final GameProxy gameProxy;
+    private BitmapText screenStatsText;
 
     private long runningFrameSecond;
     private int runningFrameCount;
     private int frameCount;
+    private BitmapFont bitmapFont;
 
     public ApplicationClient(GameProxy gameProxy) {
         super();
@@ -64,7 +71,7 @@ public class ApplicationClient extends Application {
     @Override
     protected void initScene() {
         long nanos = System.nanoTime();
-        GLFW.glfwSetWindowTitle(getWindow(), "Player " + gameProxy.getPlayer());
+        GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
         assetManager.addLocator(new FileLocator("./assets"));
 
         DirectionalLight directionalLight = new DirectionalLight();
@@ -84,6 +91,14 @@ public class ApplicationClient extends Application {
                 "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                 "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
         });
+
+        // text
+
+        bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
+
+        screenStatsText = new BitmapText(bitmapFont, "Hello World.");
+        screenStatsText.move(new Vector3f(0, 0, 1));
+        guiNode.add(screenStatsText);
 
 
         // Ground
@@ -213,7 +228,19 @@ public class ApplicationClient extends Application {
                 Node model = (Node) assetManager.loadModel("models/amara/amara.gltf");
                 model.scale(new Vector3f(0.01f, 0.01f, 0.01f));
                 model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
-                models.put(entity, new ModelWrapper(entity, model, List.of("attack1", "attack2", "idle", "walk")));
+
+                long owner = data.get(entity, OwnedBy.class).playerId();
+                int playerEntity = data.findByValue(new PlayerId(owner)).get(0);
+                String playerName = data.get(playerEntity, PlayerName.class).name();
+
+                BitmapText nameText = null;
+//                BitmapText nameText = new BitmapText(bitmapFont, playerName);
+////                nameText.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / 2), 1, 0, 0)));
+//                nameText.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI), 0, 1, 0)));
+//                nameText.move(new Vector3f(0, 5, 0));
+//                model.add(nameText);
+
+                models.put(entity, new ModelWrapper(entity, model, List.of("attack1", "attack2", "idle", "walk"), nameText));
                 System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
             }
             ModelWrapper wrapper = models.get(entity);
@@ -245,7 +272,7 @@ public class ApplicationClient extends Application {
             }
         }
 
-        int player = gameProxy.getPlayer();
+        long player = gameProxy.getPlayer().id;
         gameProxy.requestInput(toInput(player, pressedKeys));
         gameProxy.update();
 
@@ -256,6 +283,7 @@ public class ApplicationClient extends Application {
             runningFrameSecond = frameSecond;
         }
         runningFrameCount++;
+        screenStatsText.setText("fps: " + frameCount + "   latency: " + gameProxy.getLatency() + "ms");
     }
 
     private float directionToAngle(Direction direction) {
@@ -268,7 +296,7 @@ public class ApplicationClient extends Application {
         return new Vector3f(vector.x() * milli, 0, vector.y() * milli);
     }
 
-    private static PlayerInput toInput(int player, Set<Integer> keyCodes) {
+    private static PlayerInput toInput(long player, Set<Integer> keyCodes) {
         int x = 0;
         int y = 0;
         if (keyCodes.contains(GLFW.GLFW_KEY_UP)) {
