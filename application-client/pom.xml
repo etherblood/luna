@@ -62,6 +62,11 @@
                             <resources>
                                 <resource>
                                     <directory>../assets</directory>
+                                    <excludes>
+                                        <exclude>**/*.blend</exclude>
+                                        <exclude>**/*.blend1</exclude>
+                                        <exclude>**/*_reference.png</exclude>
+                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>
