@@ -22,12 +22,10 @@ import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.engine.OwnedBy;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Vector2;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -229,8 +227,7 @@ public class ApplicationClient extends Application {
                 model.scale(new Vector3f(0.01f, 0.01f, 0.01f));
                 model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
 
-                long owner = data.get(entity, OwnedBy.class).playerId();
-                int playerEntity = data.findByValue(new PlayerId(owner)).get(0);
+                int playerEntity = data.findByValue(new PlayerId(gameProxy.getPlayer().id)).get(0);
                 String playerName = data.get(playerEntity, PlayerName.class).name();
 
                 BitmapText nameText = null;
@@ -240,7 +237,7 @@ public class ApplicationClient extends Application {
 //                nameText.move(new Vector3f(0, 5, 0));
 //                model.add(nameText);
 
-                models.put(entity, new ModelWrapper(entity, model, List.of("attack1", "attack2", "idle", "walk"), nameText));
+                models.put(entity, new ModelWrapper(entity, model, List.of("attack1", "attack2", "dash", "death", "idle", "walk"), nameText));
                 System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
             }
             ModelWrapper wrapper = models.get(entity);
@@ -257,18 +254,23 @@ public class ApplicationClient extends Application {
                 }
             }
 
-            Direction direction = data.get(entity, Direction.class);
-            if (direction != null) {
-                float angle1 = directionToAngle(direction);
+            ActorState actorState = data.get(entity, ActorState.class);
+            if (actorState != null && actorState.direction() != Direction.NONE) {
+                float angle1 = directionToAngle(actorState.direction());
                 AxisAngle4f angle = new AxisAngle4f(angle1, 0, 1, 0);
                 wrapper.getNode().setLocalRotation(new Quaternionf(angle));
             }
 
-            Speed speed = data.get(entity, Speed.class);
-            if (speed != null && (speed.vector().x() != 0 || speed.vector().y() != 0)) {
-                wrapper.setAnimation("walk");
-            } else {
-                wrapper.setAnimation("idle");
+            if (actorState != null) {
+                if (actorState.action() == ActorAction.IDLE) {
+                    if (actorState.direction() == Direction.NONE) {
+                        wrapper.setAnimation("idle");
+                    } else {
+                        wrapper.setAnimation("walk");
+                    }
+                } else if (actorState.action() == ActorAction.DASH) {
+                    wrapper.setAnimation("dash");
+                }
             }
         }
 
@@ -311,7 +313,11 @@ public class ApplicationClient extends Application {
         if (keyCodes.contains(GLFW.GLFW_KEY_LEFT)) {
             x--;
         }
-        return new PlayerInput(player, Direction.of(x, y), ActorAction.IDLE);
+        ActorAction action = ActorAction.IDLE;
+        if (keyCodes.contains(GLFW.GLFW_KEY_X)) {
+            action = ActorAction.DASH;
+        }
+        return new PlayerInput(player, Direction.of(x, y), action);
     }
 
 }

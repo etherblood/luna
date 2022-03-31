@@ -20,9 +20,6 @@ public class MovementSystem implements GameSystem {
 
             //TODO: collisions
             data.set(entity, new Position(position.vector().add(speed)));
-            if (speed.x() != 0 || speed.y() != 0) {
-                data.set(entity, Direction.of(speed.x(), speed.y()));
-            }
         }
     }
 }

@@ -16,17 +16,15 @@ public class GameRules {
                         Position.class,
                         Speed.class,
                         Movebox.class,
-                        OwnedBy.class,
                         ActorState.class,
                         PlayerInput.class,
-                        Direction.class,
                         PlayerId.class,
                         PlayerName.class
                 ),
                 List.of(
                         new ApplyActionSystem(),
                         new MovementSystem(),
-                        new UpdateActionSystem()
+                        new UpdateActorStateSystem()
                 )));
     }
 

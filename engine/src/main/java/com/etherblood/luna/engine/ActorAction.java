@@ -4,10 +4,23 @@ public enum ActorAction {
     IDLE,
     DASH;
 
-    public boolean isInterruptible() {
+    public boolean interrupts(ActorAction previous) {
+        return this != previous && interrupts() >= previous.isInterruptedBy();
+    }
+
+    private int isInterruptedBy() {
         return switch (this) {
-            case IDLE, DASH -> true;
-            default -> false;
+            case IDLE -> 0;
+            case DASH -> 1;
+            default -> 0;
+        };
+    }
+
+    private int interrupts() {
+        return switch (this) {
+            case IDLE -> 0;
+            case DASH -> 2;
+            default -> 0;
         };
     }
 

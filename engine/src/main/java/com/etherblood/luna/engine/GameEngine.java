@@ -30,7 +30,7 @@ public class GameEngine {
         for (GameEvent event : events) {
             if (event.input() != null) {
                 long player = event.input().player();
-                for (int entity : data.findByValue(new OwnedBy(player))) {
+                for (int entity : data.findByValue(new PlayerId(player))) {
                     data.set(entity, event.input());
                 }
             }
@@ -40,13 +40,10 @@ public class GameEngine {
                         int player = data.createEntity();
                         data.set(player, new PlayerId(event.join().playerId()));
                         data.set(player, new PlayerName(event.join().playerName()));
-                        int character = data.createEntity();
-                        data.set(character, new OwnedBy(event.join().playerId()));
-                        data.set(character, new Movebox(new Rectangle(-250, -250, 500, 500)));
-                        data.set(character, new Position(0, 0));
-                        data.set(character, new Speed(0, 0));
-                        data.set(character, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
-                        data.set(character, Direction.RIGHT);
+                        data.set(player, new Movebox(new Rectangle(-250, -250, 500, 500)));
+                        data.set(player, new Position(0, 0));
+                        data.set(player, new Speed(0, 0));
+                        data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
                     }
                 } else {
 //                    List<Integer> playerEntities = data.findByValue(new PlayerId(event.join().playerId()));
