@@ -26,14 +26,13 @@ public class ClientGameModule extends GameModule {
     @Override
     public synchronized void received(Connection connection, Object object) {
         if (object instanceof GameEngine state) {
-            System.out.println("received: " + state);
             this.state = state;
         } else if (object instanceof EventMessage message) {
             builder.updateAck(message);
             for (EventMessagePart part : message.parts()) {
                 if (!buffer.buffer(part.frame(), part.event())) {
-                    //TODO can this even happen?
-                    System.out.println("event dropped on frame " + part.frame());
+                    //TODO this happens a lot when someone is connecting, since they are trying to send input before their character creation...
+                    // System.out.println("event dropped on frame " + part.frame());
                 }
             }
             for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {

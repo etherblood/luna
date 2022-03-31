@@ -4,14 +4,10 @@ import com.destrostudios.icetea.core.Application;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.camera.systems.CameraKeyMoveSystem;
 import com.destrostudios.icetea.core.camera.systems.CameraMouseRotateSystem;
-import com.destrostudios.icetea.core.collision.CollisionResult;
-import com.destrostudios.icetea.core.collision.Ray;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
 import com.destrostudios.icetea.core.material.Material;
-import com.destrostudios.icetea.core.mesh.Box;
-import com.destrostudios.icetea.core.mesh.Mesh;
 import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
@@ -26,10 +22,8 @@ import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,23 +35,18 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.KHRSurface;
 
-import static org.lwjgl.vulkan.VK10.VK_CULL_MODE_NONE;
-import static org.lwjgl.vulkan.VK10.VK_POLYGON_MODE_LINE;
-
 public class ApplicationClient extends Application {
 
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final Map<Integer, ModelWrapper> models = new HashMap<>();
     private Geometry geometryGround;
-    private Geometry geometryBounds;
-    private Node nodeCollisions;
     private final GameProxy gameProxy;
-    private BitmapText screenStatsText;
 
+    private BitmapFont bitmapFont;
+    private BitmapText screenStatsText;
     private long runningFrameSecond;
     private int runningFrameCount;
     private int frameCount;
-    private BitmapFont bitmapFont;
 
     public ApplicationClient(GameProxy gameProxy) {
         super();
@@ -115,27 +104,6 @@ public class ApplicationClient extends Application {
         geometryGround.setShadowMode(ShadowMode.RECEIVE);
         sceneNode.add(geometryGround);
 
-        // Bounds
-
-        Mesh meshBox = new Box(1, 1, 1);
-
-        Material materialBounds = new Material();
-        materialBounds.setVertexShader(vertexShaderDefault);
-        materialBounds.setFragmentShader(fragShaderDefault);
-        materialBounds.setCullMode(VK_CULL_MODE_NONE);
-        materialBounds.setFillMode(VK_POLYGON_MODE_LINE);
-        materialBounds.getParameters().setVector4f("color", new Vector4f(1, 0, 0, 1));
-
-        geometryBounds = new Geometry();
-        geometryBounds.setMesh(meshBox);
-        geometryBounds.setMaterial(materialBounds);
-        sceneNode.add(geometryBounds);
-
-        // Collisions
-
-        nodeCollisions = new Node();
-        sceneNode.add(nodeCollisions);
-
         // Inputs
 
         CameraMouseRotateSystem cameraMouseRotateSystem = new CameraMouseRotateSystem(sceneCamera);
@@ -162,40 +130,7 @@ public class ApplicationClient extends Application {
         });
         inputManager.addMouseButtonListener(mouseButtonEvent -> {
             if (mouseButtonEvent.getAction() == GLFW.GLFW_PRESS) {
-                Vector3f worldCoordinatesFront = getWorldCoordinates(sceneCamera, inputManager.getCursorPosition(), 0);
-                Vector3f worldCoordinatesBack = getWorldCoordinates(sceneCamera, inputManager.getCursorPosition(), 1);
-                Vector3f rayDirection = worldCoordinatesBack.sub(worldCoordinatesFront, new Vector3f());
-                Ray ray = new Ray(worldCoordinatesFront, rayDirection);
-
-                ArrayList<CollisionResult> collisionResults = new ArrayList<>();
-                if (mouseButtonEvent.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-                    sceneNode.collideStatic(ray, collisionResults);
-                } else {
-                    sceneNode.collideDynamic(ray, collisionResults);
-                }
-
-                LinkedList<Geometry> displayedCollisions = new LinkedList<>();
-                for (CollisionResult collisionResult : collisionResults) {
-                    if (collisionResult.getGeometry().getParent() != nodeCollisions) {
-                        Geometry geometryBox = new Geometry();
-                        geometryBox.setMesh(meshBox);
-
-                        Material materialBox = new Material();
-                        materialBox.setVertexShader(vertexShaderDefault);
-                        materialBox.setFragmentShader(fragShaderDefault);
-                        geometryBox.setMaterial(materialBox);
-
-                        float boxSize = 0.05f;
-                        geometryBox.setLocalTranslation(collisionResult.getPosition().sub((boxSize / 2), (boxSize / 2), (boxSize / 2), new Vector3f()));
-                        geometryBox.setLocalScale(new Vector3f(boxSize, boxSize, boxSize));
-                        displayedCollisions.add(geometryBox);
-                    }
-                }
-
-                nodeCollisions.removeAll();
-                for (Geometry displayedCollision : displayedCollisions) {
-                    nodeCollisions.add(displayedCollision);
-                }
+                // placeholder
             }
         });
         System.out.println("init() in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
