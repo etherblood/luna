@@ -45,4 +45,9 @@ public record Rectangle(
                 && minY() < other.maxY() && other.minY() < maxY();
     }
 
+    public boolean contains(Vector2 pos) {
+        return minX() < pos.x() && pos.x() < maxX()
+                && minY() < pos.y() && pos.y() < maxY();
+    }
+
 }

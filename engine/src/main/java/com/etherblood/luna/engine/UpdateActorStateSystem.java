@@ -28,13 +28,21 @@ public class UpdateActorStateSystem implements GameSystem {
                     state = new ActorState(ActorAction.IDLE, state.direction(), engine.getFrame());
                 } else if (state.startFrame() + ATTACK1_DAMAGE_FRAME == engine.getFrame()) {
                     // TODO: deal damage on specific attack frame?
+                    int damage = 20;
 
                     // placeholder
+                    Vector2 attackPosition = data.get(entity, Position.class).vector();
                     for (int other : data.list(Health.class)) {
                         if (other == entity) {
                             continue;
                         }
-                        data.set(other, new Health(data.get(other, Health.class).value() - 20));
+                        Hitbox hitbox = data.get(other, Hitbox.class);
+                        Position position = data.get(other, Position.class);
+                        if (hitbox != null && position != null) {
+                            if (hitbox.rectangle().translate(position.vector()).contains(attackPosition)) {
+                                data.set(other, new Health(data.get(other, Health.class).value() - damage));
+                            }
+                        }
                     }
                 }
             }
@@ -43,13 +51,21 @@ public class UpdateActorStateSystem implements GameSystem {
                     state = new ActorState(ActorAction.IDLE, state.direction(), engine.getFrame());
                 } else if (state.startFrame() + ATTACK2_DAMAGE_FRAME == engine.getFrame()) {
                     // TODO: deal damage on specific attack frame?
+                    int damage = 10;
 
                     // placeholder
+                    Vector2 attackPosition = data.get(entity, Position.class).vector();
                     for (int other : data.list(Health.class)) {
                         if (other == entity) {
                             continue;
                         }
-                        data.set(other, new Health(data.get(other, Health.class).value() - 10));
+                        Hitbox hitbox = data.get(other, Hitbox.class);
+                        Position position = data.get(other, Position.class);
+                        if (hitbox != null && position != null) {
+                            if (hitbox.rectangle().translate(position.vector()).contains(attackPosition)) {
+                                data.set(other, new Health(data.get(other, Health.class).value() - damage));
+                            }
+                        }
                     }
                 }
             }

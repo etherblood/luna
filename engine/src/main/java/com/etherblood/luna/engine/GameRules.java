@@ -16,6 +16,7 @@ public class GameRules {
                         Position.class,
                         Speed.class,
                         Movebox.class,
+                        Hitbox.class,
                         ActorState.class,
                         PlayerInput.class,
                         PlayerId.class,
