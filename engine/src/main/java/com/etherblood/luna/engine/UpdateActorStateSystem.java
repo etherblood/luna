@@ -39,7 +39,7 @@ public class UpdateActorStateSystem implements GameSystem {
                         Hitbox hitbox = data.get(other, Hitbox.class);
                         Position position = data.get(other, Position.class);
                         if (hitbox != null && position != null) {
-                            if (hitbox.rectangle().translate(position.vector()).contains(attackPosition)) {
+                            if (hitbox.shape().translate(position.vector()).contains(attackPosition)) {
                                 data.set(other, new Health(data.get(other, Health.class).value() - damage));
                             }
                         }
@@ -62,7 +62,7 @@ public class UpdateActorStateSystem implements GameSystem {
                         Hitbox hitbox = data.get(other, Hitbox.class);
                         Position position = data.get(other, Position.class);
                         if (hitbox != null && position != null) {
-                            if (hitbox.rectangle().translate(position.vector()).contains(attackPosition)) {
+                            if (hitbox.shape().translate(position.vector()).contains(attackPosition)) {
                                 data.set(other, new Health(data.get(other, Health.class).value() - damage));
                             }
                         }

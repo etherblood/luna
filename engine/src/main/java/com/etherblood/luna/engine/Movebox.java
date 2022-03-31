@@ -1,4 +1,5 @@
 package com.etherblood.luna.engine;
 
-public record Movebox(Rectangle rectangle) {
+public record Movebox(
+        Rectangle shape) {
 }

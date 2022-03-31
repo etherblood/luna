@@ -1,4 +1,5 @@
 package com.etherblood.luna.engine;
 
-public record Hitbox(Rectangle rectangle) {
+public record Hitbox(
+        Circle shape) {
 }

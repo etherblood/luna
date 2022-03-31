@@ -41,7 +41,7 @@ public class GameEngine {
                         data.set(player, new PlayerId(event.join().playerId()));
                         data.set(player, new PlayerName(event.join().playerName()));
                         data.set(player, new Movebox(new Rectangle(-250, -250, 500, 500)));
-                        data.set(player, new Hitbox(new Rectangle(-250, -250, 500, 500)));
+                        data.set(player, new Hitbox(new Circle(0, 0, 250)));
                         data.set(player, new Position(0, 0));
                         data.set(player, new Speed(0, 0));
                         data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));

@@ -9,7 +9,7 @@ public class MovementSystem implements GameSystem {
         for (int entity : data.list(Speed.class)) {
             Vector2 speed = data.get(entity, Speed.class).vector();
             Position position = data.get(entity, Position.class);
-            Rectangle movebox = data.get(entity, Movebox.class).rectangle().translate(position.vector());
+            Rectangle movebox = data.get(entity, Movebox.class).shape().translate(position.vector());
 
             Vector2 min = new Vector2(
                     movebox.minX() + Math.min(0, speed.x()),

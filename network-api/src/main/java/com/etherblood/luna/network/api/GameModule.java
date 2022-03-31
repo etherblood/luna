@@ -11,6 +11,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
+import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
@@ -46,6 +47,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Health.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
+        kryo.register(Circle.class, new RecordSerializer<>());
         kryo.register(Vector2.class, new RecordSerializer<>());
         kryo.register(ActorAction.class, new EnumSerializer(ActorAction.class));
         kryo.register(Direction.class, new EnumSerializer<>(Direction.class));
@@ -54,6 +56,8 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(PlayerName.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
 
+        // workaround for broken default serializers
+        // TODO: move elsewhere (or better: fix library)
         kryo.register(Login.class, new Serializer<Login>() {
             @Override
             public void write(Kryo kryo, Output output, Login object) {

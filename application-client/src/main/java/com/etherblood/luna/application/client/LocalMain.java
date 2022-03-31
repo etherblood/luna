@@ -4,6 +4,7 @@ import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
+import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
@@ -32,7 +33,7 @@ public class LocalMain {
         data.set(player, new PlayerId(user.id));
         data.set(player, new PlayerName(user.login));
         data.set(player, new Movebox(new Rectangle(-250, -250, 500, 500)));
-        data.set(player, new Hitbox(new Rectangle(-250, -250, 500, 500)));
+        data.set(player, new Hitbox(new Circle(0, 0, 250)));
         data.set(player, new Position(0, 0));
         data.set(player, new Speed(0, 0));
         data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
