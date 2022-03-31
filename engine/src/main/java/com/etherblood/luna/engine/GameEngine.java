@@ -44,6 +44,7 @@ public class GameEngine {
                         data.set(player, new Position(0, 0));
                         data.set(player, new Speed(0, 0));
                         data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
+                        data.set(player, new Health(100));
                     }
                 } else {
 //                    List<Integer> playerEntities = data.findByValue(new PlayerId(event.join().playerId()));

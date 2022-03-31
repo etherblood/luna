@@ -17,6 +17,8 @@ public class ApplyActionSystem implements GameSystem {
                 data.set(entity, new Speed(state.direction().toLengthVector(WALK_SPEED)));
             } else if (action == ActorAction.DASH) {
                 data.set(entity, new Speed(state.direction().toLengthVector(DASH_SPEED)));
+            } else {
+                data.set(entity, new Speed(0, 0));
             }
         }
     }

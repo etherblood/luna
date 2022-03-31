@@ -19,7 +19,8 @@ public class GameRules {
                         ActorState.class,
                         PlayerInput.class,
                         PlayerId.class,
-                        PlayerName.class
+                        PlayerName.class,
+                        Health.class
                 ),
                 List.of(
                         new ApplyActionSystem(),

@@ -7,6 +7,7 @@ import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
+import com.etherblood.luna.engine.Health;
 import com.etherblood.luna.engine.Movebox;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerName;
@@ -33,6 +34,7 @@ public class LocalMain {
         data.set(player, new Position(0, 0));
         data.set(player, new Speed(0, 0));
         data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
+        data.set(player, new Health(100));
 
         return new LocalGameProxy(game, user, 60);
     }

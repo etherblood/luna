@@ -22,7 +22,6 @@ import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
@@ -148,11 +147,6 @@ public class ApplicationClient extends Application {
                 pressedKeys.add(keyEvent.getKey());
             }
             switch (keyEvent.getKey()) {
-                case GLFW.GLFW_KEY_1:
-                    if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
-                        System.out.println("fps: " + frameCount);
-                    }
-                    break;
                 case GLFW.GLFW_KEY_9:
                     if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
                         if (hasSystem(cameraMouseRotateSystem)) {
@@ -227,8 +221,7 @@ public class ApplicationClient extends Application {
                 model.scale(new Vector3f(0.01f, 0.01f, 0.01f));
                 model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
 
-                int playerEntity = data.findByValue(new PlayerId(gameProxy.getPlayer().id)).get(0);
-                String playerName = data.get(playerEntity, PlayerName.class).name();
+                String playerName = data.get(entity, PlayerName.class).name();
 
                 BitmapText nameText = null;
 //                BitmapText nameText = new BitmapText(bitmapFont, playerName);
@@ -270,6 +263,12 @@ public class ApplicationClient extends Application {
                     }
                 } else if (actorState.action() == ActorAction.DASH) {
                     wrapper.setAnimation("dash");
+                } else if (actorState.action() == ActorAction.ATTACK1) {
+                    wrapper.setAnimation("attack1");
+                } else if (actorState.action() == ActorAction.ATTACK2) {
+                    wrapper.setAnimation("attack2");
+                } else if (actorState.action() == ActorAction.DEATH) {
+                    wrapper.setAnimation("death");
                 }
             }
         }
@@ -316,6 +315,12 @@ public class ApplicationClient extends Application {
         ActorAction action = ActorAction.IDLE;
         if (keyCodes.contains(GLFW.GLFW_KEY_X)) {
             action = ActorAction.DASH;
+        }
+        if (keyCodes.contains(GLFW.GLFW_KEY_1)) {
+            action = ActorAction.ATTACK1;
+        }
+        if (keyCodes.contains(GLFW.GLFW_KEY_2)) {
+            action = ActorAction.ATTACK2;
         }
         return new PlayerInput(player, Direction.of(x, y), action);
     }
