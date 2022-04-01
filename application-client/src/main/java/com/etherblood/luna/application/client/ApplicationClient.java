@@ -143,7 +143,9 @@ public class ApplicationClient extends Application {
 
         for (ModelWrapper wrapper : models.values()) {
             if (!data.has(wrapper.getEntity(), ActorState.class)) {
-                sceneNode.remove(wrapper.getNode());
+                if (wrapper.getNode().hasParent(sceneNode)) {
+                    sceneNode.remove(wrapper.getNode());
+                }
                 models.remove(wrapper.getEntity());
             }
         }
@@ -165,7 +167,19 @@ public class ApplicationClient extends Application {
 //                nameText.move(new Vector3f(0, 5, 0));
 //                model.add(nameText);
 
-                models.put(entity, new ModelWrapper(entity, model, List.of("attack1", "attack2", "dash", "death", "idle", "walk"), nameText));
+                models.put(entity, new ModelWrapper(entity, model, List.of(
+                        "agonizing",
+                        "attack1",
+                        "attack2",
+                        "dash",
+                        "death",
+                        "hit",
+                        "idle",
+                        "thriller1",
+                        "thriller2",
+                        "thriller3",
+                        "thriller4",
+                        "walk"), nameText));
                 System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
             }
             ModelWrapper wrapper = models.get(entity);
@@ -184,9 +198,9 @@ public class ApplicationClient extends Application {
 
             ActorState actorState = data.get(entity, ActorState.class);
             if (actorState != null && actorState.direction() != Direction.NONE) {
-                float angle1 = directionToAngle(actorState.direction());
-                AxisAngle4f angle = new AxisAngle4f(angle1, 0, 1, 0);
-                wrapper.getNode().setLocalRotation(new Quaternionf(angle));
+                float angle = directionToAngle(actorState.direction());
+                AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
+                wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
             }
 
             if (actorState != null) {

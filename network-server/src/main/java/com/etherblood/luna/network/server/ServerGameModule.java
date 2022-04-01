@@ -63,7 +63,7 @@ public class ServerGameModule extends GameModule {
         }
         if (object instanceof Login login) {
             JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt).user;
-            int joinDelay = 60;
+            int joinDelay = 1;
             long frame = state.getFrame() + joinDelay;
             GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
             buffer.buffer(frame, event);
