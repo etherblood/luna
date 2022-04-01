@@ -38,8 +38,10 @@ public class RemoteGameProxy implements GameProxy {
     public void update() {
         timestampModule.run();
 
-        long approxServerTime = timestampModule.getApproxServerTime();
-        gameModule.run(approxServerTime, 60);
+        if (timestampModule.isInitialized()) {
+            long approxServerTime = timestampModule.getApproxServerTime();
+            gameModule.run(approxServerTime, 60);
+        }
     }
 
     @Override
