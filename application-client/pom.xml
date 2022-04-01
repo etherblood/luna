@@ -85,7 +85,7 @@
         <dependency>
             <groupId>com.github.destrostudios.ice-tea-engine</groupId>
             <artifactId>ice-tea-engine-core</artifactId>
-            <version>676e4e6c204562a71654cb8e7e8efa553b831459</version>
+            <version>d20604f72f59a9e23f95a0803f1b050349d605c1</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.lwjgl</groupId>
