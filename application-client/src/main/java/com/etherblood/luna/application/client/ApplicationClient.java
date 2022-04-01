@@ -13,11 +13,14 @@ import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
+import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.ActorState;
+import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.Hitbox;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
@@ -34,11 +37,13 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.KHRSurface;
+import org.lwjgl.vulkan.VK10;
 
 public class ApplicationClient extends Application {
 
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final Map<Integer, ModelWrapper> models = new HashMap<>();
+    private final Map<Integer, HitboxWrapper> hitboxes = new HashMap<>();
     private Geometry geometryGround;
     private final GameProxy gameProxy;
 
@@ -47,6 +52,10 @@ public class ApplicationClient extends Application {
     private long runningFrameSecond;
     private int runningFrameCount;
     private int frameCount;
+
+    Shader vertexShaderDefault;
+    Shader fragShaderDefault;
+    Node debugNode = new Node();
 
     public ApplicationClient(GameProxy gameProxy) {
         super();
@@ -69,11 +78,11 @@ public class ApplicationClient extends Application {
 
         sceneCamera.setLocation(new Vector3f(0, 2, 10));
 
-        Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
+        vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
                 "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                 "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
         });
-        Shader fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
+        fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
                 "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                 "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
         });
@@ -114,9 +123,16 @@ public class ApplicationClient extends Application {
             } else {
                 pressedKeys.add(keyEvent.getKey());
             }
-            switch (keyEvent.getKey()) {
-                case GLFW.GLFW_KEY_9:
-                    if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
+            if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
+                switch (keyEvent.getKey()) {
+                    case GLFW.GLFW_KEY_F1:
+                        if (debugNode.hasParent(sceneNode)) {
+                            sceneNode.remove(debugNode);
+                        } else {
+                            sceneNode.add(debugNode);
+                        }
+                        break;
+                    case GLFW.GLFW_KEY_9:
                         if (hasSystem(cameraMouseRotateSystem)) {
                             removeSystem(cameraMouseRotateSystem);
                             removeSystem(cameraKeyMoveSystem);
@@ -124,8 +140,8 @@ public class ApplicationClient extends Application {
                             addSystem(cameraMouseRotateSystem);
                             addSystem(cameraKeyMoveSystem);
                         }
-                    }
-                    break;
+                        break;
+                }
             }
         });
         inputManager.addMouseButtonListener(mouseButtonEvent -> {
@@ -141,6 +157,36 @@ public class ApplicationClient extends Application {
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         EntityData data = snapshot.getData();
 
+
+        for (HitboxWrapper wrapper : hitboxes.values()) {
+            if (!data.has(wrapper.getEntity(), Hitbox.class)) {
+                debugNode.remove(wrapper.getNode());
+                hitboxes.remove(wrapper.getEntity());
+            }
+        }
+        for (int entity : data.list(Hitbox.class)) {
+            if (!hitboxes.containsKey(entity)) {
+                Circle shape = data.get(entity, Hitbox.class).shape();
+
+                CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
+                Geometry geometry = new Geometry();
+                geometry.setMesh(circle);
+                Material material = new Material();
+                material.setVertexShader(vertexShaderDefault);
+                material.setFragmentShader(fragShaderDefault);
+                material.setCullMode(VK10.VK_CULL_MODE_NONE);
+                material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
+                material.getParameters().setVector4f("color", new Vector4f(1, 1, 1, 1));
+                geometry.setMaterial(material);
+                geometry.setShadowMode(ShadowMode.OFF);
+                hitboxes.put(entity, new HitboxWrapper(entity, geometry));
+                debugNode.add(geometry);
+            }
+            Vector2 position = data.get(entity, Position.class).vector();
+            hitboxes.get(entity).getNode().setLocalTranslation(convert(position));
+        }
+
+
         for (ModelWrapper wrapper : models.values()) {
             if (!data.has(wrapper.getEntity(), ActorState.class)) {
                 if (wrapper.getNode().hasParent(sceneNode)) {
@@ -155,7 +201,8 @@ public class ApplicationClient extends Application {
                 long nanos = System.nanoTime();
                 // hard coded amara model
                 Node model = (Node) assetManager.loadModel("models/amara/amara.gltf");
-                model.scale(new Vector3f(0.01f, 0.01f, 0.01f));
+                float scale = 0.01f;
+                model.scale(new Vector3f(scale));
                 model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
 
                 String playerName = data.get(entity, PlayerName.class).name();
@@ -219,6 +266,9 @@ public class ApplicationClient extends Application {
                 } else if (actorState.action() == ActorAction.DEATH) {
                     wrapper.setAnimation("death");
                 }
+                float fps = 60;
+                long animationFrames = snapshot.getFrame() - actorState.startFrame();
+                wrapper.setAnimationTime(animationFrames / fps);
             }
         }
 
@@ -233,7 +283,7 @@ public class ApplicationClient extends Application {
             runningFrameSecond = frameSecond;
         }
         runningFrameCount++;
-        screenStatsText.setText("fps: " + frameCount + "   latency: " + gameProxy.getLatency() + "ms");
+        screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
     }
 
     private float directionToAngle(Direction direction) {

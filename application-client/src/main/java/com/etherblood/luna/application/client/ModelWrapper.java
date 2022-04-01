@@ -21,6 +21,12 @@ public class ModelWrapper {
         this.nameText = nameText;
     }
 
+    public void setAnimationTime(float seconds) {
+        AnimationControl a = (AnimationControl) node.getControls().iterator().next();
+        a.play(animationIndex);// workaround to reset animation time
+        a.update(seconds);
+    }
+
     public void setAnimation(String animation) {
         int nextIndex = animations.indexOf(animation);
         if (animationIndex != nextIndex) {
