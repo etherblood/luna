@@ -5,10 +5,12 @@ import com.etherblood.luna.data.EntityData;
 public class UpdateActorStateSystem implements GameSystem {
 
     private static final long DASH_DURATION_TICKS = 48;
-    private static final long ATTACK1_DURATION_TICKS = 140;
-    private static final long ATTACK1_DAMAGE_FRAME = 50;
-    private static final long ATTACK2_DURATION_TICKS = 80;
-    private static final long ATTACK2_DAMAGE_FRAME = 32;
+    
+    private static final long ATTACK1_DURATION_TICKS = 280;// allow any interrupt for frames 160+
+    private static final long ATTACK1_DAMAGE_FRAME = 100;
+
+    private static final long ATTACK2_DURATION_TICKS = 160;// allow any interrupt for frames 100+
+    private static final long ATTACK2_DAMAGE_FRAME = 64;
 
     @Override
     public void tick(GameEngine engine) {
