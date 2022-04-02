@@ -16,8 +16,8 @@ public class PlaybackBuffer {
         if (clearedFrame >= frame) {
             return false;
         }
-        events.computeIfAbsent(frame, k -> new HashSet<>()).add(event);
-        return true;
+        Set<GameEvent> frameEvents = events.computeIfAbsent(frame, k -> new HashSet<>());
+        return frameEvents.add(event);
     }
 
     public synchronized Set<GameEvent> peek(long frame) {

@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerGameModule extends GameModule {
 
+    private final Object lock = new Object();
     private final GameEngine state;
     private final Map<Integer, ServerEventMessageBuilder> builders = new ConcurrentHashMap<>();
     private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
@@ -28,9 +29,6 @@ public class ServerGameModule extends GameModule {
 
     @Override
     public void connected(Connection connection) {
-        connection.sendTCP(state);
-        builders.put(connection.getID(), new ServerEventMessageBuilder());
-        connections.put(connection.getID(), connection);
     }
 
     @Override
@@ -42,47 +40,51 @@ public class ServerGameModule extends GameModule {
     @Override
     public void received(Connection connection, Object object) {
         if (object instanceof EventMessage message) {
-            ServerEventMessageBuilder builder = builders.get(connection.getID());
-            builder.updateAck(message);
-            for (EventMessagePart part : message.parts()) {
-                if (buffer.buffer(part.frame(), part.event())) {
-                    for (ServerEventMessageBuilder other : builders.values()) {
-                        other.broadcast(new EventMessagePart(part.frame(), part.event()));
-                    }
-                } else {
-                    // TODO better solution for late inputs...
-                    int skips = 1;
-                    while (!buffer.buffer(part.frame() + skips, part.event())) {
-                        skips++;
-                    }
-                    for (ServerEventMessageBuilder other : builders.values()) {
-                        other.broadcast(new EventMessagePart(part.frame() + skips, part.event()));
+            synchronized (lock) {
+                ServerEventMessageBuilder builder = builders.get(connection.getID());
+                builder.updateAck(message);
+                for (EventMessagePart part : message.parts()) {
+                    if (buffer.buffer(part.frame(), part.event())) {
+                        for (ServerEventMessageBuilder other : builders.values()) {
+                            other.broadcast(new EventMessagePart(part.frame(), part.event()));
+                        }
+                    } else {
+                        // this is likely a duplicate of already handled input, do nothing
                     }
                 }
             }
         }
         if (object instanceof Login login) {
             JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt).user;
-            int joinDelay = 1;
-            long frame = state.getFrame() + joinDelay;
-            GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
-            buffer.buffer(frame, event);
-            for (ServerEventMessageBuilder builder : builders.values()) {
-                builder.broadcast(new EventMessagePart(frame, event));
+            synchronized (lock) {
+                long frame = state.getFrame();
+
+                System.out.println("User " + user.login + " connected on frame " + frame);
+                connection.sendTCP(state);
+                builders.put(connection.getID(), new ServerEventMessageBuilder());
+                connections.put(connection.getID(), connection);
+
+                GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
+                buffer.buffer(frame + 1, event);
+                for (ServerEventMessageBuilder builder : builders.values()) {
+                    builder.broadcast(new EventMessagePart(frame, event));
+                }
             }
         }
     }
 
     public void tick() {
-        long frame = state.getFrame();
-        Set<GameEvent> events = buffer.peek(frame);
-        buffer.clear(frame);
-        state.tick(events);
-        for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
-            Connection connection = connections.get(entry.getKey());
-            ServerEventMessageBuilder builder = builders.get(entry.getKey());
-            builder.lockFrame(frame);
-            connection.sendUDP(builder.build());
+        synchronized (lock) {
+            long frame = state.getFrame();
+            Set<GameEvent> events = buffer.peek(frame);
+            state.tick(events);
+            buffer.clear(frame);
+            for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
+                Connection connection = connections.get(entry.getKey());
+                ServerEventMessageBuilder builder = builders.get(entry.getKey());
+                builder.lockFrame(frame);
+                connection.sendUDP(builder.build());
+            }
         }
     }
 }

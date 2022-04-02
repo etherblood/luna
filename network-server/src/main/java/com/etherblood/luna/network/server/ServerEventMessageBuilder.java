@@ -27,8 +27,10 @@ public class ServerEventMessageBuilder {
 
     public synchronized void broadcast(EventMessagePart... parts) {
         for (EventMessagePart part : parts) {
-            if (part.frame() >= lockFrame) {
+            if (part.frame() > lockFrame) {
                 pendingQueue.putIfAbsent(part, seq);
+            } else {
+                // drop part, it is likely a late duplicate
             }
         }
     }

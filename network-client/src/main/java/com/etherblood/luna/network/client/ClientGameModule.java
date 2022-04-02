@@ -31,8 +31,7 @@ public class ClientGameModule extends GameModule {
             builder.updateAck(message);
             for (EventMessagePart part : message.parts()) {
                 if (!buffer.buffer(part.frame(), part.event())) {
-                    //TODO this happens a lot when someone is connecting, since they are trying to send input before their character creation...
-                    // System.out.println("event dropped on frame " + part.frame());
+                    // drop part, it is a duplicate of an already handled one
                 }
             }
             for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {

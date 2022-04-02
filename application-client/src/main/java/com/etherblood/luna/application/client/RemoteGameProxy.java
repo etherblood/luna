@@ -26,7 +26,9 @@ public class RemoteGameProxy implements GameProxy {
 
     @Override
     public void requestInput(PlayerInput input) {
-        gameModule.input(new GameEvent(input, null));
+        if (timestampModule.isInitialized()) {
+            gameModule.input(new GameEvent(input, null));
+        }
     }
 
     @Override
