@@ -331,16 +331,28 @@ public class ApplicationClient extends Application {
     private static PlayerInput toInput(long player, Set<Integer> keyCodes) {
         int x = 0;
         int y = 0;
-        if (keyCodes.contains(GLFW.GLFW_KEY_UP)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_UP)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_7)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_8)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_9)) {
             y--;
         }
-        if (keyCodes.contains(GLFW.GLFW_KEY_DOWN)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_DOWN)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_1)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_2)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_3)) {
             y++;
         }
-        if (keyCodes.contains(GLFW.GLFW_KEY_RIGHT)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_RIGHT)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_3)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_6)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_9)) {
             x++;
         }
-        if (keyCodes.contains(GLFW.GLFW_KEY_LEFT)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_LEFT)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_1)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_4)
+                || keyCodes.contains(GLFW.GLFW_KEY_KP_7)) {
             x--;
         }
         Direction direction = Direction.of(x, y);
@@ -348,13 +360,16 @@ public class ApplicationClient extends Application {
         if (direction != null) {
             action = ActorAction.WALK;
         }
-        if (keyCodes.contains(GLFW.GLFW_KEY_X)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_X)
+                || keyCodes.contains(GLFW.GLFW_KEY_LEFT_SHIFT)) {
             action = ActorAction.DASH;
         }
-        if (keyCodes.contains(GLFW.GLFW_KEY_1)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_1)
+                || keyCodes.contains(GLFW.GLFW_KEY_Q)) {
             action = ActorAction.ATTACK1;
         }
-        if (keyCodes.contains(GLFW.GLFW_KEY_2)) {
+        if (keyCodes.contains(GLFW.GLFW_KEY_2)
+                || keyCodes.contains(GLFW.GLFW_KEY_W)) {
             action = ActorAction.ATTACK2;
         }
         return new PlayerInput(player, direction, action);
