@@ -25,24 +25,17 @@ public class RemoteGameProxy implements GameProxy {
     }
 
     @Override
-    public void requestInput(PlayerInput input) {
-        if (timestampModule.isInitialized()) {
-            gameModule.input(new GameEvent(input, null));
-        }
-    }
-
-    @Override
     public JwtAuthenticationUser getPlayer() {
         return player;
     }
 
     @Override
-    public void update() {
+    public void update(PlayerInput input) {
         timestampModule.run();
 
         if (timestampModule.isInitialized()) {
             long approxServerTime = timestampModule.getApproxServerTime();
-            gameModule.run(approxServerTime, 60);
+            gameModule.run(approxServerTime, 60, new GameEvent(input, null));
         }
     }
 

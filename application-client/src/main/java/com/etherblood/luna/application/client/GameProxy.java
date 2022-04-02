@@ -8,11 +8,9 @@ public interface GameProxy {
 
     GameEngine getEngineSnapshot();
 
-    void requestInput(PlayerInput input);
-
     JwtAuthenticationUser getPlayer();
 
-    void update();
+    void update(PlayerInput requestedInput);
 
     long getLatency();
 }

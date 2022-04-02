@@ -260,8 +260,7 @@ public class ApplicationClient extends Application {
         }
 
         long player = gameProxy.getPlayer().id;
-        gameProxy.requestInput(toInput(player, pressedKeys));
-        gameProxy.update();
+        gameProxy.update(toInput(player, pressedKeys));
 
         long frameSecond = Math.floorDiv(System.nanoTime(), 1_000_000_000L);
         if (runningFrameSecond != frameSecond) {

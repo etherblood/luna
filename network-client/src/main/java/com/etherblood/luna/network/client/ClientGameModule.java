@@ -13,11 +13,11 @@ public class ClientGameModule extends GameModule {
 
     public static final int MILLIS_PER_SECOND = 1000;
     private GameEngine state = null;
-    private long serverFrame = -1;
     private final ClientEventMessageBuilder builder = new ClientEventMessageBuilder();
     private final PlaybackBuffer buffer = new PlaybackBuffer();
-    private final int delayFrames = 2;
     private final Connection connection;
+    private final int inputDelayFrames = 2;
+    private long serverFrame = -1;
 
     public ClientGameModule(Connection connection) {
         this.connection = connection;
@@ -27,6 +27,7 @@ public class ClientGameModule extends GameModule {
     public synchronized void received(Connection connection, Object object) {
         if (object instanceof GameEngine state) {
             this.state = state;
+            this.serverFrame = state.getFrame();
         } else if (object instanceof EventMessage message) {
             builder.updateAck(message);
             for (EventMessagePart part : message.parts()) {
@@ -41,14 +42,13 @@ public class ClientGameModule extends GameModule {
         }
     }
 
-    public synchronized void input(GameEvent event) {
-        builder.enqueueAction(new EventMessagePart(serverFrame + delayFrames, event));
-    }
-
-    public synchronized void run(long servertime, int fps) {
+    public synchronized void run(long servertime, int fps, GameEvent input) {
         long nextFrame = (servertime - state.getStartEpochMillis()) * fps / MILLIS_PER_SECOND;
-        if (nextFrame != serverFrame) {
-            serverFrame = nextFrame;
+        if (serverFrame < nextFrame) {
+            do {
+                serverFrame++;
+                builder.enqueueAction(new EventMessagePart(serverFrame + inputDelayFrames, input));
+            } while (serverFrame < nextFrame);
             connection.sendUDP(builder.build());
         }
     }
