@@ -181,7 +181,7 @@ public class ApplicationClient extends Application {
         // status huds
         for (StatusHudWrapper wrapper : statusHuds.values()) {
             if (!data.has(wrapper.getEntity(), PlayerName.class)) {
-                sceneNode.remove(wrapper.getNode());
+                guiNode.remove(wrapper.getNode());
                 statusHuds.remove(wrapper.getEntity());
             }
         }
@@ -189,7 +189,7 @@ public class ApplicationClient extends Application {
             if (!statusHuds.containsKey(entity)) {
                 StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
                 statusHuds.put(entity, wrapper);
-                sceneNode.add(wrapper.getNode());
+                guiNode.add(wrapper.getNode());
             }
             Vector2 position = data.get(entity, Position.class).vector();
             String name = data.get(entity, PlayerName.class).name();
@@ -197,7 +197,8 @@ public class ApplicationClient extends Application {
             StatusHudWrapper wrapper = statusHuds.get(entity);
             wrapper.setName(name);
             wrapper.setHealth(health == null ? null : health.value());
-            wrapper.getNode().setLocalTranslation(convert(position));
+            Vector3f screenCoordinates = getScreenCoordinates(convert(position));
+            wrapper.getNode().setLocalTranslation(screenCoordinates);
         }
 
 
