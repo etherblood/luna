@@ -39,7 +39,7 @@ public class LocalMain {
         data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
         data.set(player, new Health(100));
 
-        return new LocalGameProxy(game, user, 60);
+        return new LocalGameProxy(game, user);
     }
 
     static JwtAuthenticationUser getTestJwtUser(long playerId) {

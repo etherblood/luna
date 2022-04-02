@@ -42,8 +42,8 @@ public class ClientGameModule extends GameModule {
         }
     }
 
-    public synchronized void run(long servertime, int fps, GameEvent input) {
-        long nextFrame = (servertime - state.getStartEpochMillis()) * fps / MILLIS_PER_SECOND;
+    public synchronized void run(long servertime, GameEvent input) {
+        long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFps() / MILLIS_PER_SECOND;
         if (serverFrame < nextFrame) {
             do {
                 serverFrame++;

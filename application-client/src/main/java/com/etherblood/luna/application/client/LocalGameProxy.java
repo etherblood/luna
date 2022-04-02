@@ -11,12 +11,10 @@ public class LocalGameProxy implements GameProxy {
     private static final long MILLIS_PER_SECOND = 1000;
     private final GameEngine engine;
     private final JwtAuthenticationUser player;
-    private final long fps;
 
-    public LocalGameProxy(GameEngine engine, JwtAuthenticationUser player, long fps) {
+    public LocalGameProxy(GameEngine engine, JwtAuthenticationUser player) {
         this.engine = engine;
         this.player = player;
-        this.fps = fps;
     }
 
     @Override
@@ -31,7 +29,7 @@ public class LocalGameProxy implements GameProxy {
 
     @Override
     public void update(PlayerInput input) {
-        while (engine.getStartEpochMillis() + MILLIS_PER_SECOND * engine.getFrame() / fps <= System.currentTimeMillis()) {
+        while (engine.getStartEpochMillis() + MILLIS_PER_SECOND * engine.getFrame() / engine.getRules().getFps() <= System.currentTimeMillis()) {
             engine.tick(Set.of(new GameEvent(input, null)));
         }
     }

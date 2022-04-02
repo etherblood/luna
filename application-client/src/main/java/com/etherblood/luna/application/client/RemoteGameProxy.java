@@ -35,7 +35,7 @@ public class RemoteGameProxy implements GameProxy {
 
         if (timestampModule.isInitialized()) {
             long approxServerTime = timestampModule.getApproxServerTime();
-            gameModule.run(approxServerTime, 60, new GameEvent(input, null));
+            gameModule.run(approxServerTime, new GameEvent(input, null));
         }
     }
 

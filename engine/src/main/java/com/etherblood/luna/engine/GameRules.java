@@ -27,17 +27,19 @@ public class GameRules {
                         new ApplyActionSystem(),
                         new MovementSystem(),
                         new UpdateActorStateSystem()
-                )));
+                ), 60));
     }
 
     private final String id;
     private final Set<Class<?>> componentTypes;
     private final List<GameSystem> systems;
+    private final int fps;
 
-    public GameRules(String id, Set<Class<?>> componentTypes, List<GameSystem> systems) {
+    public GameRules(String id, Set<Class<?>> componentTypes, List<GameSystem> systems, int fps) {
         this.id = id;
         this.componentTypes = componentTypes;
         this.systems = systems;
+        this.fps = fps;
     }
 
     public static GameRules getDefault() {
@@ -62,5 +64,9 @@ public class GameRules {
 
     public List<GameSystem> getSystems() {
         return systems;
+    }
+
+    public int getFps() {
+        return fps;
     }
 }

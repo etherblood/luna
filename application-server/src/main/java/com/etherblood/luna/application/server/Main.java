@@ -35,7 +35,7 @@ public class Main {
         server.start();
         server.bind(NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 
-        int fps = 60;
+        int fps = game.getRules().getFps();
         GameLoop loop = new GameLoop(fps, () -> {
             gameModule.tick();
         });
