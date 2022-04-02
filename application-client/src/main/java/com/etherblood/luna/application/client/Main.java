@@ -17,6 +17,7 @@ import java.util.Map;
 public class Main {
 
     public static void main(String... args) throws IOException {
+        System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         if (args.length == 0) {
             System.out.println("First argument must be a jwt (usually passed by the destrostudios launcher).");
             return;

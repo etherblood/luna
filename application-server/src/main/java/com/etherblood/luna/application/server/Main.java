@@ -17,12 +17,11 @@ import java.util.Date;
 
 public class Main {
     public static void main(String... args) throws IOException {
+        System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
 //        Log.DEBUG();
         Log.info(new Date().toString());// time reference for kryo logs
         System.err.println("WARNING: Using jwt service without validation.");
         JwtService jwtService = new NoValidateJwtService();
-
-        System.out.println("Unsafe access warnings are a known issue, see: https://github.com/EsotericSoftware/kryonet/issues/154");
 
         GameEngine game = GameRules.getDefault().createGame();
 

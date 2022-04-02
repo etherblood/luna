@@ -16,11 +16,11 @@ import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
-import java.io.IOException;
 
 public class LocalMain {
 
-    public static void main(String... args) throws IOException {
+    public static void main(String... args) {
+        System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         new ApplicationClient(localProxy()).start();
     }
 

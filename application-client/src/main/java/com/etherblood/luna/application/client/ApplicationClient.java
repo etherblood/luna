@@ -20,6 +20,7 @@ import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.Health;
 import com.etherblood.luna.engine.Hitbox;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
@@ -43,6 +44,7 @@ public class ApplicationClient extends Application {
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final Map<Integer, ModelWrapper> models = new HashMap<>();
     private final Map<Integer, HitboxWrapper> hitboxes = new HashMap<>();
+    private final Map<Integer, StatusHudWrapper> statusHuds = new HashMap<>();
     private Geometry geometryGround;
     private final GameProxy gameProxy;
 
@@ -157,6 +159,30 @@ public class ApplicationClient extends Application {
         EntityData data = snapshot.getData();
 
 
+        // status huds
+        for (StatusHudWrapper wrapper : statusHuds.values()) {
+            if (!data.has(wrapper.getEntity(), PlayerName.class)) {
+                sceneNode.remove(wrapper.getNode());
+                statusHuds.remove(wrapper.getEntity());
+            }
+        }
+        for (int entity : data.list(PlayerName.class)) {
+            if (!statusHuds.containsKey(entity)) {
+                StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
+                statusHuds.put(entity, wrapper);
+                sceneNode.add(wrapper.getNode());
+            }
+            Vector2 position = data.get(entity, Position.class).vector();
+            String name = data.get(entity, PlayerName.class).name();
+            Health health = data.get(entity, Health.class);
+            StatusHudWrapper wrapper = statusHuds.get(entity);
+            wrapper.setName(name);
+            wrapper.setHealth(health == null ? null : health.value());
+            wrapper.getNode().setLocalTranslation(convert(position));
+        }
+
+
+        // hitboxes
         for (HitboxWrapper wrapper : hitboxes.values()) {
             if (!data.has(wrapper.getEntity(), Hitbox.class)) {
                 debugNode.remove(wrapper.getNode());
@@ -186,6 +212,7 @@ public class ApplicationClient extends Application {
         }
 
 
+        // models
         for (ModelWrapper wrapper : models.values()) {
             if (!data.has(wrapper.getEntity(), ActorState.class)) {
                 if (wrapper.getNode().hasParent(sceneNode)) {
