@@ -12,11 +12,12 @@ public class ApplyActionSystem implements GameSystem {
         EntityData data = engine.getData();
         for (int entity : data.list(ActorState.class)) {
             ActorState state = data.get(entity, ActorState.class);
+            Direction direction = data.get(entity, Direction.class);
             ActorAction action = state.action();
-            if (action == ActorAction.IDLE) {
-                data.set(entity, new Speed(state.direction().toLengthVector(WALK_SPEED)));
+            if (action == ActorAction.WALK) {
+                data.set(entity, new Speed(direction.toLengthVector(WALK_SPEED)));
             } else if (action == ActorAction.DASH) {
-                data.set(entity, new Speed(state.direction().toLengthVector(DASH_SPEED)));
+                data.set(entity, new Speed(direction.toLengthVector(DASH_SPEED)));
             } else {
                 data.set(entity, new Speed(0, 0));
             }

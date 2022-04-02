@@ -2,6 +2,7 @@ package com.etherblood.luna.engine;
 
 public enum ActorAction {
     IDLE,
+    WALK,
     DASH,
     ATTACK1,
     ATTACK2,
@@ -14,6 +15,7 @@ public enum ActorAction {
     private int isInterruptedBy() {
         return switch (this) {
             case IDLE -> 0;
+            case WALK -> 0;
             case DASH -> 1;
             case ATTACK1 -> 2;
             case ATTACK2 -> 2;
@@ -24,6 +26,7 @@ public enum ActorAction {
     private int interrupts() {
         return switch (this) {
             case IDLE -> 0;
+            case WALK -> 0;
             case DASH -> 2;
             case ATTACK1 -> 1;
             case ATTACK2 -> 1;
@@ -34,6 +37,7 @@ public enum ActorAction {
     public boolean isTurnable() {
         return switch (this) {
             case IDLE -> true;
+            case WALK -> true;
             default -> false;
         };
     }

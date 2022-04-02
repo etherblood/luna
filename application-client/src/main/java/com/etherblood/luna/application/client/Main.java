@@ -57,7 +57,6 @@ public class Main {
 
         jwtModule.login(jwt);
         return new RemoteGameProxy(timestampModule, gameModule, new NoValidateJwtService().decode(jwt).user);
-
     }
 
     static String getTestJwt(long playerId) {

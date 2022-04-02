@@ -257,20 +257,19 @@ public class ApplicationClient extends Application {
                 }
             }
 
-            ActorState actorState = data.get(entity, ActorState.class);
-            if (actorState != null && actorState.direction() != Direction.NONE) {
-                float angle = directionToAngle(actorState.direction());
+            Direction direction = data.get(entity, Direction.class);
+            if (direction != null) {
+                float angle = directionToAngle(direction);
                 AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
                 wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
             }
 
+            ActorState actorState = data.get(entity, ActorState.class);
             if (actorState != null) {
                 if (actorState.action() == ActorAction.IDLE) {
-                    if (actorState.direction() == Direction.NONE) {
-                        wrapper.setAnimation("idle");
-                    } else {
-                        wrapper.setAnimation("walk");
-                    }
+                    wrapper.setAnimation("idle");
+                } else if (actorState.action() == ActorAction.WALK) {
+                    wrapper.setAnimation("walk");
                 } else if (actorState.action() == ActorAction.DASH) {
                     wrapper.setAnimation("dash");
                 } else if (actorState.action() == ActorAction.ATTACK1) {
@@ -324,7 +323,11 @@ public class ApplicationClient extends Application {
         if (keyCodes.contains(GLFW.GLFW_KEY_LEFT)) {
             x--;
         }
+        Direction direction = Direction.of(x, y);
         ActorAction action = ActorAction.IDLE;
+        if (direction != null) {
+            action = ActorAction.WALK;
+        }
         if (keyCodes.contains(GLFW.GLFW_KEY_X)) {
             action = ActorAction.DASH;
         }
@@ -334,7 +337,7 @@ public class ApplicationClient extends Application {
         if (keyCodes.contains(GLFW.GLFW_KEY_2)) {
             action = ActorAction.ATTACK2;
         }
-        return new PlayerInput(player, Direction.of(x, y), action);
+        return new PlayerInput(player, direction, action);
     }
 
 }

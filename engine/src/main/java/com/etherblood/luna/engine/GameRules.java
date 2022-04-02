@@ -21,6 +21,7 @@ public class GameRules {
                         PlayerInput.class,
                         PlayerId.class,
                         PlayerName.class,
+                        Direction.class,
                         Health.class
                 ),
                 List.of(

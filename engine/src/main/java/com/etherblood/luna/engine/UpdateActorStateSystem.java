@@ -19,15 +19,15 @@ public class UpdateActorStateSystem implements GameSystem {
             ActorState state = data.get(entity, ActorState.class);
             if (data.has(entity, Health.class) && data.get(entity, Health.class).value() <= 0) {
                 if (ActorAction.DEATH.interrupts(state.action())) {
-                    state = new ActorState(ActorAction.DEATH, Direction.NONE, engine.getFrame());
+                    state = new ActorState(ActorAction.DEATH, engine.getFrame());
                 }
             }
             if (state.action() == ActorAction.DASH && state.startFrame() + DASH_DURATION_TICKS <= engine.getFrame()) {
-                state = new ActorState(ActorAction.IDLE, state.direction(), engine.getFrame());
+                state = new ActorState(ActorAction.IDLE, engine.getFrame());
             }
             if (state.action() == ActorAction.ATTACK1) {
                 if (state.startFrame() + ATTACK1_DURATION_TICKS <= engine.getFrame()) {
-                    state = new ActorState(ActorAction.IDLE, state.direction(), engine.getFrame());
+                    state = new ActorState(ActorAction.IDLE, engine.getFrame());
                 } else if (state.startFrame() + ATTACK1_DAMAGE_FRAME == engine.getFrame()) {
                     // TODO: deal damage on specific attack frame?
                     int damage = 20;
@@ -50,7 +50,7 @@ public class UpdateActorStateSystem implements GameSystem {
             }
             if (state.action() == ActorAction.ATTACK2) {
                 if (state.startFrame() + ATTACK2_DURATION_TICKS <= engine.getFrame()) {
-                    state = new ActorState(ActorAction.IDLE, state.direction(), engine.getFrame());
+                    state = new ActorState(ActorAction.IDLE, engine.getFrame());
                 } else if (state.startFrame() + ATTACK2_DAMAGE_FRAME == engine.getFrame()) {
                     // TODO: deal damage on specific attack frame?
                     int damage = 10;
@@ -75,9 +75,14 @@ public class UpdateActorStateSystem implements GameSystem {
             PlayerInput input = data.get(entity, PlayerInput.class);
             if (input != null) {
                 if (input.action().interrupts(state.action())) {
-                    state = new ActorState(input.action(), input.direction(), engine.getFrame());
-                } else if (state.action().isTurnable() && state.direction() != input.direction()) {
-                    state = new ActorState(state.action(), input.direction(), state.startFrame());
+                    state = new ActorState(input.action(), engine.getFrame());
+                    if (input.direction() != null) {
+                        data.set(entity, input.direction());
+                    }
+                } else if (state.action().isTurnable()) {
+                    if (input.direction() != null) {
+                        data.set(entity, input.direction());
+                    }
                 }
                 data.remove(entity, PlayerInput.class);
             }

@@ -36,7 +36,8 @@ public class LocalMain {
         data.set(player, new Hitbox(new Circle(0, 0, 250)));
         data.set(player, new Position(0, 0));
         data.set(player, new Speed(0, 0));
-        data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
+        data.set(player, new ActorState(ActorAction.IDLE, 0));
+        data.set(player, Direction.DOWN);
         data.set(player, new Health(100));
 
         return new LocalGameProxy(game, user);

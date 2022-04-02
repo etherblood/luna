@@ -10,20 +10,20 @@ public class GameEngine {
 
     private final GameRules rules;
     private final long startEpochMillis;
-    private long tick;
+    private long frame;
     private final EntityData data;
     private final List<GameSystem> systems;
 
-    public GameEngine(GameRules rules, long startEpochMillis, long tick) {
-        this(rules, startEpochMillis, new EntityDataImpl(rules.getComponentTypes()), tick);
+    public GameEngine(GameRules rules, long startEpochMillis, long frame) {
+        this(rules, startEpochMillis, new EntityDataImpl(rules.getComponentTypes()), frame);
     }
 
-    public GameEngine(GameRules rules, long startEpochMillis, EntityData data, long tick) {
+    public GameEngine(GameRules rules, long startEpochMillis, EntityData data, long frame) {
         this.rules = rules;
         this.startEpochMillis = startEpochMillis;
         this.data = data;
         this.systems = rules.getSystems();
-        this.tick = tick;
+        this.frame = frame;
     }
 
     public void tick(Collection<GameEvent> events) {
@@ -62,7 +62,8 @@ public class GameEngine {
                         data.set(player, new Hitbox(new Circle(0, 0, 250)));
                         data.set(player, new Position(0, 0));
                         data.set(player, new Speed(0, 0));
-                        data.set(player, new ActorState(ActorAction.IDLE, Direction.NONE, 0));
+                        data.set(player, new ActorState(ActorAction.IDLE, frame));
+                        data.set(player, Direction.DOWN);
                         data.set(player, new Health(100));
                     }
                 } else {
@@ -79,7 +80,7 @@ public class GameEngine {
                 }
             }
         }
-        tick++;
+        frame++;
         for (GameSystem system : systems) {
             system.tick(this);
         }
@@ -90,7 +91,7 @@ public class GameEngine {
     }
 
     public long getFrame() {
-        return tick;
+        return frame;
     }
 
     public EntityData getData() {
