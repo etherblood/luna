@@ -22,12 +22,14 @@ import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Health;
 import com.etherblood.luna.engine.Hitbox;
+import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +42,10 @@ import org.lwjgl.vulkan.KHRSurface;
 import org.lwjgl.vulkan.VK10;
 
 public class ApplicationClient extends Application {
+
+    private final float CAMERA_DISTANCE = 10;
+    private final float CAMERA_LOOKAT_HEIGHT = 0f;
+    private final float CAMERA_ANGLE = (float) (30 * Math.PI / 180);
 
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final Map<Integer, ModelWrapper> models = new HashMap<>();
@@ -79,6 +85,7 @@ public class ApplicationClient extends Application {
         setLight(directionalLight);
 
         sceneCamera.setLocation(new Vector3f(0, 2, 10));
+        sceneCamera.setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
 
         vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
                 "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
@@ -159,6 +166,17 @@ public class ApplicationClient extends Application {
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         EntityData data = snapshot.getData();
 
+        List<Integer> players = data.findByValue(new PlayerId(gameProxy.getPlayer().id));
+        for (int player : players) {
+            Position position = data.get(player, Position.class);
+            if (position != null) {
+                Vector3f lookAt = convert(position.vector()).add(0, CAMERA_LOOKAT_HEIGHT, 0);
+                Vector3f cameraOffset = new Vector3f(0, 0, CAMERA_DISTANCE);
+                cameraOffset.rotate(new Quaternionf(new AxisAngle4f(-CAMERA_ANGLE, 1, 0, 0)));
+                Vector3f lookFrom = lookAt.add(cameraOffset, new Vector3f());
+                sceneCamera.setLocation(lookFrom);
+            }
+        }
 
         // status huds
         for (StatusHudWrapper wrapper : statusHuds.values()) {
