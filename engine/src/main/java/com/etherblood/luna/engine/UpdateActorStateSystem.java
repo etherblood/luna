@@ -5,7 +5,7 @@ import com.etherblood.luna.data.EntityData;
 public class UpdateActorStateSystem implements GameSystem {
 
     private static final long DASH_DURATION_TICKS = 48;
-    
+
     private static final long ATTACK1_DURATION_TICKS = 280;// allow any interrupt for frames 160+
     private static final long ATTACK1_DAMAGE_FRAME = 100;
 
@@ -79,6 +79,7 @@ public class UpdateActorStateSystem implements GameSystem {
                 } else if (state.action().isTurnable() && state.direction() != input.direction()) {
                     state = new ActorState(state.action(), input.direction(), state.startFrame());
                 }
+                data.remove(entity, PlayerInput.class);
             }
             data.set(entity, state);
         }

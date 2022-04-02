@@ -49,7 +49,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());
         kryo.register(Vector2.class, new RecordSerializer<>());
-        kryo.register(ActorAction.class, new EnumSerializer(ActorAction.class));
+        kryo.register(ActorAction.class, new EnumSerializer<>(ActorAction.class));
         kryo.register(Direction.class, new EnumSerializer<>(Direction.class));
 
         kryo.register(PlayerId.class, new RecordSerializer<>());
