@@ -11,16 +11,34 @@ import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.client.ClientGameModule;
 import com.etherblood.luna.network.client.timestamp.ClientTimestampModule;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.Map;
+import javax.swing.JOptionPane;
 
 public class Main {
 
     public static void main(String... args) throws IOException {
+        try {
+            startApp(args);
+        } catch (Throwable t) {
+            showErrorDialog(t);
+            throw t;
+        }
+    }
+
+    static void showErrorDialog(Throwable t) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        t.printStackTrace(pw);
+        JOptionPane.showMessageDialog(null, sw.toString(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private static void startApp(String[] args) throws IOException {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         if (args.length == 0) {
-            System.out.println("First argument must be a jwt (usually passed by the destrostudios launcher).");
-            return;
+            throw new IllegalArgumentException("First argument must be a jwt.");
         }
         new ApplicationClient(remoteProxy("destrostudios.com", args[0])).start();
     }
