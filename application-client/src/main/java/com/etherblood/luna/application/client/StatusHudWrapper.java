@@ -13,7 +13,7 @@ public class StatusHudWrapper {
     private final Node node;
     private final BitmapText nameNode;
     private final BitmapText healthNode;
-    private final float MAGIC = 10f;
+    private final float MAGIC = 9f;
     private static final float SCALE_MAGIC = 0.005f;
 
     public StatusHudWrapper(int entity, BitmapFont font) {
