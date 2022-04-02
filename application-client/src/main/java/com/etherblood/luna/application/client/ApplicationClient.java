@@ -27,7 +27,6 @@ import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -214,19 +213,7 @@ public class ApplicationClient extends Application {
 //                nameText.move(new Vector3f(0, 5, 0));
 //                model.add(nameText);
 
-                models.put(entity, new ModelWrapper(entity, model, List.of(
-                        "agonizing",
-                        "attack1",
-                        "attack2",
-                        "dash",
-                        "death",
-                        "hit",
-                        "idle",
-                        "thriller1",
-                        "thriller2",
-                        "thriller3",
-                        "thriller4",
-                        "walk"), nameText));
+                models.put(entity, new ModelWrapper(entity, model));
                 System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
             }
             ModelWrapper wrapper = models.get(entity);
