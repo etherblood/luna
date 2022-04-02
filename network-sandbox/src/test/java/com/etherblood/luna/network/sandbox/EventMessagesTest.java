@@ -1,7 +1,6 @@
 package com.etherblood.luna.network.sandbox;
 
 import com.etherblood.luna.engine.ActorAction;
-import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.network.api.EventMessage;
@@ -22,7 +21,7 @@ public class EventMessagesTest {
         // given
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -40,7 +39,7 @@ public class EventMessagesTest {
         // given
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -59,8 +58,8 @@ public class EventMessagesTest {
         // given
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
-        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
+        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActorAction.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -80,7 +79,7 @@ public class EventMessagesTest {
         // given
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -99,8 +98,8 @@ public class EventMessagesTest {
         // given
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
-        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
+        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActorAction.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -123,7 +122,7 @@ public class EventMessagesTest {
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
 
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
 
         // when
         server.ackAndBroadcast(new EventMessage(0, 0, -1, new EventMessagePart[]{input0}));
@@ -140,7 +139,7 @@ public class EventMessagesTest {
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
 
         // when
         server.ackAndBroadcast(new EventMessage(0, 0, -1, new EventMessagePart[]{input0}));
@@ -158,8 +157,8 @@ public class EventMessagesTest {
         ServerEventMessageBuilder server = new ServerEventMessageBuilder();
         ClientEventMessageBuilder client = new ClientEventMessageBuilder();
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, Direction.NONE, ActorAction.IDLE), null));
-        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, Direction.NONE, ActorAction.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActorAction.IDLE), null));
+        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActorAction.IDLE), null));
 
         // when
         server.ackAndBroadcast(new EventMessage(0, 0, -1, new EventMessagePart[]{input0}));
