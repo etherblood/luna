@@ -25,18 +25,22 @@ public class GameRules {
                         Speed.class,
                         Movebox.class,
                         Hitbox.class,
+                        Damagebox.class,
                         ActorState.class,
                         PlayerInput.class,
                         PlayerId.class,
                         PlayerName.class,
                         Direction.class,
-                        Health.class,
-                        ActorKey.class
+                        MilliHealth.class,
+                        ActorKey.class,
+                        PendingDelete.class
                 ),
                 List.of(
                         new UpdateActorStateSystem(actionFactory),
                         new ApplyActionSystem(actionFactory),
-                        new MovementSystem()
+                        new MovementSystem(),
+                        new DamageboxSystem(),
+                        new PendingDeleteSystem()
                 ),
                 new TemplatesFactoryImpl(),
                 60));

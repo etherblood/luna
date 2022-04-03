@@ -2,7 +2,7 @@ package com.etherblood.luna.engine.actions;
 
 import com.etherblood.luna.engine.GameEngine;
 
-public class Attack2 extends Action {
+public class BladeOfChaos extends Action {
     private static final long DAMAGE_FRAME = 64;
     private static final long INTERRUPT_RESIST_FRAMES = 100;
     private static final long DURATION_FRAMES = 160;

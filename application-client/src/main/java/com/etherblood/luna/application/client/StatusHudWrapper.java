@@ -30,11 +30,11 @@ public class StatusHudWrapper {
         nameNode.setLocalTranslation(new Vector3f(-name.length() / 2f * MAGIC, 10, 0));
     }
 
-    public void setHealth(Integer health) {
-        if (health == null) {
+    public void setHealth(Integer milliHealth) {
+        if (milliHealth == null) {
             healthNode.setText("");
         } else {
-            String text = Integer.toString(Math.max(0, health));
+            String text = Integer.toString(Math.max(0, ceilDiv(milliHealth, 1000)));
             healthNode.setText(text);
             healthNode.setLocalTranslation(new Vector3f(-text.length() / 2f * MAGIC, 30, 0));
         }
@@ -47,5 +47,8 @@ public class StatusHudWrapper {
     public Node getNode() {
         return node;
     }
-
+    
+    private static int ceilDiv(int x, int y) {
+        return -Math.floorDiv(-x, y);
+    }
 }

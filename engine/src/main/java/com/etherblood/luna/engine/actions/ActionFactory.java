@@ -8,8 +8,8 @@ public class ActionFactory {
             ActionKey.IDLE, new Idle(),
             ActionKey.WALK, new Walk(),
             ActionKey.DASH, new Dash(),
-            ActionKey.ATTACK1, new Attack1(),
-            ActionKey.ATTACK2, new Attack2(),
+            ActionKey.ATTACK1, new GazeOfDarkness(),
+            ActionKey.ATTACK2, new BladeOfChaos(),
             ActionKey.FALLEN, new Fallen()
     );
 

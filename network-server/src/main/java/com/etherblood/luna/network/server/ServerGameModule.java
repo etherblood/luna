@@ -59,7 +59,7 @@ public class ServerGameModule extends GameModule {
             synchronized (lock) {
                 long frame = state.getFrame();
 
-                System.out.println("User " + user.login + " connected on frame " + frame);
+                System.out.println("User " + user.login + " connected on afterFrame " + frame);
                 connection.sendTCP(state);
                 builders.put(connection.getID(), new ServerEventMessageBuilder());
                 connections.put(connection.getID(), connection);

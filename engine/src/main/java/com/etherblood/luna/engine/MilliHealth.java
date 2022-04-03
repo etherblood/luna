@@ -1,6 +1,6 @@
 package com.etherblood.luna.engine;
 
-public record Health(
+public record MilliHealth(
         int value
 ) {
 }

@@ -24,4 +24,11 @@ public record Circle(
         int dY = pos.y() - y;
         return dX * dX + dY * dY < radius * radius;
     }
+
+    public boolean intersects(Circle other) {
+        int dX = other.x() - x;
+        int dY = other.y() - y;
+        int radiusSum = other.radius() + radius;
+        return dX * dX + dY * dY < radiusSum * radiusSum;
+    }
 }

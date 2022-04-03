@@ -1,11 +1,16 @@
 package com.etherblood.luna.engine.actions;
 
+import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.Position;
+import com.etherblood.luna.engine.Vector2;
 
-public class Attack1 extends Action {
+public class GazeOfDarkness extends Action {
     private static final long DAMAGE_FRAME = 100;
     private static final long INTERRUPT_RESIST_FRAMES = 160;
     private static final long DURATION_FRAMES = 280;
+    private static final int RANGE = 1_500;
 
     @Override
     public ActionKey getKey() {
@@ -25,7 +30,12 @@ public class Attack1 extends Action {
     @Override
     public void update(GameEngine game, int actor) {
         if (getElapsedFrames(game, actor) == DAMAGE_FRAME) {
-            // damage magic
+            EntityData data = game.getData();
+            int entity = data.createEntity();
+            game.applyTemplate(entity, "gaze_of_darkness");
+            Vector2 actorPosition = data.get(actor, Position.class).vector();
+            Direction actorDirection = data.get(actor, Direction.class);
+            data.set(entity, new Position(actorPosition.add(actorDirection.toLengthVector(RANGE))));
         }
     }
 }

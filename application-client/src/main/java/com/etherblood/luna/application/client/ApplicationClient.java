@@ -16,10 +16,11 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActorKey;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
+import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.engine.Health;
 import com.etherblood.luna.engine.Hitbox;
+import com.etherblood.luna.engine.MilliHealth;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
@@ -49,6 +50,7 @@ public class ApplicationClient extends Application {
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final Map<Integer, ModelWrapper> models = new HashMap<>();
     private final Map<Integer, HitboxWrapper> hitboxes = new HashMap<>();
+    private final Map<Integer, HitboxWrapper> damageboxes = new HashMap<>();
     private final Map<Integer, StatusHudWrapper> statusHuds = new HashMap<>();
     private Geometry geometryGround;
     private final GameProxy gameProxy;
@@ -181,7 +183,7 @@ public class ApplicationClient extends Application {
             }
             Vector2 position = data.get(entity, Position.class).vector();
             String name = data.get(entity, PlayerName.class).name();
-            Health health = data.get(entity, Health.class);
+            MilliHealth health = data.get(entity, MilliHealth.class);
             StatusHudWrapper wrapper = statusHuds.get(entity);
             wrapper.setName(name);
             wrapper.setHealth(health == null ? null : health.value());
@@ -217,6 +219,36 @@ public class ApplicationClient extends Application {
             }
             Vector2 position = data.get(entity, Position.class).vector();
             hitboxes.get(entity).getNode().setLocalTranslation(convert(position));
+        }
+
+
+        // damageboxes
+        for (HitboxWrapper wrapper : damageboxes.values()) {
+            if (!data.has(wrapper.getEntity(), Damagebox.class)) {
+                debugNode.remove(wrapper.getNode());
+                hitboxes.remove(wrapper.getEntity());
+            }
+        }
+        for (int entity : data.list(Damagebox.class)) {
+            if (!damageboxes.containsKey(entity)) {
+                Circle shape = data.get(entity, Damagebox.class).shape();
+
+                CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
+                Geometry geometry = new Geometry();
+                geometry.setMesh(circle);
+                Material material = new Material();
+                material.setVertexShader(vertexShaderDefault);
+                material.setFragmentShader(fragShaderDefault);
+                material.setCullMode(VK10.VK_CULL_MODE_NONE);
+                material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
+                material.getParameters().setVector4f("color", new Vector4f(1, 0, 0, 1));
+                geometry.setMaterial(material);
+                geometry.setShadowMode(ShadowMode.OFF);
+                damageboxes.put(entity, new HitboxWrapper(entity, geometry));
+                debugNode.add(geometry);
+            }
+            Vector2 position = data.get(entity, Position.class).vector();
+            damageboxes.get(entity).getNode().setLocalTranslation(convert(position));
         }
 
 

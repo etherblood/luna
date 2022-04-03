@@ -12,12 +12,14 @@ import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.ActorKey;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
+import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
-import com.etherblood.luna.engine.Health;
 import com.etherblood.luna.engine.Hitbox;
+import com.etherblood.luna.engine.MilliHealth;
 import com.etherblood.luna.engine.Movebox;
+import com.etherblood.luna.engine.PendingDelete;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerJoined;
@@ -44,9 +46,11 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Speed.class, new RecordSerializer<>());
         kryo.register(Movebox.class, new RecordSerializer<>());
         kryo.register(Hitbox.class, new RecordSerializer<>());
+        kryo.register(Damagebox.class, new RecordSerializer<>());
         kryo.register(ActorState.class, new RecordSerializer<>());
-        kryo.register(Health.class, new RecordSerializer<>());
+        kryo.register(MilliHealth.class, new RecordSerializer<>());
         kryo.register(ActorKey.class, new RecordSerializer<>());
+        kryo.register(PendingDelete.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());
