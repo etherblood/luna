@@ -1,23 +1,23 @@
 package com.etherblood.luna.engine.actions;
 
 import java.util.Map;
-import java.util.function.LongFunction;
 
 public class ActionFactory {
 
-    private final Map<ActionKey, LongFunction<Action>> actionMappings = Map.of(
-            ActionKey.IDLE, Idle::new,
-            ActionKey.WALK, Walk::new,
-            ActionKey.DASH, Dash::new,
-            ActionKey.ATTACK1, Attack1::new,
-            ActionKey.ATTACK2, Attack2::new
+    private final Map<ActionKey, Action> actionMappings = Map.of(
+            ActionKey.IDLE, new Idle(),
+            ActionKey.WALK, new Walk(),
+            ActionKey.DASH, new Dash(),
+            ActionKey.ATTACK1, new Attack1(),
+            ActionKey.ATTACK2, new Attack2(),
+            ActionKey.FALLEN, new Fallen()
     );
 
-    public Action getAction(ActionKey key, long elapsedFrames) {
-        LongFunction<Action> constructor = actionMappings.get(key);
-        if (constructor == null) {
+    public Action getAction(ActionKey key) {
+        Action action = actionMappings.get(key);
+        if (action == null) {
             throw new NullPointerException("No mapping for " + key);
         }
-        return constructor.apply(elapsedFrames);
+        return action;
     }
 }

@@ -4,24 +4,18 @@ import com.etherblood.luna.engine.GameEngine;
 
 public class Idle extends Action {
 
-    private final long elapsedFrames;
-
-    public Idle(long elapsedFrames) {
-        this.elapsedFrames = elapsedFrames;
-    }
-
     @Override
     public ActionKey getKey() {
         return ActionKey.IDLE;
     }
 
     @Override
-    public boolean hasEnded() {
+    public boolean hasEnded(GameEngine game, int actor) {
         return false;
     }
 
     @Override
-    protected int interruptResistance() {
+    protected int interruptResistance(GameEngine game, int actor) {
         return 0;
     }
 
@@ -31,7 +25,7 @@ public class Idle extends Action {
     }
 
     @Override
-    public boolean isTurnable() {
+    public boolean isTurnable(GameEngine game, int actor) {
         return true;
     }
 }

@@ -9,24 +9,18 @@ public class Dash extends Action {
     private static final long DURATION_FRAMES = 48;
     private static final int SPEED = 3000 / 60;
 
-    private final long elapsedFrames;
-
-    public Dash(long elapsedFrames) {
-        this.elapsedFrames = elapsedFrames;
-    }
-
     @Override
     public ActionKey getKey() {
         return ActionKey.DASH;
     }
 
     @Override
-    public boolean hasEnded() {
-        return elapsedFrames > DURATION_FRAMES;
+    public boolean hasEnded(GameEngine game, int actor) {
+        return getElapsedFrames(game, actor) > DURATION_FRAMES;
     }
 
     @Override
-    protected int interruptResistance() {
+    protected int interruptResistance(GameEngine game, int actor) {
         return 1;
     }
 

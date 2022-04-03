@@ -18,23 +18,23 @@ public class UpdateActorStateSystem implements GameSystem {
         EntityData data = engine.getData();
         for (int entity : data.list(ActorState.class)) {
             ActorState state = data.get(entity, ActorState.class);
-            Action action = factory.getAction(state.action(), engine.getFrame() - state.startFrame());
+            Action action = factory.getAction(state.action());
 
             // handle ended actions
-            if (action.hasEnded()) {
+            if (action.hasEnded(engine, entity)) {
                 state = new ActorState(ActionKey.IDLE, engine.getFrame());
-                action = factory.getAction(state.action(), engine.getFrame() - state.startFrame());
+                action = factory.getAction(state.action());
             }
 
             // handle user input
             PlayerInput input = data.get(entity, PlayerInput.class);
             if (input != null) {
-                if (action.isInterruptedBy(input.action())) {
+                if (action.isInterruptedBy(engine, entity, input.action())) {
                     state = new ActorState(input.action(), engine.getFrame());
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
                     }
-                } else if (action.isTurnable()) {
+                } else if (action.isTurnable(engine, entity)) {
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
                     }

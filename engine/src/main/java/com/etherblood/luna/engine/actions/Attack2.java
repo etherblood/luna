@@ -7,30 +7,24 @@ public class Attack2 extends Action {
     private static final long INTERRUPT_RESIST_FRAMES = 100;
     private static final long DURATION_FRAMES = 160;
 
-    private final long elapsedFrames;
-
-    public Attack2(long elapsedFrames) {
-        this.elapsedFrames = elapsedFrames;
-    }
-
     @Override
     public ActionKey getKey() {
         return ActionKey.ATTACK2;
     }
 
     @Override
-    public boolean hasEnded() {
-        return elapsedFrames > DURATION_FRAMES;
+    public boolean hasEnded(GameEngine game, int actor) {
+        return getElapsedFrames(game, actor) > DURATION_FRAMES;
     }
 
     @Override
-    protected int interruptResistance() {
-        return elapsedFrames < INTERRUPT_RESIST_FRAMES ? 2 : 0;
+    protected int interruptResistance(GameEngine game, int actor) {
+        return getElapsedFrames(game, actor) < INTERRUPT_RESIST_FRAMES ? 2 : 0;
     }
 
     @Override
     public void update(GameEngine game, int actor) {
-        if (elapsedFrames == DAMAGE_FRAME) {
+        if (getElapsedFrames(game, actor) == DAMAGE_FRAME) {
             // damage magic
         }
     }

@@ -276,7 +276,7 @@ public class ApplicationClient extends Application {
                     wrapper.setAnimation("attack1");
                 } else if (actorState.action() == ActionKey.ATTACK2) {
                     wrapper.setAnimation("attack2");
-                } else if (actorState.action() == ActionKey.DEATH) {
+                } else if (actorState.action() == ActionKey.FALLEN) {
                     wrapper.setAnimation("death");
                 }
                 float fps = snapshot.getRules().getFps();

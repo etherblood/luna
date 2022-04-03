@@ -16,7 +16,7 @@ public class ApplyActionSystem implements GameSystem {
         EntityData data = engine.getData();
         for (int entity : data.list(ActorState.class)) {
             ActorState state = data.get(entity, ActorState.class);
-            Action action = factory.getAction(state.action(), engine.getFrame() - state.startFrame());
+            Action action = factory.getAction(state.action());
             action.update(engine, entity);
         }
     }
