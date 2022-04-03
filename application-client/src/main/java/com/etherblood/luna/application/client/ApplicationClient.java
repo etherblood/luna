@@ -30,6 +30,7 @@ import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -169,159 +170,173 @@ public class ApplicationClient extends Application {
             }
         }
 
-        // status huds
-        for (StatusHudWrapper wrapper : statusHuds.values()) {
-            if (!data.has(wrapper.getEntity(), PlayerName.class)) {
-                guiNode.remove(wrapper.getNode());
-                statusHuds.remove(wrapper.getEntity());
-            }
-        }
-        for (int entity : data.list(PlayerName.class)) {
-            if (!statusHuds.containsKey(entity)) {
-                StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
-                statusHuds.put(entity, wrapper);
-                guiNode.add(wrapper.getNode());
-            }
-            Vector2 position = data.get(entity, Position.class).vector();
-            String name = data.get(entity, PlayerName.class).name();
-            MilliHealth health = data.get(entity, MilliHealth.class);
-            StatusHudWrapper wrapper = statusHuds.get(entity);
-            wrapper.setName(name);
-            wrapper.setHealth(health == null ? null : health.value());
-            Vector3f screenCoordinates = getScreenCoordinates(convert(position));
-            wrapper.getNode().setLocalTranslation(screenCoordinates);
-        }
-
-
-        // hitboxes
-        for (HitboxWrapper wrapper : hitboxes.values()) {
-            if (!data.has(wrapper.getEntity(), Hitbox.class)) {
-                debugNode.remove(wrapper.getNode());
-                hitboxes.remove(wrapper.getEntity());
-            }
-        }
-        for (int entity : data.list(Hitbox.class)) {
-            if (!hitboxes.containsKey(entity)) {
-                Circle shape = data.get(entity, Hitbox.class).shape();
-
-                CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
-                Geometry geometry = new Geometry();
-                geometry.setMesh(circle);
-                Material material = new Material();
-                material.setVertexShader(vertexShaderDefault);
-                material.setFragmentShader(fragShaderDefault);
-                material.setCullMode(VK10.VK_CULL_MODE_NONE);
-                material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
-                material.getParameters().setVector4f("color", new Vector4f(1, 1, 1, 1));
-                geometry.setMaterial(material);
-                geometry.setShadowMode(ShadowMode.OFF);
-                hitboxes.put(entity, new HitboxWrapper(entity, geometry));
-                debugNode.add(geometry);
-            }
-            Vector2 position = data.get(entity, Position.class).vector();
-            hitboxes.get(entity).getNode().setLocalTranslation(convert(position));
-        }
-
-
-        // damageboxes
-        for (HitboxWrapper wrapper : damageboxes.values()) {
-            if (!data.has(wrapper.getEntity(), Damagebox.class)) {
-                debugNode.remove(wrapper.getNode());
-                hitboxes.remove(wrapper.getEntity());
-            }
-        }
-        for (int entity : data.list(Damagebox.class)) {
-            if (!damageboxes.containsKey(entity)) {
-                Circle shape = data.get(entity, Damagebox.class).shape();
-
-                CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
-                Geometry geometry = new Geometry();
-                geometry.setMesh(circle);
-                Material material = new Material();
-                material.setVertexShader(vertexShaderDefault);
-                material.setFragmentShader(fragShaderDefault);
-                material.setCullMode(VK10.VK_CULL_MODE_NONE);
-                material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
-                material.getParameters().setVector4f("color", new Vector4f(1, 0, 0, 1));
-                geometry.setMaterial(material);
-                geometry.setShadowMode(ShadowMode.OFF);
-                damageboxes.put(entity, new HitboxWrapper(entity, geometry));
-                debugNode.add(geometry);
-            }
-            Vector2 position = data.get(entity, Position.class).vector();
-            damageboxes.get(entity).getNode().setLocalTranslation(convert(position));
-        }
-
-
-        // models
-        for (ModelWrapper wrapper : models.values()) {
-            if (!data.has(wrapper.getEntity(), ModelKey.class)) {
-                if (wrapper.getNode().hasParent(sceneNode)) {
-                    sceneNode.remove(wrapper.getNode());
+        {
+            // status huds
+            Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
+            while (iterator.hasNext()) {
+                StatusHudWrapper wrapper = iterator.next();
+                if (!data.has(wrapper.getEntity(), PlayerName.class)) {
+                    guiNode.remove(wrapper.getNode());
+                    iterator.remove();
                 }
-                models.remove(wrapper.getEntity());
+            }
+            for (int entity : data.list(PlayerName.class)) {
+                if (!statusHuds.containsKey(entity)) {
+                    StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
+                    statusHuds.put(entity, wrapper);
+                    guiNode.add(wrapper.getNode());
+                }
+                Vector2 position = data.get(entity, Position.class).vector();
+                String name = data.get(entity, PlayerName.class).name();
+                MilliHealth health = data.get(entity, MilliHealth.class);
+                StatusHudWrapper wrapper = statusHuds.get(entity);
+                wrapper.setName(name);
+                wrapper.setHealth(health == null ? null : health.value());
+                Vector3f screenCoordinates = getScreenCoordinates(convert(position));
+                wrapper.getNode().setLocalTranslation(screenCoordinates);
             }
         }
 
-        for (int entity : data.list(ModelKey.class)) {
-            String name = data.get(entity, ModelKey.class).name();
-            if (!models.containsKey(entity)) {
-                long nanos = System.nanoTime();
-                // hard coded amara model
-                Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
-                if (name.equals("amara")) {
-                    model.scale(new Vector3f(0.01f));
-                    model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
+        {
+            // hitboxes
+            Iterator<HitboxWrapper> iterator = hitboxes.values().iterator();
+            while (iterator.hasNext()) {
+                HitboxWrapper wrapper = iterator.next();
+                if (!data.has(wrapper.getEntity(), Hitbox.class)) {
+                    debugNode.remove(wrapper.getNode());
+                    iterator.remove();
+                }
+            }
+            for (int entity : data.list(Hitbox.class)) {
+                if (!hitboxes.containsKey(entity)) {
+                    Circle shape = data.get(entity, Hitbox.class).shape();
+
+                    CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
+                    Geometry geometry = new Geometry();
+                    geometry.setMesh(circle);
+                    Material material = new Material();
+                    material.setVertexShader(vertexShaderDefault);
+                    material.setFragmentShader(fragShaderDefault);
+                    material.setCullMode(VK10.VK_CULL_MODE_NONE);
+                    material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
+                    material.getParameters().setVector4f("color", new Vector4f(1, 1, 1, 1));
+                    geometry.setMaterial(material);
+                    geometry.setShadowMode(ShadowMode.OFF);
+                    hitboxes.put(entity, new HitboxWrapper(entity, geometry));
+                    debugNode.add(geometry);
+                }
+                Vector2 position = data.get(entity, Position.class).vector();
+                hitboxes.get(entity).getNode().setLocalTranslation(convert(position));
+            }
+        }
+
+        {
+            // damageboxes
+            Iterator<HitboxWrapper> iterator = damageboxes.values().iterator();
+            while (iterator.hasNext()) {
+                HitboxWrapper wrapper = iterator.next();
+                if (!data.has(wrapper.getEntity(), Damagebox.class)) {
+                    debugNode.remove(wrapper.getNode());
+                    iterator.remove();
+                }
+            }
+            for (int entity : data.list(Damagebox.class)) {
+                if (!damageboxes.containsKey(entity)) {
+                    Circle shape = data.get(entity, Damagebox.class).shape();
+
+                    CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
+                    Geometry geometry = new Geometry();
+                    geometry.setMesh(circle);
+                    Material material = new Material();
+                    material.setVertexShader(vertexShaderDefault);
+                    material.setFragmentShader(fragShaderDefault);
+                    material.setCullMode(VK10.VK_CULL_MODE_NONE);
+                    material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
+                    material.getParameters().setVector4f("color", new Vector4f(1, 0, 0, 1));
+                    geometry.setMaterial(material);
+                    geometry.setShadowMode(ShadowMode.OFF);
+                    damageboxes.put(entity, new HitboxWrapper(entity, geometry));
+                    debugNode.add(geometry);
+                }
+                Vector2 position = data.get(entity, Position.class).vector();
+                damageboxes.get(entity).getNode().setLocalTranslation(convert(position));
+            }
+        }
+
+        {
+            // models
+            Iterator<ModelWrapper> iterator = models.values().iterator();
+            while (iterator.hasNext()) {
+                ModelWrapper wrapper = iterator.next();
+                if (!data.has(wrapper.getEntity(), ModelKey.class)) {
+                    if (wrapper.getNode().hasParent(sceneNode)) {
+                        sceneNode.remove(wrapper.getNode());
+                    }
+                    iterator.remove();
+                }
+            }
+
+            for (int entity : data.list(ModelKey.class)) {
+                String name = data.get(entity, ModelKey.class).name();
+                if (!models.containsKey(entity)) {
+                    long nanos = System.nanoTime();
+                    // hard coded amara model
+                    Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
+                    if (name.equals("amara")) {
+                        model.scale(new Vector3f(0.01f));
+                        model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
+                    } else {
+                        model.setRenderBucket(RenderBucketType.TRANSPARENT);
+                        model.forEachGeometry(geometry -> {
+                            geometry.getMaterial().setTransparent(true);
+                            geometry.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
+                        });
+
+                    }
+
+                    models.put(entity, new ModelWrapper(entity, model));
+                    System.out.println("load " + name + " in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
+                }
+                ModelWrapper wrapper = models.get(entity);
+                Position position = data.get(entity, Position.class);
+                if (position != null) {
+                    if (!wrapper.getNode().hasParent(sceneNode)) {
+                        sceneNode.add(wrapper.getNode());
+                    }
+                    Vector2 vector = position.vector();
+                    wrapper.getNode().setLocalTranslation(convert(vector));
                 } else {
-                    model.setRenderBucket(RenderBucketType.TRANSPARENT);
-                    model.forEachGeometry(geometry -> {
-                        geometry.getMaterial().setTransparent(true);
-                    });
-
+                    if (wrapper.getNode().hasParent(sceneNode)) {
+                        sceneNode.remove(wrapper.getNode());
+                    }
                 }
 
-                models.put(entity, new ModelWrapper(entity, model));
-                System.out.println("load " + name + " in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
-            }
-            ModelWrapper wrapper = models.get(entity);
-            Position position = data.get(entity, Position.class);
-            if (position != null) {
-                if (!wrapper.getNode().hasParent(sceneNode)) {
-                    sceneNode.add(wrapper.getNode());
+                Direction direction = data.get(entity, Direction.class);
+                if (direction != null) {
+                    float angle = directionToAngle(direction);
+                    AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
+                    wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
                 }
-                Vector2 vector = position.vector();
-                wrapper.getNode().setLocalTranslation(convert(vector));
-            } else {
-                if (wrapper.getNode().hasParent(sceneNode)) {
-                    sceneNode.remove(wrapper.getNode());
-                }
-            }
 
-            Direction direction = data.get(entity, Direction.class);
-            if (direction != null) {
-                float angle = directionToAngle(direction);
-                AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
-                wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
-            }
-
-            ActorState actorState = data.get(entity, ActorState.class);
-            if (actorState != null) {
-                if (actorState.action() == ActionKey.IDLE) {
-                    wrapper.setAnimation("idle");
-                } else if (actorState.action() == ActionKey.WALK) {
-                    wrapper.setAnimation("walk");
-                } else if (actorState.action() == ActionKey.DASH) {
-                    wrapper.setAnimation("dash");
-                } else if (actorState.action() == ActionKey.ATTACK1) {
-                    wrapper.setAnimation("attack1");
-                } else if (actorState.action() == ActionKey.ATTACK2) {
-                    wrapper.setAnimation("attack2");
-                } else if (actorState.action() == ActionKey.FALLEN) {
-                    wrapper.setAnimation("death");
+                ActorState actorState = data.get(entity, ActorState.class);
+                if (actorState != null) {
+                    if (actorState.action() == ActionKey.IDLE) {
+                        wrapper.setAnimation("idle");
+                    } else if (actorState.action() == ActionKey.WALK) {
+                        wrapper.setAnimation("walk");
+                    } else if (actorState.action() == ActionKey.DASH) {
+                        wrapper.setAnimation("dash");
+                    } else if (actorState.action() == ActionKey.ATTACK1) {
+                        wrapper.setAnimation("attack1");
+                    } else if (actorState.action() == ActionKey.ATTACK2) {
+                        wrapper.setAnimation("attack2");
+                    } else if (actorState.action() == ActionKey.FALLEN) {
+                        wrapper.setAnimation("death");
+                    }
+                    float fps = snapshot.getRules().getFramesPerSecond();
+                    long animationFrames = snapshot.getFrame() - actorState.startFrame();
+                    wrapper.setAnimationTime(animationFrames / fps);
                 }
-                float fps = snapshot.getRules().getFramesPerSecond();
-                long animationFrames = snapshot.getFrame() - actorState.startFrame();
-                wrapper.setAnimationTime(animationFrames / fps);
             }
         }
 
