@@ -34,4 +34,9 @@ public class Walk extends Action {
     public boolean isTurnable(GameEngine game, int actor) {
         return true;
     }
+
+    @Override
+    public void cleanup(GameEngine game, int actor) {
+        game.getData().remove(actor, Speed.class);
+    }
 }

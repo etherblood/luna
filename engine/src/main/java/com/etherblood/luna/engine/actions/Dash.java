@@ -30,4 +30,9 @@ public class Dash extends Action {
         Direction direction = data.get(actor, Direction.class);
         data.set(actor, new Speed(direction.toLengthVector(SPEED)));
     }
+
+    @Override
+    public void cleanup(GameEngine game, int actor) {
+        game.getData().remove(actor, Speed.class);
+    }
 }

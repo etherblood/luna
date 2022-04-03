@@ -22,6 +22,7 @@ public class UpdateActorStateSystem implements GameSystem {
 
             // handle ended actions
             if (action.hasEnded(engine, entity)) {
+                action.cleanup(engine, entity);
                 state = new ActorState(ActionKey.IDLE, engine.getFrame());
                 action = factory.getAction(state.action());
             }
@@ -30,6 +31,7 @@ public class UpdateActorStateSystem implements GameSystem {
             PlayerInput input = data.get(entity, PlayerInput.class);
             if (input != null) {
                 if (action.isInterruptedBy(engine, entity, input.action())) {
+                    action.cleanup(engine, entity);
                     state = new ActorState(input.action(), engine.getFrame());
                     if (input.direction() != null) {
                         data.set(entity, input.direction());

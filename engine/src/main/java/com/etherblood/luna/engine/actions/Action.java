@@ -25,4 +25,8 @@ public abstract class Action {
         return game.getFrame() - game.getData().get(actor, ActorState.class).startFrame();
     }
 
+    public void cleanup(GameEngine game, int actor) {
+        // do nothing as default
+    }
+
 }
