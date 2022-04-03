@@ -9,16 +9,19 @@ public class MovementSystem implements GameSystem {
         for (int entity : data.list(Speed.class)) {
             Vector2 speed = data.get(entity, Speed.class).vector();
             Position position = data.get(entity, Position.class);
-            Rectangle movebox = data.get(entity, Movebox.class).shape().translate(position.vector());
+            Movebox movebox = data.get(entity, Movebox.class);
+            if (movebox != null) {
+                Rectangle moveboxShape = movebox.shape().translate(position.vector());
 
-            Vector2 min = new Vector2(
-                    movebox.minX() + Math.min(0, speed.x()),
-                    movebox.minY() + Math.min(0, speed.y()));
-            Vector2 max = new Vector2(
-                    movebox.maxX() + Math.max(0, speed.x()),
-                    movebox.maxY() + Math.max(0, speed.y()));
+                Vector2 min = new Vector2(
+                        moveboxShape.minX() + Math.min(0, speed.x()),
+                        moveboxShape.minY() + Math.min(0, speed.y()));
+                Vector2 max = new Vector2(
+                        moveboxShape.maxX() + Math.max(0, speed.x()),
+                        moveboxShape.maxY() + Math.max(0, speed.y()));
 
-            //TODO: collisions
+                //TODO: collisions
+            }
             data.set(entity, new Position(position.vector().add(speed)));
         }
     }
