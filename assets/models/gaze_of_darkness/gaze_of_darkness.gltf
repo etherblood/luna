@@ -58,7 +58,7 @@
         {
             "mimeType" : "image/png",
             "name" : "gaze_of_darkness",
-            "uri" : "../../../../../images/_own/2022/gaze_of_darkness_model/gaze_of_darkness.png"
+            "uri" : "gaze_of_darkness.png"
         }
     ],
     "accessors" : [

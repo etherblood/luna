@@ -57,8 +57,8 @@
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "blade_of_chaos.png",
-            "uri" : "../../../../../images/_own/2022/blade_of_chaos_model/blade_of_chaos.png"
+            "name" : "blade_of_chaos",
+            "uri" : "blade_of_chaos.png"
         }
     ],
     "accessors" : [
