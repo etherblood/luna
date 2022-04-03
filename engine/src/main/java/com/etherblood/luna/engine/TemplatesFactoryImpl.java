@@ -16,17 +16,19 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new ActorState(ActionKey.IDLE, game.getFrame()));
                 data.set(entity, Direction.DOWN);
                 data.set(entity, new MilliHealth(100_000));
-                data.set(entity, new ActorKey("amara"));
+                data.set(entity, new ModelKey("amara"));
                 break;
             case "gaze_of_darkness":
                 data.set(entity, new Damagebox(new Circle(0, 0, 1_000), 10_000 / fps));
                 data.set(entity, new PendingDelete(game.getFrame() + 5 * fps));
+                data.set(entity, new ModelKey("gaze_of_darkness"));
                 break;
             case "blade_of_chaos":
                 data.set(entity, new Damagebox(new Circle(0, 0, 500), 25_000 / fps));
                 data.set(entity, new PendingDelete(game.getFrame() + 1 * fps));
                 int milliMetresPerFrame = 6_000 / game.getRules().getFramesPerSecond();
                 data.set(entity, new Speed(milliMetresPerFrame));
+                data.set(entity, new ModelKey("blade_of_chaos"));
                 break;
             default:
                 throw new AssertionError(templateKey);

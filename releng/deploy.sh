@@ -17,7 +17,6 @@ bash stop.sh
 echo stopped server
 cp ${GIT}/application-server/target/application-server-*[!s].jar ${SERVER}/luna.jar
 rsync -rc --delete ${GIT}/application-server/target/libs ${SERVER}/
-#rsync -rc --delete ${GIT}/application-server/target/assets ${SERVER}/
 echo updated server files
 bash start.sh
 echo started server

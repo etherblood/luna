@@ -32,7 +32,7 @@ public class GameRules {
                         PlayerName.class,
                         Direction.class,
                         MilliHealth.class,
-                        ActorKey.class,
+                        ModelKey.class,
                         PendingDelete.class
                 ),
                 List.of(

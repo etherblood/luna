@@ -1,6 +1,6 @@
 package com.etherblood.luna.engine;
 
-public record ActorKey(
+public record ModelKey(
         String name
 ) {
 }

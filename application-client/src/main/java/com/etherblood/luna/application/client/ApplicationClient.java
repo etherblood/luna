@@ -7,13 +7,13 @@ import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
 import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Quad;
+import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
-import com.etherblood.luna.engine.ActorKey;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Damagebox;
@@ -21,6 +21,7 @@ import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Hitbox;
 import com.etherblood.luna.engine.MilliHealth;
+import com.etherblood.luna.engine.ModelKey;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
@@ -254,7 +255,7 @@ public class ApplicationClient extends Application {
 
         // models
         for (ModelWrapper wrapper : models.values()) {
-            if (!data.has(wrapper.getEntity(), ActorState.class)) {
+            if (!data.has(wrapper.getEntity(), ModelKey.class)) {
                 if (wrapper.getNode().hasParent(sceneNode)) {
                     sceneNode.remove(wrapper.getNode());
                 }
@@ -262,18 +263,25 @@ public class ApplicationClient extends Application {
             }
         }
 
-        for (int entity : data.list(ActorKey.class)) {
-            String name = data.get(entity, ActorKey.class).name();
+        for (int entity : data.list(ModelKey.class)) {
+            String name = data.get(entity, ModelKey.class).name();
             if (!models.containsKey(entity)) {
                 long nanos = System.nanoTime();
                 // hard coded amara model
                 Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
-                float scale = 0.01f;
-                model.scale(new Vector3f(scale));
-                model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
+                if (name.equals("amara")) {
+                    model.scale(new Vector3f(0.01f));
+                    model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
+                } else {
+                    model.setRenderBucket(RenderBucketType.TRANSPARENT);
+                    model.forEachGeometry(geometry -> {
+                        geometry.getMaterial().setTransparent(true);
+                    });
+
+                }
 
                 models.put(entity, new ModelWrapper(entity, model));
-                System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
+                System.out.println("load " + name + " in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
             }
             ModelWrapper wrapper = models.get(entity);
             Position position = data.get(entity, Position.class);
