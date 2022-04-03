@@ -290,6 +290,7 @@ public class ApplicationClient extends Application {
                         model.forEachGeometry(geometry -> {
                             geometry.getMaterial().setTransparent(true);
                             geometry.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
+                            geometry.getMaterial().setDepthWrite(false);
                         });
 
                     }
