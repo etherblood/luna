@@ -2,7 +2,7 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.data.EntityData;
-import com.etherblood.luna.engine.ActorAction;
+import com.etherblood.luna.engine.ActorKey;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
@@ -16,6 +16,7 @@ import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
+import com.etherblood.luna.engine.actions.ActionKey;
 
 public class LocalMain {
 
@@ -36,9 +37,10 @@ public class LocalMain {
         data.set(player, new Hitbox(new Circle(0, 0, 250)));
         data.set(player, new Position(0, 0));
         data.set(player, new Speed(0, 0));
-        data.set(player, new ActorState(ActorAction.IDLE, 0));
+        data.set(player, new ActorState(ActionKey.IDLE, 0));
         data.set(player, Direction.DOWN);
         data.set(player, new Health(100));
+        data.set(player, new ActorKey("amara"));
 
         return new LocalGameProxy(game, user);
     }

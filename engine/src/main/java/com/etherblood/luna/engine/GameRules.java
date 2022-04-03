@@ -1,5 +1,6 @@
 package com.etherblood.luna.engine;
 
+import com.etherblood.luna.engine.actions.ActionFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +11,7 @@ public class GameRules {
     private static final String DEFAULT_RULES_ID = "default";
 
     static {
+        ActionFactory actionFactory = new ActionFactory();
         RULES_MAP = Map.of(DEFAULT_RULES_ID, new GameRules(
                 DEFAULT_RULES_ID,
                 Set.of(
@@ -22,12 +24,13 @@ public class GameRules {
                         PlayerId.class,
                         PlayerName.class,
                         Direction.class,
-                        Health.class
+                        Health.class,
+                        ActorKey.class
                 ),
                 List.of(
-                        new ApplyActionSystem(),
-                        new MovementSystem(),
-                        new UpdateActorStateSystem()
+                        new UpdateActorStateSystem(actionFactory),
+                        new ApplyActionSystem(actionFactory),
+                        new MovementSystem()
                 ), 60));
     }
 

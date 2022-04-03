@@ -1,10 +1,10 @@
 package com.etherblood.luna.network.api.serialization;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.etherblood.luna.engine.ActorAction;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
+import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class EventMessageSerializerTest {
 
         EventMessage message = new EventMessage(9, 15, 25, new EventMessagePart[]{
                 new EventMessagePart(19, new GameEvent(null, null)),
-                new EventMessagePart(20, new GameEvent(new PlayerInput(13, Direction.DOWN_LEFT, ActorAction.DASH), null))
+                new EventMessagePart(20, new GameEvent(new PlayerInput(13, Direction.DOWN_LEFT, ActionKey.DASH), null))
         });
 
         EventMessage copy = kryo.copy(message);

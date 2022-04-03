@@ -1,91 +1,48 @@
 package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.actions.Action;
+import com.etherblood.luna.engine.actions.ActionFactory;
+import com.etherblood.luna.engine.actions.ActionKey;
 
 public class UpdateActorStateSystem implements GameSystem {
 
-    private static final long DASH_DURATION_TICKS = 48;
+    private final ActionFactory factory;
 
-    private static final long ATTACK1_DURATION_TICKS = 280;// allow any interrupt for frames 160+
-    private static final long ATTACK1_DAMAGE_FRAME = 100;
-
-    private static final long ATTACK2_DURATION_TICKS = 160;// allow any interrupt for frames 100+
-    private static final long ATTACK2_DAMAGE_FRAME = 64;
+    public UpdateActorStateSystem(ActionFactory factory) {
+        this.factory = factory;
+    }
 
     @Override
     public void tick(GameEngine engine) {
         EntityData data = engine.getData();
         for (int entity : data.list(ActorState.class)) {
             ActorState state = data.get(entity, ActorState.class);
-            if (data.has(entity, Health.class) && data.get(entity, Health.class).value() <= 0) {
-                if (ActorAction.DEATH.interrupts(state.action())) {
-                    state = new ActorState(ActorAction.DEATH, engine.getFrame());
-                }
-            }
-            if (state.action() == ActorAction.DASH && state.startFrame() + DASH_DURATION_TICKS <= engine.getFrame()) {
-                state = new ActorState(ActorAction.IDLE, engine.getFrame());
-            }
-            if (state.action() == ActorAction.ATTACK1) {
-                if (state.startFrame() + ATTACK1_DURATION_TICKS <= engine.getFrame()) {
-                    state = new ActorState(ActorAction.IDLE, engine.getFrame());
-                } else if (state.startFrame() + ATTACK1_DAMAGE_FRAME == engine.getFrame()) {
-                    // TODO: deal damage on specific attack frame?
-                    int damage = 20;
+            Action action = factory.getAction(state.action(), engine.getFrame() - state.startFrame());
 
-                    // placeholder
-                    Vector2 attackPosition = data.get(entity, Position.class).vector();
-                    for (int other : data.list(Health.class)) {
-                        if (other == entity) {
-                            continue;
-                        }
-                        Hitbox hitbox = data.get(other, Hitbox.class);
-                        Position position = data.get(other, Position.class);
-                        if (hitbox != null && position != null) {
-                            if (hitbox.shape().translate(position.vector()).contains(attackPosition)) {
-                                data.set(other, new Health(data.get(other, Health.class).value() - damage));
-                            }
-                        }
-                    }
-                }
-            }
-            if (state.action() == ActorAction.ATTACK2) {
-                if (state.startFrame() + ATTACK2_DURATION_TICKS <= engine.getFrame()) {
-                    state = new ActorState(ActorAction.IDLE, engine.getFrame());
-                } else if (state.startFrame() + ATTACK2_DAMAGE_FRAME == engine.getFrame()) {
-                    // TODO: deal damage on specific attack frame?
-                    int damage = 10;
-
-                    // placeholder
-                    Vector2 attackPosition = data.get(entity, Position.class).vector();
-                    for (int other : data.list(Health.class)) {
-                        if (other == entity) {
-                            continue;
-                        }
-                        Hitbox hitbox = data.get(other, Hitbox.class);
-                        Position position = data.get(other, Position.class);
-                        if (hitbox != null && position != null) {
-                            if (hitbox.shape().translate(position.vector()).contains(attackPosition)) {
-                                data.set(other, new Health(data.get(other, Health.class).value() - damage));
-                            }
-                        }
-                    }
-                }
+            // handle ended actions
+            if (action.hasEnded()) {
+                state = new ActorState(ActionKey.IDLE, engine.getFrame());
+                action = factory.getAction(state.action(), engine.getFrame() - state.startFrame());
             }
 
+            // handle user input
             PlayerInput input = data.get(entity, PlayerInput.class);
             if (input != null) {
-                if (input.action().interrupts(state.action())) {
+                if (action.isInterruptedBy(input.action())) {
                     state = new ActorState(input.action(), engine.getFrame());
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
                     }
-                } else if (state.action().isTurnable()) {
+                } else if (action.isTurnable()) {
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
                     }
                 }
                 data.remove(entity, PlayerInput.class);
             }
+
+            // set new state
             data.set(entity, state);
         }
     }

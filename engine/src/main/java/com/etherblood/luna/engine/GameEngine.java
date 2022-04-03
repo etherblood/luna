@@ -2,6 +2,7 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.data.EntityDataImpl;
+import com.etherblood.luna.engine.actions.ActionKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,9 +63,10 @@ public class GameEngine {
                         data.set(player, new Hitbox(new Circle(0, 0, 250)));
                         data.set(player, new Position(0, 0));
                         data.set(player, new Speed(0, 0));
-                        data.set(player, new ActorState(ActorAction.IDLE, frame));
+                        data.set(player, new ActorState(ActionKey.IDLE, frame));
                         data.set(player, Direction.DOWN);
                         data.set(player, new Health(100));
+                        data.set(player, new ActorKey("amara"));
                     }
                 } else {
 //                    List<Integer> playerEntities = data.findByValue(new PlayerId(event.join().playerId()));

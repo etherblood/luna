@@ -2,8 +2,6 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.Application;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
-import com.destrostudios.icetea.core.camera.systems.CameraKeyMoveSystem;
-import com.destrostudios.icetea.core.camera.systems.CameraMouseRotateSystem;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
@@ -15,7 +13,7 @@ import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
-import com.etherblood.luna.engine.ActorAction;
+import com.etherblood.luna.engine.ActorKey;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
@@ -27,6 +25,7 @@ import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
+import com.etherblood.luna.engine.actions.ActionKey;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -124,8 +123,6 @@ public class ApplicationClient extends Application {
 
         // Inputs
 
-        CameraMouseRotateSystem cameraMouseRotateSystem = new CameraMouseRotateSystem(sceneCamera);
-        CameraKeyMoveSystem cameraKeyMoveSystem = new CameraKeyMoveSystem(sceneCamera);
         inputManager.addKeyListener(keyEvent -> {
             if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
                 pressedKeys.remove(keyEvent.getKey());
@@ -139,15 +136,6 @@ public class ApplicationClient extends Application {
                             sceneNode.remove(debugNode);
                         } else {
                             sceneNode.add(debugNode);
-                        }
-                        break;
-                    case GLFW.GLFW_KEY_9:
-                        if (hasSystem(cameraMouseRotateSystem)) {
-                            removeSystem(cameraMouseRotateSystem);
-                            removeSystem(cameraKeyMoveSystem);
-                        } else {
-                            addSystem(cameraMouseRotateSystem);
-                            addSystem(cameraKeyMoveSystem);
                         }
                         break;
                 }
@@ -242,23 +230,15 @@ public class ApplicationClient extends Application {
             }
         }
 
-        for (int entity : data.list(ActorState.class)) {
+        for (int entity : data.list(ActorKey.class)) {
+            String name = data.get(entity, ActorKey.class).name();
             if (!models.containsKey(entity)) {
                 long nanos = System.nanoTime();
                 // hard coded amara model
-                Node model = (Node) assetManager.loadModel("models/amara/amara.gltf");
+                Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
                 float scale = 0.01f;
                 model.scale(new Vector3f(scale));
                 model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
-
-                String playerName = data.get(entity, PlayerName.class).name();
-
-                BitmapText nameText = null;
-//                BitmapText nameText = new BitmapText(bitmapFont, playerName);
-////                nameText.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / 2), 1, 0, 0)));
-//                nameText.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI), 0, 1, 0)));
-//                nameText.move(new Vector3f(0, 5, 0));
-//                model.add(nameText);
 
                 models.put(entity, new ModelWrapper(entity, model));
                 System.out.println("load amara in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
@@ -286,17 +266,17 @@ public class ApplicationClient extends Application {
 
             ActorState actorState = data.get(entity, ActorState.class);
             if (actorState != null) {
-                if (actorState.action() == ActorAction.IDLE) {
+                if (actorState.action() == ActionKey.IDLE) {
                     wrapper.setAnimation("idle");
-                } else if (actorState.action() == ActorAction.WALK) {
+                } else if (actorState.action() == ActionKey.WALK) {
                     wrapper.setAnimation("walk");
-                } else if (actorState.action() == ActorAction.DASH) {
+                } else if (actorState.action() == ActionKey.DASH) {
                     wrapper.setAnimation("dash");
-                } else if (actorState.action() == ActorAction.ATTACK1) {
+                } else if (actorState.action() == ActionKey.ATTACK1) {
                     wrapper.setAnimation("attack1");
-                } else if (actorState.action() == ActorAction.ATTACK2) {
+                } else if (actorState.action() == ActionKey.ATTACK2) {
                     wrapper.setAnimation("attack2");
-                } else if (actorState.action() == ActorAction.DEATH) {
+                } else if (actorState.action() == ActionKey.DEATH) {
                     wrapper.setAnimation("death");
                 }
                 float fps = snapshot.getRules().getFps();
@@ -356,21 +336,21 @@ public class ApplicationClient extends Application {
             x--;
         }
         Direction direction = Direction.of(x, y);
-        ActorAction action = ActorAction.IDLE;
+        ActionKey action = ActionKey.IDLE;
         if (direction != null) {
-            action = ActorAction.WALK;
+            action = ActionKey.WALK;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_X)
                 || keyCodes.contains(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            action = ActorAction.DASH;
+            action = ActionKey.DASH;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_1)
                 || keyCodes.contains(GLFW.GLFW_KEY_Q)) {
-            action = ActorAction.ATTACK1;
+            action = ActionKey.ATTACK1;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_2)
                 || keyCodes.contains(GLFW.GLFW_KEY_W)) {
-            action = ActorAction.ATTACK2;
+            action = ActionKey.ATTACK2;
         }
         return new PlayerInput(player, direction, action);
     }

@@ -9,7 +9,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.etherblood.luna.engine.ActorAction;
+import com.etherblood.luna.engine.ActorKey;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
@@ -26,6 +26,7 @@ import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Vector2;
+import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.network.api.serialization.EnumSerializer;
 import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
@@ -45,11 +46,12 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Hitbox.class, new RecordSerializer<>());
         kryo.register(ActorState.class, new RecordSerializer<>());
         kryo.register(Health.class, new RecordSerializer<>());
+        kryo.register(ActorKey.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());
         kryo.register(Vector2.class, new RecordSerializer<>());
-        kryo.register(ActorAction.class, new EnumSerializer<>(ActorAction.class));
+        kryo.register(ActionKey.class, new EnumSerializer<>(ActionKey.class));
         kryo.register(Direction.class, new EnumSerializer<>(Direction.class));
 
         kryo.register(PlayerId.class, new RecordSerializer<>());
