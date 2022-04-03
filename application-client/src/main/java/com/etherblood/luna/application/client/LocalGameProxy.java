@@ -29,7 +29,7 @@ public class LocalGameProxy implements GameProxy {
 
     @Override
     public void update(PlayerInput input) {
-        while (engine.getStartEpochMillis() + MILLIS_PER_SECOND * engine.getFrame() / engine.getRules().getFps() <= System.currentTimeMillis()) {
+        while (engine.getStartEpochMillis() + MILLIS_PER_SECOND * engine.getFrame() / engine.getRules().getFramesPerSecond() <= System.currentTimeMillis()) {
             engine.tick(Set.of(new GameEvent(input, null)));
         }
     }

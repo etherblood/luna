@@ -1,12 +1,11 @@
 package com.etherblood.luna.engine.actions;
 
 import com.etherblood.luna.data.EntityData;
-import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Speed;
 
 public class Walk extends Action {
-    private static final int SPEED = 1000 / 60;
+    private static final int SPEED_MILLIMETRES_PER_SECOND = 1000;
 
     @Override
     public ActionKey getKey() {
@@ -26,8 +25,7 @@ public class Walk extends Action {
     @Override
     public void update(GameEngine game, int actor) {
         EntityData data = game.getData();
-        Direction direction = data.get(actor, Direction.class);
-        data.set(actor, new Speed(direction.toLengthVector(SPEED)));
+        data.set(actor, new Speed(SPEED_MILLIMETRES_PER_SECOND / game.getRules().getFramesPerSecond()));
     }
 
     @Override

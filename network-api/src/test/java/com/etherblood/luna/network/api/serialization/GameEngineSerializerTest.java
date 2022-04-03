@@ -28,7 +28,7 @@ public class GameEngineSerializerTest {
 
         data.set(a, new Position(0, 1));
         data.set(b, new Position(110, 111));
-        data.set(b, new Speed(110, 111));
+        data.set(b, new Speed(110_111));
 
         GameEngine copy = kryo.copy(game);
 

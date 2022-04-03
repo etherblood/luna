@@ -311,7 +311,7 @@ public class ApplicationClient extends Application {
                 } else if (actorState.action() == ActionKey.FALLEN) {
                     wrapper.setAnimation("death");
                 }
-                float fps = snapshot.getRules().getFps();
+                float fps = snapshot.getRules().getFramesPerSecond();
                 long animationFrames = snapshot.getFrame() - actorState.startFrame();
                 wrapper.setAnimationTime(animationFrames / fps);
             }

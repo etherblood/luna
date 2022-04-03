@@ -7,7 +7,8 @@ public class MovementSystem implements GameSystem {
     public void tick(GameEngine engine) {
         EntityData data = engine.getData();
         for (int entity : data.list(Speed.class)) {
-            Vector2 speed = data.get(entity, Speed.class).vector();
+            Direction direction = data.get(entity, Direction.class);
+            Vector2 speed = direction.toLengthVector(data.get(entity, Speed.class).milliMetresPerFrame());
             Position position = data.get(entity, Position.class);
             Movebox movebox = data.get(entity, Movebox.class);
             if (movebox != null) {

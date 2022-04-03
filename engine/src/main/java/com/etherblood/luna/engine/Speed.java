@@ -1,9 +1,6 @@
 package com.etherblood.luna.engine;
 
 public record Speed(
-        Vector2 vector
+        int milliMetresPerFrame
 ) {
-    public Speed(int x, int y) {
-        this(new Vector2(x, y));
-    }
 }

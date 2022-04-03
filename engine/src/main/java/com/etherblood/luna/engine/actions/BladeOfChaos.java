@@ -4,7 +4,6 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Vector2;
 
 public class BladeOfChaos extends Action {
@@ -12,7 +11,6 @@ public class BladeOfChaos extends Action {
     private static final long INTERRUPT_RESIST_FRAMES = 100;
     private static final long DURATION_FRAMES = 160;
     private static final int RANGE = 500;
-    private static final int SPEED = 6_000;
 
     @Override
     public ActionKey getKey() {
@@ -38,7 +36,7 @@ public class BladeOfChaos extends Action {
             Vector2 actorPosition = data.get(actor, Position.class).vector();
             Direction actorDirection = data.get(actor, Direction.class);
             data.set(entity, new Position(actorPosition.add(actorDirection.toLengthVector(RANGE))));
-            data.set(entity, new Speed(actorDirection.toLengthVector(SPEED / game.getRules().getFps())));
+            data.set(entity, actorDirection);
         }
     }
 }

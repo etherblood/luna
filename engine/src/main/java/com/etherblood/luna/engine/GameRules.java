@@ -14,7 +14,7 @@ public class GameRules {
     private final Set<Class<?>> componentTypes;
     private final List<GameSystem> systems;
     private final TemplatesFactory templates;
-    private final int fps;
+    private final int framesPerSecond;
 
     static {
         ActionFactory actionFactory = new ActionFactory();
@@ -46,12 +46,12 @@ public class GameRules {
                 60));
     }
 
-    public GameRules(String id, Set<Class<?>> componentTypes, List<GameSystem> systems, TemplatesFactory templates, int fps) {
+    public GameRules(String id, Set<Class<?>> componentTypes, List<GameSystem> systems, TemplatesFactory templates, int framesPerSecond) {
         this.id = id;
         this.componentTypes = componentTypes;
         this.systems = systems;
         this.templates = templates;
-        this.fps = fps;
+        this.framesPerSecond = framesPerSecond;
     }
 
     public static GameRules getDefault() {
@@ -82,7 +82,7 @@ public class GameRules {
         return templates;
     }
 
-    public int getFps() {
-        return fps;
+    public int getFramesPerSecond() {
+        return framesPerSecond;
     }
 }
