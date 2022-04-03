@@ -2,21 +2,11 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.data.EntityData;
-import com.etherblood.luna.engine.ActorKey;
-import com.etherblood.luna.engine.ActorState;
-import com.etherblood.luna.engine.Circle;
-import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
-import com.etherblood.luna.engine.Health;
-import com.etherblood.luna.engine.Hitbox;
-import com.etherblood.luna.engine.Movebox;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Rectangle;
-import com.etherblood.luna.engine.Speed;
-import com.etherblood.luna.engine.actions.ActionKey;
 
 public class LocalMain {
 
@@ -31,16 +21,10 @@ public class LocalMain {
 
         EntityData data = game.getData();
         int player = data.createEntity();
+        game.applyTemplate(player, "amara");
         data.set(player, new PlayerId(user.id));
         data.set(player, new PlayerName(user.login));
-        data.set(player, new Movebox(new Rectangle(-250, -250, 500, 500)));
-        data.set(player, new Hitbox(new Circle(0, 0, 250)));
         data.set(player, new Position(0, 0));
-        data.set(player, new Speed(0, 0));
-        data.set(player, new ActorState(ActionKey.IDLE, 0));
-        data.set(player, Direction.DOWN);
-        data.set(player, new Health(100));
-        data.set(player, new ActorKey("amara"));
 
         return new LocalGameProxy(game, user);
     }

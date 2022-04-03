@@ -2,7 +2,6 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.data.EntityDataImpl;
-import com.etherblood.luna.engine.actions.ActionKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +13,7 @@ public class GameEngine {
     private long frame;
     private final EntityData data;
     private final List<GameSystem> systems;
+    private final TemplatesFactory templates;
 
     public GameEngine(GameRules rules, long startEpochMillis, long frame) {
         this(rules, startEpochMillis, new EntityDataImpl(rules.getComponentTypes()), frame);
@@ -24,6 +24,7 @@ public class GameEngine {
         this.startEpochMillis = startEpochMillis;
         this.data = data;
         this.systems = rules.getSystems();
+        this.templates = rules.getTemplates();
         this.frame = frame;
     }
 
@@ -57,28 +58,11 @@ public class GameEngine {
                 if (event.join().enter()) {
                     if (data.findByValue(new PlayerId(event.join().playerId())).isEmpty()) {
                         int player = data.createEntity();
+                        applyTemplate(player, "amara");
                         data.set(player, new PlayerId(event.join().playerId()));
                         data.set(player, new PlayerName(event.join().playerName()));
-                        data.set(player, new Movebox(new Rectangle(-250, -250, 500, 500)));
-                        data.set(player, new Hitbox(new Circle(0, 0, 250)));
                         data.set(player, new Position(0, 0));
-                        data.set(player, new Speed(0, 0));
-                        data.set(player, new ActorState(ActionKey.IDLE, frame));
-                        data.set(player, Direction.DOWN);
-                        data.set(player, new Health(100));
-                        data.set(player, new ActorKey("amara"));
                     }
-                } else {
-//                    List<Integer> playerEntities = data.findByValue(new PlayerId(event.join().playerId()));
-//                    List<Integer> characterEntities = data.findByValue(new OwnedBy(event.join().playerId()));
-//                    for (Class<?> component : data.getRegisteredClasses()) {
-//                        for (Integer entity : playerEntities) {
-//                            data.remove(entity, component);
-//                        }
-//                        for (Integer entity : characterEntities) {
-//                            data.remove(entity, component);
-//                        }
-//                    }
                 }
             }
         }
@@ -86,6 +70,10 @@ public class GameEngine {
         for (GameSystem system : systems) {
             system.tick(this);
         }
+    }
+
+    public void applyTemplate(int entity, String template) {
+        templates.apply(this, entity, template);
     }
 
     public GameRules getRules() {
@@ -104,4 +92,7 @@ public class GameEngine {
         return startEpochMillis;
     }
 
+    public TemplatesFactory getTemplates() {
+        return templates;
+    }
 }

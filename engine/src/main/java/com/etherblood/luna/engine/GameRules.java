@@ -10,6 +10,12 @@ public class GameRules {
     private static final Map<String, GameRules> RULES_MAP;
     private static final String DEFAULT_RULES_ID = "default";
 
+    private final String id;
+    private final Set<Class<?>> componentTypes;
+    private final List<GameSystem> systems;
+    private final TemplatesFactory templates;
+    private final int fps;
+
     static {
         ActionFactory actionFactory = new ActionFactory();
         RULES_MAP = Map.of(DEFAULT_RULES_ID, new GameRules(
@@ -31,18 +37,16 @@ public class GameRules {
                         new UpdateActorStateSystem(actionFactory),
                         new ApplyActionSystem(actionFactory),
                         new MovementSystem()
-                ), 60));
+                ),
+                new TemplatesFactoryImpl(),
+                60));
     }
 
-    private final String id;
-    private final Set<Class<?>> componentTypes;
-    private final List<GameSystem> systems;
-    private final int fps;
-
-    public GameRules(String id, Set<Class<?>> componentTypes, List<GameSystem> systems, int fps) {
+    public GameRules(String id, Set<Class<?>> componentTypes, List<GameSystem> systems, TemplatesFactory templates, int fps) {
         this.id = id;
         this.componentTypes = componentTypes;
         this.systems = systems;
+        this.templates = templates;
         this.fps = fps;
     }
 
@@ -68,6 +72,10 @@ public class GameRules {
 
     public List<GameSystem> getSystems() {
         return systems;
+    }
+
+    public TemplatesFactory getTemplates() {
+        return templates;
     }
 
     public int getFps() {
