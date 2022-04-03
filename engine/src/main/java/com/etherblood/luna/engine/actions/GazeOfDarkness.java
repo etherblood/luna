@@ -36,6 +36,7 @@ public class GazeOfDarkness extends Action {
             Vector2 actorPosition = data.get(actor, Position.class).vector();
             Direction actorDirection = data.get(actor, Direction.class);
             data.set(entity, new Position(actorPosition.add(actorDirection.toLengthVector(RANGE))));
+            data.set(entity, actorDirection);
         }
     }
 }
