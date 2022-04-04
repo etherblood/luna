@@ -27,6 +27,7 @@ import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Speed;
+import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.network.api.serialization.EnumSerializer;
@@ -51,6 +52,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(MilliHealth.class, new RecordSerializer<>());
         kryo.register(ModelKey.class, new RecordSerializer<>());
         kryo.register(PendingDelete.class, new RecordSerializer<>());
+        kryo.register(Team.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());

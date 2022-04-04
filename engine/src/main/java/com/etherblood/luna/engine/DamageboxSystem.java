@@ -10,9 +10,14 @@ public class DamageboxSystem implements GameSystem {
             Position position = data.get(entity, Position.class);
             Damagebox damagebox = data.get(entity, Damagebox.class);
             Circle damageCircle = damagebox.shape().translate(position.vector());
+            Team team = data.get(entity, Team.class);
 
             for (int other : data.list(Hitbox.class)) {
                 if (entity == other) {
+                    continue;
+                }
+                Team otherTeam = data.get(other, Team.class);
+                if (team != null && team.equals(otherTeam)) {
                     continue;
                 }
                 Position otherPosition = data.get(other, Position.class);

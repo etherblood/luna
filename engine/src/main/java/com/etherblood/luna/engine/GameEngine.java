@@ -62,6 +62,10 @@ public class GameEngine {
                         data.set(player, new PlayerId(event.join().playerId()));
                         data.set(player, new PlayerName(event.join().playerName()));
                         data.set(player, new Position(0, 0));
+
+                        // temporary solution as long as there are no enemies
+//                        data.set(player, Team.PLAYERS);
+                        data.set(player, new Team(data.createEntity()));
                     }
                 }
             }

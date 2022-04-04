@@ -7,6 +7,7 @@ import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
+import com.etherblood.luna.engine.Team;
 
 public class LocalMain {
 
@@ -25,6 +26,7 @@ public class LocalMain {
         data.set(player, new PlayerId(user.id));
         data.set(player, new PlayerName(user.login));
         data.set(player, new Position(0, 0));
+        data.set(player, Team.PLAYERS);
 
         return new LocalGameProxy(game, user);
     }

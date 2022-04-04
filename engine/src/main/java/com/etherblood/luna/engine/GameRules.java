@@ -33,7 +33,8 @@ public class GameRules {
                         Direction.class,
                         MilliHealth.class,
                         ModelKey.class,
-                        PendingDelete.class
+                        PendingDelete.class,
+                        Team.class
                 ),
                 List.of(
                         new UpdateActorStateSystem(actionFactory),

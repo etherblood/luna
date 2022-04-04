@@ -4,6 +4,7 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Position;
+import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 
 public class BladeOfChaos extends Action {
@@ -37,6 +38,10 @@ public class BladeOfChaos extends Action {
             Direction actorDirection = data.get(actor, Direction.class);
             data.set(entity, new Position(actorPosition.add(actorDirection.toLengthVector(RANGE))));
             data.set(entity, actorDirection);
+            Team team = data.get(actor, Team.class);
+            if (team != null) {
+                data.set(entity, team);
+            }
         }
     }
 }
