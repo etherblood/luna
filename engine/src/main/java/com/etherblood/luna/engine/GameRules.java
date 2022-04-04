@@ -1,6 +1,8 @@
 package com.etherblood.luna.engine;
 
 import com.etherblood.luna.engine.actions.ActionFactory;
+import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,16 +29,19 @@ public class GameRules {
                         Hitbox.class,
                         Damagebox.class,
                         ActorState.class,
-                        PlayerInput.class,
+                        ActorInput.class,
                         PlayerId.class,
                         PlayerName.class,
                         Direction.class,
                         MilliHealth.class,
                         ModelKey.class,
                         PendingDelete.class,
-                        Team.class
+                        Team.class,
+                        GhostBehavior.class
                 ),
                 List.of(
+                        new SpawnGhostSystem(),
+                        new GhostBehaviorSystem(),
                         new UpdateActorStateSystem(actionFactory),
                         new ApplyActionSystem(actionFactory),
                         new MovementSystem(),

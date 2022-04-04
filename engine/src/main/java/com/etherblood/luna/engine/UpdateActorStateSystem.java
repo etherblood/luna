@@ -28,7 +28,7 @@ public class UpdateActorStateSystem implements GameSystem {
             }
 
             // handle user input
-            PlayerInput input = data.get(entity, PlayerInput.class);
+            ActorInput input = data.get(entity, ActorInput.class);
             if (input != null) {
                 if (action.isInterruptedBy(engine, entity, input.action())) {
                     action.cleanup(engine, entity);
@@ -41,7 +41,7 @@ public class UpdateActorStateSystem implements GameSystem {
                         data.set(entity, input.direction());
                     }
                 }
-                data.remove(entity, PlayerInput.class);
+                data.remove(entity, ActorInput.class);
             }
 
             // set new state

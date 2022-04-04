@@ -16,4 +16,16 @@ public record Vector2(
     public Vector2 add(Vector2 v) {
         return add(v.x(), v.y());
     }
+
+    public int squaredLength() {
+        return x * x + y * y;
+    }
+
+    public int squaredDistance(Vector2 other) {
+        return sub(other).squaredLength();
+    }
+
+    public Vector2 sub(Vector2 other) {
+        return add(-other.x(), -other.y());
+    }
 }

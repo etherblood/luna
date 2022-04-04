@@ -17,8 +17,8 @@ public class EventMessageSerializerTest {
     public void copyEventMessage() {
         Kryo kryo = new Kryo();
         kryo.register(EventMessage.class, new EventMessageSerializer());
-        kryo.register(GameEvent.class, new RecordSerializer<GameEvent>());
-        kryo.register(PlayerInput.class, new RecordSerializer<PlayerInput>());
+        kryo.register(GameEvent.class, new RecordSerializer<>());
+        kryo.register(PlayerInput.class, new RecordSerializer<>());
 
         EventMessage message = new EventMessage(9, 15, 25, new EventMessagePart[]{
                 new EventMessagePart(19, new GameEvent(null, null)),

@@ -1,7 +1,6 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.Application;
-import com.destrostudios.icetea.core.animation.AnimationControl;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
@@ -152,18 +151,6 @@ public class ApplicationClient extends Application {
             }
         });
         System.out.println("init() in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
-
-
-        {
-
-            Node model = (Node) assetManager.loadModel("models/ghost/ghost.gltf");
-            model.scale(new Vector3f(0.01f));
-            model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
-            sceneNode.add(model);
-
-            AnimationControl a = (AnimationControl) model.getControls().iterator().next();
-            a.play("idle");
-        }
     }
 
     @Override
@@ -171,10 +158,12 @@ public class ApplicationClient extends Application {
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         EntityData data = snapshot.getData();
 
+        // camera
         List<Integer> players = data.findByValue(new PlayerId(gameProxy.getPlayer().id));
         for (int player : players) {
             Position position = data.get(player, Position.class);
             if (position != null) {
+                // TODO: camera has NORTH & SOUTH mixed up...
                 Vector3f lookAt = convert(position.vector()).add(0, CAMERA_LOOKAT_HEIGHT, 0);
                 Vector3f cameraOffset = new Vector3f(0, 0, CAMERA_DISTANCE);
                 cameraOffset.rotate(new Quaternionf(new AxisAngle4f(-CAMERA_ANGLE, 1, 0, 0)));
@@ -295,7 +284,7 @@ public class ApplicationClient extends Application {
                     long nanos = System.nanoTime();
                     // hard coded amara model
                     Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
-                    if (name.equals("amara")) {
+                    if (name.equals("amara") || name.equals("ghost")) {
                         model.scale(new Vector3f(0.01f));
                         model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
                     } else {
@@ -334,18 +323,28 @@ public class ApplicationClient extends Application {
 
                 ActorState actorState = data.get(entity, ActorState.class);
                 if (actorState != null) {
-                    if (actorState.action() == ActionKey.IDLE) {
-                        wrapper.setAnimation("idle");
-                    } else if (actorState.action() == ActionKey.WALK) {
-                        wrapper.setAnimation("walk");
-                    } else if (actorState.action() == ActionKey.DASH) {
-                        wrapper.setAnimation("dash");
-                    } else if (actorState.action() == ActionKey.ATTACK1) {
-                        wrapper.setAnimation("attack1");
-                    } else if (actorState.action() == ActionKey.ATTACK2) {
-                        wrapper.setAnimation("attack2");
-                    } else if (actorState.action() == ActionKey.FALLEN) {
-                        wrapper.setAnimation("death");
+                    if (name.equals("amara")) {
+                        if (actorState.action() == ActionKey.IDLE) {
+                            wrapper.setAnimation("idle");
+                        } else if (actorState.action() == ActionKey.WALK) {
+                            wrapper.setAnimation("walk");
+                        } else if (actorState.action() == ActionKey.DASH) {
+                            wrapper.setAnimation("dash");
+                        } else if (actorState.action() == ActionKey.ATTACK1) {
+                            wrapper.setAnimation("attack1");
+                        } else if (actorState.action() == ActionKey.ATTACK2) {
+                            wrapper.setAnimation("attack2");
+                        } else if (actorState.action() == ActionKey.FALLEN) {
+                            wrapper.setAnimation("death");
+                        }
+                    } else if (name.equals("ghost")) {
+                        if (actorState.action() == ActionKey.IDLE) {
+                            wrapper.setAnimation("idle");
+                        } else if (actorState.action() == ActionKey.WALK) {
+                            wrapper.setAnimation("fly_forward");
+                        } else if (actorState.action() == ActionKey.ATTACK1) {
+                            wrapper.setAnimation("melee_attack");
+                        }
                     }
                     float fps = snapshot.getRules().getFramesPerSecond();
                     long animationFrames = snapshot.getFrame() - actorState.startFrame();

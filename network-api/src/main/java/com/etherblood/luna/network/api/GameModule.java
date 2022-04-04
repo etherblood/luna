@@ -9,6 +9,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Damagebox;
@@ -30,6 +31,7 @@ import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.network.api.serialization.EnumSerializer;
 import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
@@ -43,6 +45,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(GameEvent.class, new RecordSerializer<>());
         kryo.register(PlayerInput.class, new RecordSerializer<>());
 
+        kryo.register(ActorInput.class, new RecordSerializer<>());
         kryo.register(Position.class, new RecordSerializer<>());
         kryo.register(Speed.class, new RecordSerializer<>());
         kryo.register(Movebox.class, new RecordSerializer<>());
@@ -53,6 +56,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(ModelKey.class, new RecordSerializer<>());
         kryo.register(PendingDelete.class, new RecordSerializer<>());
         kryo.register(Team.class, new RecordSerializer<>());
+        kryo.register(GhostBehavior.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());

@@ -2,6 +2,7 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.behaviors.GhostBehavior;
 
 public class TemplatesFactoryImpl implements TemplatesFactory {
 
@@ -14,9 +15,18 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new Movebox(new Rectangle(-250, -250, 500, 500)));
                 data.set(entity, new Hitbox(new Circle(0, 0, 250)));
                 data.set(entity, new ActorState(ActionKey.IDLE, game.getFrame()));
-                data.set(entity, Direction.DOWN);
+                data.set(entity, Direction.UP);
                 data.set(entity, new MilliHealth(100_000));
                 data.set(entity, new ModelKey("amara"));
+                break;
+            case "ghost":
+                data.set(entity, new Movebox(new Rectangle(-250, -250, 500, 500)));
+                data.set(entity, new Hitbox(new Circle(0, 0, 250)));
+                data.set(entity, new ActorState(ActionKey.IDLE, game.getFrame()));
+                data.set(entity, Direction.DOWN);
+                data.set(entity, new MilliHealth(100_000));
+                data.set(entity, new ModelKey("ghost"));
+                data.set(entity, new GhostBehavior());
                 break;
             case "gaze_of_darkness":
                 data.set(entity, new Damagebox(new Circle(0, 0, 1_000), 10_000 / fps));
