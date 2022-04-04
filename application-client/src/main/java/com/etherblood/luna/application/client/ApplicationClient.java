@@ -1,6 +1,7 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.Application;
+import com.destrostudios.icetea.core.animation.AnimationControl;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
@@ -151,6 +152,18 @@ public class ApplicationClient extends Application {
             }
         });
         System.out.println("init() in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
+
+
+        {
+
+            Node model = (Node) assetManager.loadModel("models/ghost/ghost.gltf");
+            model.scale(new Vector3f(0.01f));
+            model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
+            sceneNode.add(model);
+
+            AnimationControl a = (AnimationControl) model.getControls().iterator().next();
+            a.play("idle");
+        }
     }
 
     @Override
