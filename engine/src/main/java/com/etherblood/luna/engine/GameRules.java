@@ -37,7 +37,8 @@ public class GameRules {
                         ModelKey.class,
                         PendingDelete.class,
                         Team.class,
-                        GhostBehavior.class
+                        GhostBehavior.class,
+                        SkillSet.class
                 ),
                 List.of(
                         new SpawnGhostSystem(),

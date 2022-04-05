@@ -1,9 +1,7 @@
 package com.etherblood.luna.engine;
 
-import com.etherblood.luna.engine.actions.ActionKey;
-
 public record ActorState(
-        ActionKey action,
+        String actionId,
         long startFrame
 ) {
 }

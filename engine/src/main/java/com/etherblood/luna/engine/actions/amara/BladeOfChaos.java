@@ -1,4 +1,4 @@
-package com.etherblood.luna.engine.actions;
+package com.etherblood.luna.engine.actions.amara;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.Direction;
@@ -6,6 +6,8 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
+import com.etherblood.luna.engine.actions.Action;
+import com.etherblood.luna.engine.actions.ActionKey;
 
 public class BladeOfChaos extends Action {
     private static final long DAMAGE_FRAME = 64;

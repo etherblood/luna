@@ -1,22 +1,29 @@
 package com.etherblood.luna.engine.actions;
 
+import com.etherblood.luna.engine.actions.amara.BladeOfChaos;
+import com.etherblood.luna.engine.actions.amara.GazeOfDarkness;
 import java.util.Map;
 
 public class ActionFactory {
 
-    private final Map<ActionKey, Action> actionMappings = Map.of(
-            ActionKey.IDLE, new Idle(),
-            ActionKey.WALK, new Walk(),
-            ActionKey.DASH, new Dash(),
-            ActionKey.ATTACK1, new GazeOfDarkness(),
-            ActionKey.ATTACK2, new BladeOfChaos(),
-            ActionKey.FALLEN, new Fallen()
+    // TODO: this class should be located close to templates
+
+    private final Map<String, Action> actionMappings = Map.of(
+            "amara.idle", new Idle(),
+            "amara.walk", new Walk(1000),
+            "amara.dash", new Dash(48, 3000),
+            "amara.gaze_of_darkness", new GazeOfDarkness(),
+            "amara.blade_of_chaos", new BladeOfChaos(),
+
+            "ghost.idle", new Idle(),
+            "ghost.fly_forward", new Walk(2500),
+            "ghost.melee_attack", new GazeOfDarkness()
     );
 
-    public Action getAction(ActionKey key) {
-        Action action = actionMappings.get(key);
+    public Action getAction(String id) {
+        Action action = actionMappings.get(id);
         if (action == null) {
-            throw new NullPointerException("No mapping for " + key);
+            throw new NullPointerException("No mapping for " + id);
         }
         return action;
     }

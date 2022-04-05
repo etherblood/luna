@@ -5,8 +5,14 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Speed;
 
 public class Dash extends Action {
-    private static final long DURATION_FRAMES = 48;
-    private static final int SPEED_MILLIMETRES_PER_SECOND = 3000;
+
+    private final long durationFrames;
+    private final int speedMillimetresPerSecond;
+
+    public Dash(long durationFrames, int speedMillimetresPerSecond) {
+        this.durationFrames = durationFrames;
+        this.speedMillimetresPerSecond = speedMillimetresPerSecond;
+    }
 
     @Override
     public ActionKey getKey() {
@@ -15,7 +21,7 @@ public class Dash extends Action {
 
     @Override
     public boolean hasEnded(GameEngine game, int actor) {
-        return getElapsedFrames(game, actor) > DURATION_FRAMES;
+        return getElapsedFrames(game, actor) > durationFrames;
     }
 
     @Override
@@ -26,7 +32,7 @@ public class Dash extends Action {
     @Override
     public void update(GameEngine game, int actor) {
         EntityData data = game.getData();
-        data.set(actor, new Speed(SPEED_MILLIMETRES_PER_SECOND / game.getRules().getFramesPerSecond()));
+        data.set(actor, new Speed(speedMillimetresPerSecond / game.getRules().getFramesPerSecond()));
     }
 
     @Override

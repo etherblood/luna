@@ -5,8 +5,7 @@ public enum ActionKey {
     WALK,
     DASH,
     ATTACK1,
-    ATTACK2,
-    FALLEN;
+    ATTACK2;
 
     int interruptStrength() {
         return switch (this) {
@@ -15,7 +14,6 @@ public enum ActionKey {
             case DASH -> 2;
             case ATTACK1 -> 1;
             case ATTACK2 -> 1;
-            case FALLEN -> Integer.MAX_VALUE - 1;
         };
     }
 }

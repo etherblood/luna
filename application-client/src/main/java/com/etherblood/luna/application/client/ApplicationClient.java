@@ -323,29 +323,8 @@ public class ApplicationClient extends Application {
 
                 ActorState actorState = data.get(entity, ActorState.class);
                 if (actorState != null) {
-                    if (name.equals("amara")) {
-                        if (actorState.action() == ActionKey.IDLE) {
-                            wrapper.setAnimation("idle");
-                        } else if (actorState.action() == ActionKey.WALK) {
-                            wrapper.setAnimation("walk");
-                        } else if (actorState.action() == ActionKey.DASH) {
-                            wrapper.setAnimation("dash");
-                        } else if (actorState.action() == ActionKey.ATTACK1) {
-                            wrapper.setAnimation("attack1");
-                        } else if (actorState.action() == ActionKey.ATTACK2) {
-                            wrapper.setAnimation("attack2");
-                        } else if (actorState.action() == ActionKey.FALLEN) {
-                            wrapper.setAnimation("death");
-                        }
-                    } else if (name.equals("ghost")) {
-                        if (actorState.action() == ActionKey.IDLE) {
-                            wrapper.setAnimation("idle");
-                        } else if (actorState.action() == ActionKey.WALK) {
-                            wrapper.setAnimation("fly_forward");
-                        } else if (actorState.action() == ActionKey.ATTACK1) {
-                            wrapper.setAnimation("melee_attack");
-                        }
-                    }
+                    String animation = actorState.actionId().split("\\.")[1];
+                    wrapper.setAnimation(animation);
                     float fps = snapshot.getRules().getFramesPerSecond();
                     long animationFrames = snapshot.getFrame() - actorState.startFrame();
                     wrapper.setAnimationTime(animationFrames / fps);

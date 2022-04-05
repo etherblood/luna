@@ -24,14 +24,14 @@ public class GhostBehaviorSystem implements GameSystem {
 
                 // <hacky workaround>
                 Direction direction;
-                int milli_sin_45_half_degrees = 383;
-                if (milli_sin_45_half_degrees * Math.abs(delta.x()) >= 1000 * Math.abs(delta.y())) {
+                int milli_sin_of_pi_eights = 383;// Math.round(1000 * Math.sin(PI / 8))
+                if (milli_sin_of_pi_eights * Math.abs(delta.x()) >= 1000 * Math.abs(delta.y())) {
                     if (delta.x() >= 0) {
                         direction = Direction.RIGHT;
                     } else {
                         direction = Direction.LEFT;
                     }
-                } else if (milli_sin_45_half_degrees * Math.abs(delta.y()) >= 1000 * Math.abs(delta.x())) {
+                } else if (milli_sin_of_pi_eights * Math.abs(delta.y()) >= 1000 * Math.abs(delta.x())) {
                     if (delta.y() >= 0) {
                         direction = Direction.UP;
                     } else {

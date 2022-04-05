@@ -9,7 +9,7 @@ public class Fallen extends Action {
 
     @Override
     public ActionKey getKey() {
-        return ActionKey.FALLEN;
+        return null;
     }
 
     @Override

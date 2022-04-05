@@ -4,6 +4,7 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.Action;
 import com.etherblood.luna.engine.actions.ActionFactory;
 import com.etherblood.luna.engine.actions.ActionKey;
+import java.util.Map;
 
 public class UpdateActorStateSystem implements GameSystem {
 
@@ -18,21 +19,22 @@ public class UpdateActorStateSystem implements GameSystem {
         EntityData data = engine.getData();
         for (int entity : data.list(ActorState.class)) {
             ActorState state = data.get(entity, ActorState.class);
-            Action action = factory.getAction(state.action());
+            Action action = factory.getAction(state.actionId());
 
+            Map<ActionKey, String> skillMap = data.get(entity, SkillSet.class).skillMap();
             // handle ended actions
             if (action.hasEnded(engine, entity)) {
                 action.cleanup(engine, entity);
-                state = new ActorState(ActionKey.IDLE, engine.getFrame());
-                action = factory.getAction(state.action());
+                state = new ActorState(skillMap.get(ActionKey.IDLE), engine.getFrame());
+                action = factory.getAction(state.actionId());
             }
 
             // handle user input
             ActorInput input = data.get(entity, ActorInput.class);
-            if (input != null) {
+            if (input != null && skillMap.containsKey(input.action())) {
                 if (action.isInterruptedBy(engine, entity, input.action())) {
                     action.cleanup(engine, entity);
-                    state = new ActorState(input.action(), engine.getFrame());
+                    state = new ActorState(skillMap.get(input.action()), engine.getFrame());
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
                     }

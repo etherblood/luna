@@ -9,7 +9,7 @@ public class SpawnGhostSystem implements GameSystem {
         if (data.findByValue(new ModelKey("ghost")).isEmpty()) {
             int player = data.createEntity();
             engine.applyTemplate(player, "ghost");
-            data.set(player, new Position(0, 10_000));
+            data.set(player, new Position(0, 20_000));
             data.set(player, Team.OPPONENTS);
         }
     }

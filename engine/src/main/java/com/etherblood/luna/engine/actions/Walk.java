@@ -5,7 +5,11 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Speed;
 
 public class Walk extends Action {
-    private static final int SPEED_MILLIMETRES_PER_SECOND = 1000;
+    private final int speedMillimetresPerSecond;
+
+    public Walk(int speed_millimetres_per_second) {
+        speedMillimetresPerSecond = speed_millimetres_per_second;
+    }
 
     @Override
     public ActionKey getKey() {
@@ -25,7 +29,7 @@ public class Walk extends Action {
     @Override
     public void update(GameEngine game, int actor) {
         EntityData data = game.getData();
-        data.set(actor, new Speed(SPEED_MILLIMETRES_PER_SECOND / game.getRules().getFramesPerSecond()));
+        data.set(actor, new Speed(speedMillimetresPerSecond / game.getRules().getFramesPerSecond()));
     }
 
     @Override

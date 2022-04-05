@@ -27,6 +27,7 @@ import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
+import com.etherblood.luna.engine.SkillSet;
 import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
@@ -36,6 +37,7 @@ import com.etherblood.luna.network.api.serialization.EnumSerializer;
 import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
 import com.etherblood.luna.network.api.serialization.RecordSerializer;
+import java.util.EnumMap;
 
 public abstract class GameModule extends NetworkModule {
     @Override
@@ -67,6 +69,27 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(PlayerId.class, new RecordSerializer<>());
         kryo.register(PlayerName.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
+
+        kryo.register(SkillSet.class, new Serializer<SkillSet>() {
+            @Override
+            public void write(Kryo kryo, Output output, SkillSet object) {
+                for (ActionKey key : ActionKey.values()) {
+                    output.writeString(object.skillMap().get(key));
+                }
+            }
+
+            @Override
+            public SkillSet read(Kryo kryo, Input input, Class<SkillSet> type) {
+                EnumMap<ActionKey, String> map = new EnumMap<>(ActionKey.class);
+                for (ActionKey key : ActionKey.values()) {
+                    String value = input.readString();
+                    if (value != null) {
+                        map.put(key, value);
+                    }
+                }
+                return new SkillSet(map);
+            }
+        });
 
         // workaround for broken default serializers
         // TODO: move elsewhere (or better: fix library)
