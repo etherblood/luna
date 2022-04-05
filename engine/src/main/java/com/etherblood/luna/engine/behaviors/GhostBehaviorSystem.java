@@ -23,15 +23,25 @@ public class GhostBehaviorSystem implements GameSystem {
                 Vector2 delta = otherPosition.vector().sub(position.vector());
 
                 // <hacky workaround>
-                if (Math.abs(delta.x()) < 200) {
-                    delta = new Vector2(0, delta.y());
-                }
-                if (Math.abs(delta.y()) < 200) {
-                    delta = new Vector2(delta.x(), 0);
+                Direction direction;
+                int milli_sin_45_half_degrees = 383;
+                if (milli_sin_45_half_degrees * Math.abs(delta.x()) >= 1000 * Math.abs(delta.y())) {
+                    if (delta.x() >= 0) {
+                        direction = Direction.RIGHT;
+                    } else {
+                        direction = Direction.LEFT;
+                    }
+                } else if (milli_sin_45_half_degrees * Math.abs(delta.y()) >= 1000 * Math.abs(delta.x())) {
+                    if (delta.y() >= 0) {
+                        direction = Direction.UP;
+                    } else {
+                        direction = Direction.DOWN;
+                    }
+                } else {
+                    direction = Direction.of(delta.x(), delta.y());
                 }
                 // </hacky workaround>
 
-                Direction direction = Direction.of(delta.x(), delta.y());
                 int attackRange = 1000;
                 if (delta.squaredLength() < attackRange * attackRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK1));
