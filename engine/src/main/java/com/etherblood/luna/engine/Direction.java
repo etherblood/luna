@@ -11,7 +11,7 @@ public enum Direction {
     UP_LEFT;
 
     public Vector2 toLengthVector(int length) {
-        int diagonalSideLength = (int) Math.floor(length * Math.sqrt(0.5));
+        int diagonalSideLength = length * 707 / 1000;// length * Math.sqrt(0.5)
         return switch (this) {
             case UP -> new Vector2(0, length);
             case DOWN -> new Vector2(0, -length);

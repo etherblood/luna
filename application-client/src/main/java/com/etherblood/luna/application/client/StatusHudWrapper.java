@@ -3,6 +3,7 @@ package com.etherblood.luna.application.client;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.scene.Node;
+import com.etherblood.luna.engine.MathUtil;
 import org.joml.Vector3f;
 
 public class StatusHudWrapper {
@@ -24,7 +25,7 @@ public class StatusHudWrapper {
 
     public void setName(String name) {
         if (name == null) {
-            name = "";
+            name = "Nameless";
         }
         nameNode.setText(name);
         nameNode.setLocalTranslation(new Vector3f(-name.length() / 2f * MAGIC, 10, 0));
@@ -34,7 +35,7 @@ public class StatusHudWrapper {
         if (milliHealth == null) {
             healthNode.setText("");
         } else {
-            String text = Integer.toString(Math.max(0, ceilDiv(milliHealth, 1000)));
+            String text = Integer.toString(Math.max(0, MathUtil.ceilDiv(milliHealth, 1000)));
             healthNode.setText(text);
             healthNode.setLocalTranslation(new Vector3f(-text.length() / 2f * MAGIC, 30, 0));
         }
@@ -46,9 +47,5 @@ public class StatusHudWrapper {
 
     public Node getNode() {
         return node;
-    }
-    
-    private static int ceilDiv(int x, int y) {
-        return -Math.floorDiv(-x, y);
     }
 }

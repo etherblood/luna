@@ -19,7 +19,7 @@ public class ActionFactory {
             "ghost.idle", new Idle(),
             "ghost.fly_forward", new Walk(2500),
             "ghost.melee_attack", new MeleeAttack(48, 72, 72,
-                    500, 750, 30_000)
+                    500, 750, 3_000)
     );
 
     public Action getAction(String id) {

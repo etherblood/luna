@@ -28,6 +28,7 @@ import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -177,19 +178,24 @@ public class ApplicationClient extends Application {
             Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
             while (iterator.hasNext()) {
                 StatusHudWrapper wrapper = iterator.next();
-                if (!data.has(wrapper.getEntity(), PlayerName.class)) {
+                if (!data.has(wrapper.getEntity(), PlayerName.class)
+                        && !data.has(wrapper.getEntity(), MilliHealth.class)) {
                     guiNode.remove(wrapper.getNode());
                     iterator.remove();
                 }
             }
-            for (int entity : data.list(PlayerName.class)) {
+            List<Integer> entities = new ArrayList<>();
+            entities.addAll(data.list(PlayerName.class));
+            entities.addAll(data.list(MilliHealth.class));
+            for (int entity : entities) {
                 if (!statusHuds.containsKey(entity)) {
                     StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
                     statusHuds.put(entity, wrapper);
                     guiNode.add(wrapper.getNode());
                 }
                 Vector2 position = data.get(entity, Position.class).vector();
-                String name = data.get(entity, PlayerName.class).name();
+                PlayerName playerName = data.get(entity, PlayerName.class);
+                String name = playerName == null ? null : playerName.name();
                 MilliHealth health = data.get(entity, MilliHealth.class);
                 StatusHudWrapper wrapper = statusHuds.get(entity);
                 wrapper.setName(name);
