@@ -15,11 +15,13 @@ public class ActionFactory {
             "amara.dash", new Dash(48, 3000),
             "amara.gaze_of_darkness", new GazeOfDarkness(),
             "amara.blade_of_chaos", new BladeOfChaos(),
+            "amara.fallen", new Fallen(179),
 
             "ghost.idle", new Idle(),
             "ghost.fly_forward", new Walk(2500),
             "ghost.melee_attack", new MeleeAttack(48, 72, 72,
-                    500, 750, 3_000)
+                    750, 500, 3_000),
+            "ghost.die", new Fallen(100)
     );
 
     public Action getAction(String id) {

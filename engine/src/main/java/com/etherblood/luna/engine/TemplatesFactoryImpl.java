@@ -23,12 +23,13 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                                 ActionKey.WALK, "amara.walk",
                                 ActionKey.DASH, "amara.dash",
                                 ActionKey.ATTACK1, "amara.gaze_of_darkness",
-                                ActionKey.ATTACK2, "amara.blade_of_chaos"
+                                ActionKey.ATTACK2, "amara.blade_of_chaos",
+
+                                ActionKey.FALLEN, "amara.fallen"
                         ))
                 ));
                 data.set(entity, Direction.UP);
                 data.set(entity, new MilliHealth(100_000));
-                data.set(entity, new MilliHealth(1_000_000_000));// temporary for testing
                 data.set(entity, new ModelKey("amara"));
                 break;
             case "ghost":
@@ -39,7 +40,9 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                         new EnumMap<>(Map.of(
                                 ActionKey.IDLE, "ghost.idle",
                                 ActionKey.WALK, "ghost.fly_forward",
-                                ActionKey.ATTACK1, "ghost.melee_attack"
+                                ActionKey.ATTACK1, "ghost.melee_attack",
+
+                                ActionKey.FALLEN, "ghost.die"
                         ))
                 ));
                 data.set(entity, Direction.DOWN);

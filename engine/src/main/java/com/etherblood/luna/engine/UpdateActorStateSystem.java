@@ -31,6 +31,14 @@ public class UpdateActorStateSystem implements GameSystem {
 
             // handle user input
             ActorInput input = data.get(entity, ActorInput.class);
+
+            // fall
+            MilliHealth health = data.get(entity, MilliHealth.class);
+            if (health != null && health.value() <= 0 && skillMap.containsKey(ActionKey.FALLEN)) {
+                // TODO: this is hacky, improve
+                input = new ActorInput(input.direction(), ActionKey.FALLEN);
+            }
+
             if (input != null && skillMap.containsKey(input.action())) {
                 if (action.isInterruptedBy(engine, entity, input.action())) {
                     action.cleanup(engine, entity);

@@ -335,10 +335,12 @@ public class ApplicationClient extends Application {
                             "amara.dash", "dash",
                             "amara.gaze_of_darkness", "attack1",
                             "amara.blade_of_chaos", "attack2",
+                            "amara.fallen", "death",
 
                             "ghost.idle", "idle",
                             "ghost.fly_forward", "fly_forward",
-                            "ghost.melee_attack", "melee_attack"
+                            "ghost.melee_attack", "melee_attack",
+                            "ghost.die", "die"
                     );
                     String animation = animationMap.get(actorState.actionId());
                     wrapper.setAnimation(animation);

@@ -66,7 +66,7 @@ public class GhostBehaviorSystem implements GameSystem {
             }
             Position otherPosition = data.get(other, Position.class);
             MilliHealth otherHealth = data.get(other, MilliHealth.class);
-            if (otherPosition == null || otherHealth == null) {
+            if (otherPosition == null || otherHealth == null || otherHealth.value() <= 0) {
                 continue;
             }
             int squaredDistance = position.vector().squaredDistance(otherPosition.vector());

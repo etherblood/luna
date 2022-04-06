@@ -3,18 +3,24 @@ package com.etherblood.luna.engine.actions;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.MilliHealth;
+import com.etherblood.luna.engine.PendingDelete;
 
 public class Fallen extends Action {
-    private static final long ALIVE_FRAMES = 300;
+
+    private final long aliveFrames;
+
+    public Fallen(long aliveFrames) {
+        this.aliveFrames = aliveFrames;
+    }
 
     @Override
     public ActionKey getKey() {
-        return null;
+        return ActionKey.FALLEN;
     }
 
     @Override
     public boolean hasEnded(GameEngine game, int actor) {
-        return getElapsedFrames(game, actor) > ALIVE_FRAMES;
+        return getElapsedFrames(game, actor) > aliveFrames;
     }
 
     @Override
@@ -29,12 +35,10 @@ public class Fallen extends Action {
     @Override
     public void update(GameEngine game, int actor) {
         EntityData data = game.getData();
-        if (getElapsedFrames(game, actor) == ALIVE_FRAMES) {
+        if (getElapsedFrames(game, actor) == aliveFrames) {
             MilliHealth health = data.get(actor, MilliHealth.class);
             if (health == null || health.value() <= 0) {
-                for (Class<?> component : data.getRegisteredClasses()) {
-                    data.remove(actor, component);
-                }
+                data.set(actor, new PendingDelete(game.getFrame()));
             }
         }
     }
