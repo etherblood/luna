@@ -58,17 +58,15 @@ public class ServerGameModule extends GameModule {
             JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt).user;
             synchronized (lock) {
                 long frame = state.getFrame();
-                long targetFrame = frame + 1;
-
-                System.out.println("User " + user.login + " connected on frame " + frame + " join scheduled for frame " + targetFrame);
+                System.out.println("User " + user.login + " connected on frame " + frame);
                 connection.sendTCP(state);
                 builders.put(connection.getID(), new ServerEventMessageBuilder());
                 connections.put(connection.getID(), connection);
 
                 GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
-                buffer.buffer(targetFrame, event);
+                buffer.buffer(frame, event);
                 for (ServerEventMessageBuilder builder : builders.values()) {
-                    builder.broadcast(new EventMessagePart(targetFrame, event));
+                    builder.broadcast(new EventMessagePart(frame, event));
                 }
             }
         }
