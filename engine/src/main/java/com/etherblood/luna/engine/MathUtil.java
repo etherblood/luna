@@ -2,7 +2,7 @@ package com.etherblood.luna.engine;
 
 public class MathUtil {
 
-    public static int ceilDiv(int x, int y) {
+    public static long ceilDiv(long x, long y) {
         return -Math.floorDiv(-x, y);
     }
 }

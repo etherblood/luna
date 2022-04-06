@@ -3,7 +3,7 @@ package com.etherblood.luna.engine;
 public record Position(
         Vector2 vector
 ) {
-    public Position(int x, int y) {
+    public Position(long x, long y) {
         this(new Vector2(x, y));
     }
 }

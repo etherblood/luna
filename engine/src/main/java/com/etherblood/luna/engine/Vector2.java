@@ -1,15 +1,15 @@
 package com.etherblood.luna.engine;
 
 public record Vector2(
-        int x,
-        int y
+        long x,
+        long y
 ) {
 
     public static Vector2 zero() {
         return new Vector2(0, 0);
     }
 
-    public Vector2 add(int x, int y) {
+    public Vector2 add(long x, long y) {
         return new Vector2(this.x + x, this.y + y);
     }
 
@@ -17,11 +17,11 @@ public record Vector2(
         return add(v.x(), v.y());
     }
 
-    public int squaredLength() {
+    public long squaredLength() {
         return x * x + y * y;
     }
 
-    public int squaredDistance(Vector2 other) {
+    public long squaredDistance(Vector2 other) {
         return sub(other).squaredLength();
     }
 

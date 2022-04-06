@@ -10,8 +10,8 @@ public enum Direction {
     LEFT,
     UP_LEFT;
 
-    public Vector2 toLengthVector(int length) {
-        int diagonalSideLength = length * 707 / 1000;// length * Math.sqrt(0.5)
+    public Vector2 toLengthVector(long length) {
+        long diagonalSideLength = length * 707 / 1000;// length * Math.sqrt(0.5)
         return switch (this) {
             case UP -> new Vector2(0, length);
             case DOWN -> new Vector2(0, -length);
@@ -24,7 +24,7 @@ public enum Direction {
         };
     }
 
-    public static Direction of(int x, int y) {
+    public static Direction of(long x, long y) {
         if (x < 0) {
             if (y < 0) {
                 return DOWN_LEFT;

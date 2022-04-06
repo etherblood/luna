@@ -1,10 +1,10 @@
 package com.etherblood.luna.engine;
 
 public record Rectangle(
-        int x,
-        int y,
-        int width,
-        int height
+        long x,
+        long y,
+        long width,
+        long height
 ) {
 
     public Rectangle {
@@ -16,19 +16,19 @@ public record Rectangle(
         }
     }
 
-    public int minX() {
+    public long minX() {
         return x;
     }
 
-    public int minY() {
+    public long minY() {
         return y;
     }
 
-    public int maxX() {
+    public long maxX() {
         return x + width;
     }
 
-    public int maxY() {
+    public long maxY() {
         return y + height;
     }
 
@@ -36,7 +36,7 @@ public record Rectangle(
         return translate(position.x(), position.y());
     }
 
-    public Rectangle translate(int x, int y) {
+    public Rectangle translate(long x, long y) {
         return new Rectangle(this.x + x, this.y + y, width, height);
     }
 

@@ -57,7 +57,7 @@ public class GhostBehaviorSystem implements GameSystem {
         Position position = data.get(entity, Position.class);
 
         Integer best = null;
-        int bestSquaredDistance = Integer.MAX_VALUE;
+        long bestSquaredDistance = Integer.MAX_VALUE;
 
         for (int other : data.list(Position.class)) {
             Team otherTeam = data.get(other, Team.class);
@@ -69,7 +69,7 @@ public class GhostBehaviorSystem implements GameSystem {
             if (otherPosition == null || otherHealth == null || otherHealth.value() <= 0) {
                 continue;
             }
-            int squaredDistance = position.vector().squaredDistance(otherPosition.vector());
+            long squaredDistance = position.vector().squaredDistance(otherPosition.vector());
             if (squaredDistance < bestSquaredDistance) {
                 bestSquaredDistance = squaredDistance;
                 best = other;

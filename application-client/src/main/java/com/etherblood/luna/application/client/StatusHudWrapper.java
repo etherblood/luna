@@ -31,11 +31,11 @@ public class StatusHudWrapper {
         nameNode.setLocalTranslation(new Vector3f(-name.length() / 2f * MAGIC, 10, 0));
     }
 
-    public void setHealth(Integer milliHealth) {
+    public void setHealth(Long milliHealth) {
         if (milliHealth == null) {
             healthNode.setText("");
         } else {
-            String text = Integer.toString(Math.max(0, MathUtil.ceilDiv(milliHealth, 1000)));
+            String text = Long.toString(Math.max(0, MathUtil.ceilDiv(milliHealth, 1000)));
             healthNode.setText(text);
             healthNode.setLocalTranslation(new Vector3f(-text.length() / 2f * MAGIC, 30, 0));
         }

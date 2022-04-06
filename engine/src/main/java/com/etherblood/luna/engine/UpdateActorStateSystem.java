@@ -35,8 +35,9 @@ public class UpdateActorStateSystem implements GameSystem {
             // fall
             MilliHealth health = data.get(entity, MilliHealth.class);
             if (health != null && health.value() <= 0 && skillMap.containsKey(ActionKey.FALLEN)) {
+                Direction direction = input == null ? null : input.direction();
                 // TODO: this is hacky, improve
-                input = new ActorInput(input.direction(), ActionKey.FALLEN);
+                input = new ActorInput(direction, ActionKey.FALLEN);
             }
 
             if (input != null && skillMap.containsKey(input.action())) {

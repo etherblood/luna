@@ -5,9 +5,9 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.Speed;
 
 public class Walk extends Action {
-    private final int speedMillimetresPerSecond;
+    private final long speedMillimetresPerSecond;
 
-    public Walk(int speed_millimetres_per_second) {
+    public Walk(long speed_millimetres_per_second) {
         speedMillimetresPerSecond = speed_millimetres_per_second;
     }
 

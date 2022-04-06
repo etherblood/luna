@@ -7,9 +7,9 @@ import com.etherblood.luna.engine.Speed;
 public class Dash extends Action {
 
     private final long durationFrames;
-    private final int speedMillimetresPerSecond;
+    private final long speedMillimetresPerSecond;
 
-    public Dash(long durationFrames, int speedMillimetresPerSecond) {
+    public Dash(long durationFrames, long speedMillimetresPerSecond) {
         this.durationFrames = durationFrames;
         this.speedMillimetresPerSecond = speedMillimetresPerSecond;
     }

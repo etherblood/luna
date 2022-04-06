@@ -13,7 +13,7 @@ public class BladeOfChaos extends Action {
     private static final long DAMAGE_FRAME = 64;
     private static final long INTERRUPT_RESIST_FRAMES = 100;
     private static final long DURATION_FRAMES = 160;
-    private static final int RANGE = 500;
+    private static final long RANGE = 500;
 
     @Override
     public ActionKey getKey() {

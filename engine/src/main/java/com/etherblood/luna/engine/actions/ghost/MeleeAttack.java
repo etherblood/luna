@@ -16,11 +16,11 @@ public class MeleeAttack extends Action {
     private final long damageFrame;
     private final long interruptResistFrames;
     private final long durationFrames;
-    private final int range;
-    private final int radius;
-    private final int milliDamage;
+    private final long range;
+    private final long radius;
+    private final long milliDamage;
 
-    public MeleeAttack(long damageFrame, long interruptResistFrames, long durationFrames, int range, int radius, int milliDamage) {
+    public MeleeAttack(long damageFrame, long interruptResistFrames, long durationFrames, long range, long radius, long milliDamage) {
         this.damageFrame = damageFrame;
         this.interruptResistFrames = interruptResistFrames;
         this.durationFrames = durationFrames;

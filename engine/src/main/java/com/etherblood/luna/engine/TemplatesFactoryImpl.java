@@ -60,7 +60,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new Damagebox(new Circle(0, 0, 500), 250));
 
                 data.set(entity, new PendingDelete(game.getFrame() + 1 * fps));
-                int milliMetresPerFrame = 6_000 / game.getRules().getFramesPerSecond();
+                long milliMetresPerFrame = 6_000L / game.getRules().getFramesPerSecond();
                 data.set(entity, new Speed(milliMetresPerFrame));
                 data.set(entity, new ModelKey("blade_of_chaos"));
                 break;

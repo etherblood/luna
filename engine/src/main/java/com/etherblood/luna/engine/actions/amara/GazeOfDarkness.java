@@ -13,7 +13,7 @@ public class GazeOfDarkness extends Action {
     private static final long DAMAGE_FRAME = 100;
     private static final long INTERRUPT_RESIST_FRAMES = 160;
     private static final long DURATION_FRAMES = 280;
-    private static final int RANGE = 1_500;
+    private static final long RANGE = 1_500;
 
     @Override
     public ActionKey getKey() {
