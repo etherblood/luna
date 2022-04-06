@@ -20,6 +20,7 @@ public class GameRules {
 
     static {
         ActionFactory actionFactory = new ActionFactory();
+        DamageboxCollisionSystem collisionSystem = new DamageboxCollisionSystem(true);
         RULES_MAP = Map.of(DEFAULT_RULES_ID, new GameRules(
                 DEFAULT_RULES_ID,
                 Set.of(
@@ -41,12 +42,13 @@ public class GameRules {
                         SkillSet.class
                 ),
                 List.of(
+                        collisionSystem,// cache collisions
                         new SpawnGhostSystem(),
                         new GhostBehaviorSystem(),
                         new UpdateActorStateSystem(actionFactory),
                         new ApplyActionSystem(actionFactory),
                         new MovementSystem(),
-                        new DamageboxSystem(),
+                        new DamageboxSystem(collisionSystem),
                         new PendingDeleteSystem()
                 ),
                 new TemplatesFactoryImpl(),

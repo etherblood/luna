@@ -2,6 +2,7 @@ package com.etherblood.luna.engine.actions.ghost;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.Circle;
+import com.etherblood.luna.engine.DamageTrigger;
 import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
@@ -49,7 +50,7 @@ public class MeleeAttack extends Action {
         if (getElapsedFrames(game, actor) == damageFrame) {
             EntityData data = game.getData();
             int entity = data.createEntity();
-            data.set(entity, new Damagebox(new Circle(0, 0, radius), milliDamage));
+            data.set(entity, new Damagebox(new Circle(0, 0, radius), DamageTrigger.PER_FRAME, milliDamage));
             data.set(entity, new PendingDelete(game.getFrame()));
             Vector2 actorPosition = data.get(actor, Position.class).vector();
             Direction actorDirection = data.get(actor, Direction.class);

@@ -51,13 +51,12 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new GhostBehavior());
                 break;
             case "gaze_of_darkness":
-                data.set(entity, new Damagebox(new Circle(0, 0, 1_000), MathUtil.ceilDiv(1_000, fps)));
+                data.set(entity, new Damagebox(new Circle(0, 0, 1_000), DamageTrigger.PER_FRAME, MathUtil.ceilDiv(1_000, fps)));
                 data.set(entity, new PendingDelete(game.getFrame() + 5 * fps));
                 data.set(entity, new ModelKey("gaze_of_darkness"));
                 break;
             case "blade_of_chaos":
-                // TODO: damage box that damages each enemy at most once / on collision enter, adjust value after
-                data.set(entity, new Damagebox(new Circle(0, 0, 500), 250));
+                data.set(entity, new Damagebox(new Circle(0, 0, 500), DamageTrigger.ON_COLLISION, 2_000));
 
                 data.set(entity, new PendingDelete(game.getFrame() + 1 * fps));
                 long milliMetresPerFrame = 6_000L / game.getRules().getFramesPerSecond();

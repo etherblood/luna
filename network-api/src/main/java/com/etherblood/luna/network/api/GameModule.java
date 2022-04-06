@@ -12,6 +12,7 @@ import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
+import com.etherblood.luna.engine.DamageTrigger;
 import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
@@ -53,6 +54,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Movebox.class, new RecordSerializer<>());
         kryo.register(Hitbox.class, new RecordSerializer<>());
         kryo.register(Damagebox.class, new RecordSerializer<>());
+        kryo.register(DamageTrigger.class, new EnumSerializer<>(DamageTrigger.class));
         kryo.register(ActorState.class, new RecordSerializer<>());
         kryo.register(MilliHealth.class, new RecordSerializer<>());
         kryo.register(ModelKey.class, new RecordSerializer<>());
