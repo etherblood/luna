@@ -15,11 +15,6 @@ public class ServerEventMessageBuilder {
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
-    public void ackAndBroadcast(EventMessage message) {
-        updateAck(message);
-        broadcast(message.parts());
-    }
-
     public synchronized void updateAck(EventMessage message) {
         ack = Math.max(ack, message.seq());
         pendingQueue.values().removeIf(x -> x <= message.ack());
@@ -36,7 +31,7 @@ public class ServerEventMessageBuilder {
     }
 
     public synchronized void lockFrame(long lockFrame) {
-        if (lockFrame < this.lockFrame) {
+        if (lockFrame <= this.lockFrame) {
             throw new IllegalArgumentException();
         }
         this.lockFrame = lockFrame;

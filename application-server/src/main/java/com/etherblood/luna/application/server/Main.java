@@ -36,7 +36,7 @@ public class Main {
 
         int fps = game.getRules().getFramesPerSecond();
         GameLoop loop = new GameLoop(fps, () -> {
-            gameModule.tick();
+            gameModule.update();
         });
         loop.run();
     }

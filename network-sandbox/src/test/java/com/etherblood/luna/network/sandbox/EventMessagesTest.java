@@ -27,7 +27,8 @@ public class EventMessagesTest {
         client.enqueueAction(input0);
         EventMessage request = client.build();
 
-        server.ackAndBroadcast(request);
+        server.updateAck(request);
+        server.broadcast(request.parts());
 
         // then
         EventMessage response = server.build();
@@ -45,8 +46,10 @@ public class EventMessagesTest {
         client.enqueueAction(input0);
         EventMessage request = client.build();
 
-        server.ackAndBroadcast(request);
-        server.ackAndBroadcast(request);
+        server.updateAck(request);
+        server.broadcast(request.parts());
+        server.updateAck(request);
+        server.broadcast(request.parts());
 
         // then
         EventMessage response = server.build();
@@ -67,7 +70,8 @@ public class EventMessagesTest {
         client.enqueueAction(input1);
         EventMessage request2 = client.build();
 
-        server.ackAndBroadcast(request2);
+        server.updateAck(request2);
+        server.broadcast(request2.parts());
 
         // then
         EventMessage response = server.build();
@@ -86,7 +90,8 @@ public class EventMessagesTest {
         EventMessage request1 = client.build();// dropped request
         EventMessage request2 = client.build();
 
-        server.ackAndBroadcast(request2);
+        server.updateAck(request2);
+        server.broadcast(request2.parts());
 
         // then
         EventMessage response = server.build();
@@ -107,8 +112,10 @@ public class EventMessagesTest {
         client.enqueueAction(input1);
         EventMessage request2 = client.build();
 
-        server.ackAndBroadcast(request2);
-        server.ackAndBroadcast(request1);
+        server.updateAck(request2);
+        server.broadcast(request2.parts());
+        server.updateAck(request1);
+        server.broadcast(request1.parts());
 
         // then
         EventMessage response = server.build();
@@ -125,7 +132,9 @@ public class EventMessagesTest {
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
-        server.ackAndBroadcast(new EventMessage(0, 0, -1, new EventMessagePart[]{input0}));
+        EventMessage message = new EventMessage(0, 0, -1, new EventMessagePart[]{input0});
+        server.updateAck(message);
+        server.broadcast(message.parts());
         EventMessage update = server.build();
         ackAndBuffer(client, clientBuffer, update);
 
@@ -142,7 +151,9 @@ public class EventMessagesTest {
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
-        server.ackAndBroadcast(new EventMessage(0, 0, -1, new EventMessagePart[]{input0}));
+        EventMessage message = new EventMessage(0, 0, -1, new EventMessagePart[]{input0});
+        server.updateAck(message);
+        server.broadcast(message.parts());
         EventMessage update = server.build();
         ackAndBuffer(client, clientBuffer, update);
         ackAndBuffer(client, clientBuffer, update);
@@ -161,9 +172,13 @@ public class EventMessagesTest {
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
         // when
-        server.ackAndBroadcast(new EventMessage(0, 0, -1, new EventMessagePart[]{input0}));
+        EventMessage message1 = new EventMessage(0, 0, -1, new EventMessagePart[]{input0});
+        server.updateAck(message1);
+        server.broadcast(message1.parts());
         EventMessage update0 = server.build();
-        server.ackAndBroadcast(new EventMessage(0, 1, -1, new EventMessagePart[]{input1}));
+        EventMessage message = new EventMessage(0, 1, -1, new EventMessagePart[]{input1});
+        server.updateAck(message);
+        server.broadcast(message.parts());
         EventMessage update1 = server.build();
         ackAndBuffer(client, clientBuffer, update1);
         ackAndBuffer(client, clientBuffer, update0);
