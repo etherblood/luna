@@ -2,6 +2,7 @@ package com.etherblood.luna.engine.actions;
 
 import com.etherblood.luna.engine.actions.amara.BladeOfChaos;
 import com.etherblood.luna.engine.actions.amara.GazeOfDarkness;
+import com.etherblood.luna.engine.actions.ghost.MeleeAttack;
 import java.util.Map;
 
 public class ActionFactory {
@@ -17,7 +18,8 @@ public class ActionFactory {
 
             "ghost.idle", new Idle(),
             "ghost.fly_forward", new Walk(2500),
-            "ghost.melee_attack", new GazeOfDarkness()
+            "ghost.melee_attack", new MeleeAttack(48, 72, 72,
+                    500, 750, 30_000)
     );
 
     public Action getAction(String id) {

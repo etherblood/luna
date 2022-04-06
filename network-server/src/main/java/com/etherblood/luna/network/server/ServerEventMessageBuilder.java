@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class ServerEventMessageBuilder {
 
-    // TODO: also send latest locked afterFrame index to clients
+    // TODO: also send latest locked frame index to clients
 
     private long lockFrame = -1;
     private long seq = 0;

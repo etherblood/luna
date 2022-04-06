@@ -323,7 +323,18 @@ public class ApplicationClient extends Application {
 
                 ActorState actorState = data.get(entity, ActorState.class);
                 if (actorState != null) {
-                    String animation = actorState.actionId().split("\\.")[1];
+                    Map<String, String> animationMap = Map.of(
+                            "amara.idle", "idle",
+                            "amara.walk", "walk",
+                            "amara.dash", "dash",
+                            "amara.gaze_of_darkness", "attack1",
+                            "amara.blade_of_chaos", "attack2",
+
+                            "ghost.idle", "idle",
+                            "ghost.fly_forward", "fly_forward",
+                            "ghost.melee_attack", "melee_attack"
+                    );
+                    String animation = animationMap.get(actorState.actionId());
                     wrapper.setAnimation(animation);
                     float fps = snapshot.getRules().getFramesPerSecond();
                     long animationFrames = snapshot.getFrame() - actorState.startFrame();

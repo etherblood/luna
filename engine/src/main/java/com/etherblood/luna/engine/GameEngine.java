@@ -67,10 +67,10 @@ public class GameEngine {
                 }
             }
         }
-        frame++;
         for (GameSystem system : systems) {
             system.tick(this);
         }
+        frame++;
     }
 
     public void applyTemplate(int entity, String template) {

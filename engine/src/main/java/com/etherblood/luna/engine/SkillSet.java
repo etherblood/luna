@@ -1,9 +1,10 @@
 package com.etherblood.luna.engine;
 
 import com.etherblood.luna.engine.actions.ActionKey;
-import java.util.Map;
+import java.util.EnumMap;
 
 public record SkillSet(
-        Map<ActionKey, String> skillMap
+        // map with clearly defined iteration order
+        EnumMap<ActionKey, String> skillMap
 ) {
 }
