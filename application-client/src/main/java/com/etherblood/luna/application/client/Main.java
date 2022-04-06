@@ -48,7 +48,7 @@ public class Main {
         Log.info(new Date().toString());// time reference for kryo logs
         Client client = new Client(10_000, 10_000);
         JwtClientModule jwtModule = new JwtClientModule(client);
-        ClientTimestampModule timestampModule = new ClientTimestampModule(client, 20, 50);
+        ClientTimestampModule timestampModule = new ClientTimestampModule(client, 40, 250);
         ClientGameModule gameModule = new ClientGameModule(client);
         ToolsClient toolsClient = new ToolsClient(client, jwtModule, timestampModule, gameModule);
 
