@@ -3,6 +3,7 @@ package com.etherblood.luna.engine;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class TemplatesFactoryImpl implements TemplatesFactory {
@@ -17,13 +18,13 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new Hitbox(new Circle(0, 0, 250)));
                 data.set(entity, new ActorState("amara.idle", game.getFrame()));
                 data.set(entity, new SkillSet(
-                        Map.of(
+                        new EnumMap<>(Map.of(
                                 ActionKey.IDLE, "amara.idle",
                                 ActionKey.WALK, "amara.walk",
                                 ActionKey.DASH, "amara.dash",
                                 ActionKey.ATTACK1, "amara.gaze_of_darkness",
                                 ActionKey.ATTACK2, "amara.blade_of_chaos"
-                        )
+                        ))
                 ));
                 data.set(entity, Direction.UP);
                 data.set(entity, new MilliHealth(100_000));
@@ -35,11 +36,11 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new Hitbox(new Circle(0, 0, 250)));
                 data.set(entity, new ActorState("ghost.idle", game.getFrame()));
                 data.set(entity, new SkillSet(
-                        Map.of(
+                        new EnumMap<>(Map.of(
                                 ActionKey.IDLE, "ghost.idle",
                                 ActionKey.WALK, "ghost.fly_forward",
                                 ActionKey.ATTACK1, "ghost.melee_attack"
-                        )
+                        ))
                 ));
                 data.set(entity, Direction.DOWN);
                 data.set(entity, new MilliHealth(100_000));
