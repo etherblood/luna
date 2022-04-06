@@ -48,12 +48,6 @@ public class GameEngine {
         }
 
         for (GameEvent event : events) {
-            if (event.input() != null) {
-                long player = event.input().player();
-                for (int entity : data.findByValue(new PlayerId(player))) {
-                    data.set(entity, new ActorInput(event.input().direction(), event.input().action()));
-                }
-            }
             if (event.join() != null) {
                 if (event.join().enter()) {
                     if (data.findByValue(new PlayerId(event.join().playerId())).isEmpty()) {
@@ -64,6 +58,14 @@ public class GameEngine {
                         data.set(player, new Position(0, 0));
                         data.set(player, Team.PLAYERS);
                     }
+                }
+            }
+        }
+        for (GameEvent event : events) {
+            if (event.input() != null) {
+                long player = event.input().player();
+                for (int entity : data.findByValue(new PlayerId(player))) {
+                    data.set(entity, new ActorInput(event.input().direction(), event.input().action()));
                 }
             }
         }
