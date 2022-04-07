@@ -35,7 +35,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                         ))
                 ));
                 data.set(entity, Direction.UP);
-                data.set(entity, new MilliHealth(100_000));
+                data.set(entity, new MilliHealth(20_000));
                 data.set(entity, new ModelKey("amara"));
                 break;
             case "ghost":
@@ -52,7 +52,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                         ))
                 ));
                 data.set(entity, Direction.DOWN);
-                data.set(entity, new MilliHealth(100_000));
+                data.set(entity, new MilliHealth(10_000));
                 data.set(entity, new ModelKey("ghost"));
                 data.set(entity, new GhostBehavior());
                 break;

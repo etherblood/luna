@@ -32,9 +32,19 @@ public class Main {
 
         // TODO: this does not belong here
         EntityData data = game.getData();
-        int obstacle = data.createEntity();
-        data.set(obstacle, new Obstaclebox(new Rectangle(1000, -1000, 2000, 2000)));
-        data.set(obstacle, new Position(new Vector2(0, 0)));
+        Obstaclebox obstaclebox = new Obstaclebox(new Rectangle(-10_000, -10_000, 20_000, 20_000));
+        int leftObstacle = data.createEntity();
+        data.set(leftObstacle, obstaclebox);
+        data.set(leftObstacle, new Position(new Vector2(-15_000, 0)));
+        int rightObstacle = data.createEntity();
+        data.set(rightObstacle, obstaclebox);
+        data.set(rightObstacle, new Position(new Vector2(15_000, 0)));
+        int bottomObstacle = data.createEntity();
+        data.set(bottomObstacle, obstaclebox);
+        data.set(bottomObstacle, new Position(new Vector2(0, -15_000)));
+        int topObstacle = data.createEntity();
+        data.set(topObstacle, obstaclebox);
+        data.set(topObstacle, new Position(new Vector2(0, 15_000)));
 
         Server server = new Server(10_0000, 10_000);
         JwtServerModule jwtModule = new JwtServerModule(jwtService, server::getConnections);
