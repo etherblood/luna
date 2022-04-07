@@ -170,7 +170,6 @@ public class ApplicationClient extends Application {
         for (int player : players) {
             Position position = data.get(player, Position.class);
             if (position != null) {
-                // TODO: camera has NORTH & SOUTH mixed up...
                 Vector3f lookAt = convert(position.vector()).add(0, CAMERA_LOOKAT_HEIGHT, 0);
                 Vector3f cameraOffset = new Vector3f(0, 0, CAMERA_DISTANCE);
                 cameraOffset.rotate(new Quaternionf(new AxisAngle4f(-CAMERA_ANGLE, 1, 0, 0)));
@@ -228,7 +227,7 @@ public class ApplicationClient extends Application {
                     Mesh quad = new Quad(shape.width() / 1000f, shape.height() / 1000f);
                     Geometry geometry = new Geometry();
                     geometry.setMesh(quad);
-                    geometry.setLocalRotation(new Quaternionf(new AxisAngle4f((float) (Math.PI / 2), 1, 0, 0)));
+                    geometry.setLocalRotation(new Quaternionf(new AxisAngle4f((float) (-Math.PI / 2), 1, 0, 0)));
                     Material material = new Material();
                     material.setVertexShader(vertexShaderDefault);
                     material.setFragmentShader(fragShaderDefault);
@@ -406,12 +405,12 @@ public class ApplicationClient extends Application {
 
     private float directionToAngle(Direction direction) {
         Vector2 vector = direction.toLengthVector(1_000_000);
-        return (float) Math.atan2(-vector.y(), vector.x()) + (float) (Math.PI / 2);
+        return (float) Math.atan2(vector.y(), vector.x()) + (float) (Math.PI / 2);
     }
 
     private Vector3f convert(Vector2 vector) {
         float milli = 0.001f;
-        return new Vector3f(vector.x() * milli, 0, vector.y() * milli);
+        return new Vector3f(vector.x() * milli, 0, -vector.y() * milli);
     }
 
     private static PlayerInput toInput(long player, Set<Integer> keyCodes) {
@@ -421,13 +420,13 @@ public class ApplicationClient extends Application {
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_7)
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_8)
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_9)) {
-            y--;
+            y++;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_DOWN)
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_1)
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_2)
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_3)) {
-            y++;
+            y--;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_RIGHT)
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_3)
