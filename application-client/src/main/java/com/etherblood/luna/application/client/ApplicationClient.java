@@ -89,7 +89,7 @@ public class ApplicationClient extends Application {
 
         DirectionalLight directionalLight = new DirectionalLight();
         directionalLight.getAmbientColor().set(0.8f);
-        directionalLight.setDirection(new Vector3f(2, -10, -5).normalize());
+        directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
         directionalLight.addAffectedSpatial(sceneNode);
         directionalLight.addShadows(4096);
         setLight(directionalLight);
@@ -333,7 +333,6 @@ public class ApplicationClient extends Application {
                     Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
                     if (name.equals("amara") || name.equals("ghost")) {
                         model.scale(new Vector3f(0.01f));
-                        model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
                     } else {
                         model.setRenderBucket(RenderBucketType.TRANSPARENT);
                         model.forEachGeometry(geometry -> {
@@ -341,8 +340,8 @@ public class ApplicationClient extends Application {
                             geometry.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
                             geometry.getMaterial().setDepthWrite(false);
                         });
-
                     }
+                    model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
 
                     models.put(entity, new ModelWrapper(entity, model));
                     System.out.println("load " + name + " in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");

@@ -34,6 +34,8 @@ public class GhostBehaviorSystem implements GameSystem {
                 } else {
                     data.set(entity, new ActorInput(direction, ActionKey.WALK));
                 }
+            } else {
+                data.set(entity, new ActorInput(null, ActionKey.IDLE));
             }
         }
     }
