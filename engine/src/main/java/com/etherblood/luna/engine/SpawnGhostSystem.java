@@ -1,6 +1,7 @@
 package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.damage.Team;
 
 public class SpawnGhostSystem implements GameSystem {
     @Override

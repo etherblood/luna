@@ -2,16 +2,16 @@ package com.etherblood.luna.engine.actions.ghost;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.Circle;
-import com.etherblood.luna.engine.DamageTrigger;
-import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.PendingDelete;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.Action;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.damage.DamageTrigger;
+import com.etherblood.luna.engine.damage.Damagebox;
+import com.etherblood.luna.engine.damage.Team;
 
 public class MeleeAttack extends Action {
     private final long damageFrame;

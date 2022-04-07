@@ -2,8 +2,8 @@ package com.etherblood.luna.engine.actions;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.engine.MilliHealth;
 import com.etherblood.luna.engine.PendingDelete;
+import com.etherblood.luna.engine.damage.MilliHealth;
 
 public class Fallen extends Action {
 

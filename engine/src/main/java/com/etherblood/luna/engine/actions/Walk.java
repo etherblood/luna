@@ -2,7 +2,7 @@ package com.etherblood.luna.engine.actions;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.engine.Speed;
+import com.etherblood.luna.engine.movement.Speed;
 
 public class Walk extends Action {
     private final long speedMillimetresPerSecond;

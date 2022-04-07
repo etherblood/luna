@@ -5,11 +5,11 @@ import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameSystem;
-import com.etherblood.luna.engine.MilliHealth;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.damage.MilliHealth;
+import com.etherblood.luna.engine.damage.Team;
 
 public class GhostBehaviorSystem implements GameSystem {
     @Override

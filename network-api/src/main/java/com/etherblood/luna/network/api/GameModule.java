@@ -10,30 +10,31 @@ import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.ActorInput;
+import com.etherblood.luna.engine.ActorName;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
-import com.etherblood.luna.engine.DamageTrigger;
-import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
-import com.etherblood.luna.engine.Hitbox;
-import com.etherblood.luna.engine.MilliHealth;
 import com.etherblood.luna.engine.ModelKey;
-import com.etherblood.luna.engine.Movebox;
 import com.etherblood.luna.engine.PendingDelete;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerJoined;
-import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.SkillSet;
-import com.etherblood.luna.engine.Speed;
-import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import com.etherblood.luna.engine.damage.DamageTrigger;
+import com.etherblood.luna.engine.damage.Damagebox;
+import com.etherblood.luna.engine.damage.Hitbox;
+import com.etherblood.luna.engine.damage.MilliHealth;
+import com.etherblood.luna.engine.damage.Team;
+import com.etherblood.luna.engine.movement.Movebox;
+import com.etherblood.luna.engine.movement.Obstaclebox;
+import com.etherblood.luna.engine.movement.Speed;
 import com.etherblood.luna.network.api.serialization.EnumSerializer;
 import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
@@ -52,6 +53,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Position.class, new RecordSerializer<>());
         kryo.register(Speed.class, new RecordSerializer<>());
         kryo.register(Movebox.class, new RecordSerializer<>());
+        kryo.register(Obstaclebox.class, new RecordSerializer<>());
         kryo.register(Hitbox.class, new RecordSerializer<>());
         kryo.register(Damagebox.class, new RecordSerializer<>());
         kryo.register(DamageTrigger.class, new EnumSerializer<>(DamageTrigger.class));
@@ -69,7 +71,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Direction.class, new EnumSerializer<>(Direction.class));
 
         kryo.register(PlayerId.class, new RecordSerializer<>());
-        kryo.register(PlayerName.class, new RecordSerializer<>());
+        kryo.register(ActorName.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
 
         kryo.register(SkillSet.class, new Serializer<SkillSet>() {

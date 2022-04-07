@@ -1,6 +1,10 @@
-package com.etherblood.luna.engine;
+package com.etherblood.luna.engine.damage;
 
 import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.Circle;
+import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.GameSystem;
+import com.etherblood.luna.engine.Position;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +23,7 @@ public class DamageboxCollisionSystem implements GameSystem {
             return;
         }
         if (!cachedCollisions.isEmpty()) {
+            // we want to make sure no state carries over between frames
             throw new AssertionError("cached collisions must be cleared after use.");
         }
         cachedCollisions.addAll(calculateCollisions(engine));

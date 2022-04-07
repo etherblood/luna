@@ -4,6 +4,7 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.Action;
 import com.etherblood.luna.engine.actions.ActionFactory;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.damage.MilliHealth;
 import java.util.Map;
 
 public class UpdateActorStateSystem implements GameSystem {

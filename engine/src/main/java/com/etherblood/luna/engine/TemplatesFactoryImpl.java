@@ -3,6 +3,12 @@ package com.etherblood.luna.engine;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import com.etherblood.luna.engine.damage.DamageTrigger;
+import com.etherblood.luna.engine.damage.Damagebox;
+import com.etherblood.luna.engine.damage.Hitbox;
+import com.etherblood.luna.engine.damage.MilliHealth;
+import com.etherblood.luna.engine.movement.Movebox;
+import com.etherblood.luna.engine.movement.Speed;
 import java.util.EnumMap;
 import java.util.Map;
 

@@ -1,6 +1,8 @@
-package com.etherblood.luna.engine;
+package com.etherblood.luna.engine.damage;
 
 import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.GameEngine;
+import com.etherblood.luna.engine.GameSystem;
 import java.util.List;
 
 public class DamageboxSystem implements GameSystem {

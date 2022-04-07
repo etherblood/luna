@@ -1,6 +1,6 @@
 package com.etherblood.luna.engine;
 
-public record PlayerName(
+public record ActorName(
         String name
 ) {
 }

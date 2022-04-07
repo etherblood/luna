@@ -5,8 +5,8 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Speed;
 import com.etherblood.luna.engine.Vector2;
+import com.etherblood.luna.engine.movement.Speed;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

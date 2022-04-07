@@ -2,6 +2,7 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.data.EntityDataImpl;
+import com.etherblood.luna.engine.damage.Team;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,7 +55,7 @@ public class GameEngine {
                         int player = data.createEntity();
                         applyTemplate(player, "amara");
                         data.set(player, new PlayerId(event.join().playerId()));
-                        data.set(player, new PlayerName(event.join().playerName()));
+                        data.set(player, new ActorName(event.join().playerName()));
                         data.set(player, new Position(0, 0));
                         data.set(player, Team.PLAYERS);
                     }

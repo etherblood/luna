@@ -6,6 +6,7 @@ import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
 import com.destrostudios.icetea.core.material.Material;
+import com.destrostudios.icetea.core.mesh.Mesh;
 import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
@@ -14,20 +15,22 @@ import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.ActorName;
 import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
-import com.etherblood.luna.engine.Damagebox;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.engine.Hitbox;
-import com.etherblood.luna.engine.MilliHealth;
 import com.etherblood.luna.engine.ModelKey;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
-import com.etherblood.luna.engine.PlayerName;
 import com.etherblood.luna.engine.Position;
+import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.damage.Damagebox;
+import com.etherblood.luna.engine.damage.Hitbox;
+import com.etherblood.luna.engine.damage.MilliHealth;
+import com.etherblood.luna.engine.movement.Obstaclebox;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,6 +57,7 @@ public class ApplicationClient extends Application {
     private final Map<Integer, ModelWrapper> models = new HashMap<>();
     private final Map<Integer, HitboxWrapper> hitboxes = new HashMap<>();
     private final Map<Integer, HitboxWrapper> damageboxes = new HashMap<>();
+    private final Map<Integer, HitboxWrapper> obstacleboxes = new HashMap<>();
     private final Map<Integer, StatusHudWrapper> statusHuds = new HashMap<>();
     private Geometry geometryGround;
     private final GameProxy gameProxy;
@@ -159,6 +163,8 @@ public class ApplicationClient extends Application {
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         EntityData data = snapshot.getData();
 
+        // TODO: cleanup spaghetti
+
         // camera
         List<Integer> players = data.findByValue(new PlayerId(gameProxy.getPlayer().id));
         for (int player : players) {
@@ -178,14 +184,14 @@ public class ApplicationClient extends Application {
             Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
             while (iterator.hasNext()) {
                 StatusHudWrapper wrapper = iterator.next();
-                if (!data.has(wrapper.getEntity(), PlayerName.class)
+                if (!data.has(wrapper.getEntity(), ActorName.class)
                         && !data.has(wrapper.getEntity(), MilliHealth.class)) {
                     guiNode.remove(wrapper.getNode());
                     iterator.remove();
                 }
             }
             List<Integer> entities = new ArrayList<>();
-            entities.addAll(data.list(PlayerName.class));
+            entities.addAll(data.list(ActorName.class));
             entities.addAll(data.list(MilliHealth.class));
             for (int entity : entities) {
                 if (!statusHuds.containsKey(entity)) {
@@ -194,14 +200,48 @@ public class ApplicationClient extends Application {
                     guiNode.add(wrapper.getNode());
                 }
                 Vector2 position = data.get(entity, Position.class).vector();
-                PlayerName playerName = data.get(entity, PlayerName.class);
-                String name = playerName == null ? null : playerName.name();
+                ActorName actorName = data.get(entity, ActorName.class);
+                String name = actorName == null ? null : actorName.name();
                 MilliHealth health = data.get(entity, MilliHealth.class);
                 StatusHudWrapper wrapper = statusHuds.get(entity);
                 wrapper.setName(name);
                 wrapper.setHealth(health == null ? null : health.value());
                 Vector3f screenCoordinates = getScreenCoordinates(convert(position));
                 wrapper.getNode().setLocalTranslation(screenCoordinates);
+            }
+        }
+
+        {
+            // obstacleboxes
+            Iterator<HitboxWrapper> iterator = obstacleboxes.values().iterator();
+            while (iterator.hasNext()) {
+                HitboxWrapper wrapper = iterator.next();
+                if (!data.has(wrapper.getEntity(), Obstaclebox.class)) {
+                    debugNode.remove(wrapper.getNode());
+                    iterator.remove();
+                }
+            }
+            for (int entity : data.list(Obstaclebox.class)) {
+                Rectangle shape = data.get(entity, Obstaclebox.class).shape();
+                if (!obstacleboxes.containsKey(entity)) {
+
+                    Mesh quad = new Quad(shape.width() / 1000f, shape.height() / 1000f);
+                    Geometry geometry = new Geometry();
+                    geometry.setMesh(quad);
+                    geometry.setLocalRotation(new Quaternionf(new AxisAngle4f((float) (Math.PI / 2), 1, 0, 0)));
+                    Material material = new Material();
+                    material.setVertexShader(vertexShaderDefault);
+                    material.setFragmentShader(fragShaderDefault);
+                    material.setCullMode(VK10.VK_CULL_MODE_NONE);
+                    material.setFillMode(VK10.VK_POLYGON_MODE_LINE);
+                    material.getParameters().setVector4f("color", new Vector4f(0, 0, 1, 1));
+                    geometry.setMaterial(material);
+                    geometry.setShadowMode(ShadowMode.OFF);
+                    obstacleboxes.put(entity, new HitboxWrapper(entity, geometry));
+                    debugNode.add(geometry);
+                }
+                Vector2 position = data.get(entity, Position.class).vector().add(shape.x(), shape.y());
+                obstacleboxes.get(entity).getNode().setLocalTranslation(convert(position));
             }
         }
 
