@@ -71,7 +71,7 @@ public class MovementSystem implements GameSystem {
             }
             Vector2 speed = speeds.get(entity);
             Position position = data.get(entity, Position.class);
-            data.set(entity, position.vector().add(speed));
+            data.set(entity, new Position(position.vector().add(speed)));
         }
     }
 }
