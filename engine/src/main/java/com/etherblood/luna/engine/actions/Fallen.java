@@ -19,6 +19,11 @@ public class Fallen extends Action {
     }
 
     @Override
+    public Long cooldownFrames(GameEngine game, int actor) {
+        return null;
+    }
+
+    @Override
     public Long durationFrames(GameEngine game, int actor) {
         return null;
     }

@@ -26,6 +26,8 @@ import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.SkillSet;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.actions.Attack1Cooldown;
+import com.etherblood.luna.engine.actions.Attack2Cooldown;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.damage.DamageTrigger;
 import com.etherblood.luna.engine.damage.Damagebox;
@@ -63,6 +65,8 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(PendingDelete.class, new RecordSerializer<>());
         kryo.register(Team.class, new RecordSerializer<>());
         kryo.register(GhostBehavior.class, new RecordSerializer<>());
+        kryo.register(Attack1Cooldown.class, new RecordSerializer<>());
+        kryo.register(Attack2Cooldown.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());

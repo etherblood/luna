@@ -7,6 +7,8 @@ public abstract class Action {
 
     public abstract ActionKey getKey();
 
+    public abstract Long cooldownFrames(GameEngine game, int actor);
+
     public abstract Long durationFrames(GameEngine game, int actor);
 
     public boolean hasEnded(GameEngine game, int actor) {

@@ -4,8 +4,12 @@ import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.Action;
 import com.etherblood.luna.engine.actions.ActionFactory;
 import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.actions.Attack1Cooldown;
+import com.etherblood.luna.engine.actions.Attack2Cooldown;
+import com.etherblood.luna.engine.actions.CooldownComponent;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import java.util.Map;
+import java.util.function.LongFunction;
 
 public class UpdateActorStateSystem implements GameSystem {
 
@@ -42,11 +46,27 @@ public class UpdateActorStateSystem implements GameSystem {
             }
 
             if (input != null && skillMap.containsKey(input.action())) {
-                if (action.isInterruptedBy(engine, entity, input.action())) {
+                Map<ActionKey, Class<? extends CooldownComponent>> cooldownMappings = Map.of(
+                        ActionKey.ATTACK1, Attack1Cooldown.class,
+                        ActionKey.ATTACK2, Attack2Cooldown.class
+                );
+                Class<? extends CooldownComponent> cooldownType = cooldownMappings.get(input.action());
+                boolean onCooldown = cooldownType != null && data.has(entity, cooldownType);
+
+                if (!onCooldown && action.isInterruptedBy(engine, entity, input.action())) {
                     action.cleanup(engine, entity);
                     state = new ActorState(skillMap.get(input.action()), engine.getFrame());
+                    action = factory.getAction(state.actionId());
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
+                    }
+                    Long cooldownFrames = action.cooldownFrames(engine, entity);
+                    if (cooldownFrames != null) {
+                        Map<ActionKey, LongFunction<? extends CooldownComponent>> cooldownConstructors = Map.of(
+                                ActionKey.ATTACK1, Attack1Cooldown::new,
+                                ActionKey.ATTACK2, Attack2Cooldown::new);
+                        LongFunction<? extends CooldownComponent> cooldownConstructor = cooldownConstructors.get(input.action());
+                        data.set(entity, cooldownConstructor.apply(engine.getFrame() + cooldownFrames));
                     }
                 } else if (action.isTurnable(engine, entity)) {
                     if (input.direction() != null) {

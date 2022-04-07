@@ -1,6 +1,8 @@
 package com.etherblood.luna.engine;
 
 import com.etherblood.luna.engine.actions.ActionFactory;
+import com.etherblood.luna.engine.actions.Attack1Cooldown;
+import com.etherblood.luna.engine.actions.Attack2Cooldown;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
 import com.etherblood.luna.engine.damage.Damagebox;
@@ -52,7 +54,9 @@ public class GameRules {
                             PendingDelete.class,
                             Team.class,
                             GhostBehavior.class,
-                            SkillSet.class
+                            SkillSet.class,
+                            Attack1Cooldown.class,
+                            Attack2Cooldown.class
                     ),
                     List.of(
                             collisionSystem,// cache collisions
@@ -62,7 +66,8 @@ public class GameRules {
                             new ApplyActionSystem(actionFactory),
                             new MovementSystem(),
                             new DamageboxSystem(collisionSystem),
-                            new PendingDeleteSystem()
+                            new PendingDeleteSystem(),
+                            new CooldownExpireSystem()
                     ),
                     new TemplatesFactoryImpl(),
                     60);

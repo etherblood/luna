@@ -21,6 +21,11 @@ public class BladeOfChaos extends Action {
     }
 
     @Override
+    public Long cooldownFrames(GameEngine game, int actor) {
+        return 300L;
+    }
+
+    @Override
     public Long durationFrames(GameEngine game, int actor) {
         return DURATION_FRAMES;
     }
