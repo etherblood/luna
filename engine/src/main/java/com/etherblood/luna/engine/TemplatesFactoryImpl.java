@@ -36,7 +36,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                         ))
                 ));
                 data.set(entity, Direction.UP);
-                data.set(entity, new MilliHealth(20_000));
+                data.set(entity, new MilliHealth(50_000));
                 data.set(entity, new ModelKey("amara"));
                 break;
             }
