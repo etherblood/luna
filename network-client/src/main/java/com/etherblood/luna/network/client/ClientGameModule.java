@@ -1,6 +1,7 @@
 package com.etherblood.luna.network.client;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
@@ -8,6 +9,10 @@ import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import com.etherblood.luna.network.api.GameModule;
 import com.etherblood.luna.network.api.PlaybackBuffer;
+import java.io.ByteArrayOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Formatter;
 
 public class ClientGameModule extends GameModule {
 
@@ -38,6 +43,9 @@ public class ClientGameModule extends GameModule {
             for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
                 state.tick(buffer.peek(frame));
                 buffer.clear(frame);
+                if (state.getFrame() % 1200 == 0) {
+                    logStateHash();
+                }
             }
         }
     }
@@ -57,14 +65,42 @@ public class ClientGameModule extends GameModule {
         if (state == null) {
             return null;
         }
-        Kryo kryo = new Kryo();
-        kryo.setReferences(false);
-        kryo.setCopyReferences(false);
-        initialize(kryo);
+        Kryo kryo = getKryo();
         GameEngine copy = kryo.copy(state);
         for (long frame = state.getFrame(); frame < serverFrame; frame++) {
             copy.tick(buffer.peek(frame));
         }
         return copy;
+    }
+
+    private Kryo getKryo() {
+        Kryo kryo = new Kryo();
+        kryo.setReferences(false);
+        kryo.setCopyReferences(false);
+        initialize(kryo);
+        return kryo;
+    }
+
+    private void logStateHash() {
+        Kryo kryo = getKryo();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Output output = new Output(outputStream);
+        kryo.writeObject(output, state);
+        output.flush();
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            byte[] hashBytes = md.digest(outputStream.toByteArray());
+            System.out.println("State hash on frame " + state.getFrame() + ": " + byteArray2Hex(hashBytes));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String byteArray2Hex(byte[] hash) {
+        Formatter formatter = new Formatter();
+        for (byte b : hash) {
+            formatter.format("%02x", b);
+        }
+        return formatter.toString();
     }
 }
