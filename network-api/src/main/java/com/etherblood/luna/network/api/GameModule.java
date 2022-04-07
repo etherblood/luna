@@ -31,6 +31,7 @@ import com.etherblood.luna.engine.actions.Attack2Cooldown;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.damage.DamageTrigger;
 import com.etherblood.luna.engine.damage.Damagebox;
+import com.etherblood.luna.engine.damage.DeleteSelfAfterDamageTrigger;
 import com.etherblood.luna.engine.damage.Hitbox;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.damage.Team;
@@ -67,6 +68,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(GhostBehavior.class, new RecordSerializer<>());
         kryo.register(Attack1Cooldown.class, new RecordSerializer<>());
         kryo.register(Attack2Cooldown.class, new RecordSerializer<>());
+        kryo.register(DeleteSelfAfterDamageTrigger.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());

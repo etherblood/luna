@@ -59,6 +59,10 @@ public class GameEngine {
                         data.set(player, new Position(0, 0));
                         data.set(player, Team.PLAYERS);
                     }
+                } else {
+                    for (int entity : data.findByValue(new PlayerId(event.join().playerId()))) {
+                        data.set(entity, new PendingDelete(frame));
+                    }
                 }
             }
         }

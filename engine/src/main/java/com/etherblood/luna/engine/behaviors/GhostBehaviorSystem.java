@@ -26,7 +26,7 @@ public class GhostBehaviorSystem implements GameSystem {
                 Direction direction = Direction.of(delta.x(), delta.y());
 
                 int meleeRange = 1000;
-                int rangedRange = 3000;
+                int rangedRange = 5000;
                 if (!data.has(entity, Attack1Cooldown.class) && delta.squaredLength() < meleeRange * meleeRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK1));
                 } else if (!data.has(entity, Attack2Cooldown.class) && delta.squaredLength() < rangedRange * rangedRange) {

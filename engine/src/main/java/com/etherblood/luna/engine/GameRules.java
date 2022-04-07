@@ -8,6 +8,7 @@ import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
 import com.etherblood.luna.engine.damage.Damagebox;
 import com.etherblood.luna.engine.damage.DamageboxCollisionSystem;
 import com.etherblood.luna.engine.damage.DamageboxSystem;
+import com.etherblood.luna.engine.damage.DeleteSelfAfterDamageTrigger;
 import com.etherblood.luna.engine.damage.Hitbox;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.damage.Team;
@@ -56,7 +57,8 @@ public class GameRules {
                             GhostBehavior.class,
                             SkillSet.class,
                             Attack1Cooldown.class,
-                            Attack2Cooldown.class
+                            Attack2Cooldown.class,
+                            DeleteSelfAfterDamageTrigger.class
                     ),
                     List.of(
                             collisionSystem,// cache collisions

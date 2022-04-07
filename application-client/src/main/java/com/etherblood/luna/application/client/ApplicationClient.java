@@ -373,7 +373,7 @@ public class ApplicationClient extends Application {
                             "amara.gaze_of_darkness", 280 / 60d,
                             "amara.blade_of_chaos", 160 / 60d,
                             "ghost.melee_attack", 72 / 60d,
-                            "ghost.blade_of_chaos", 92 / 60d
+                            "ghost.ghost_spell", 92 / 60d
                     );
 
                     Map<String, String> amaraMap = Map.of(
@@ -388,7 +388,7 @@ public class ApplicationClient extends Application {
                             "ghost.idle", "idle",
                             "ghost.fly_forward", "fly_forward",
                             "ghost.melee_attack", "melee_attack",
-                            "ghost.blade_of_chaos", "cast_spell",
+                            "ghost.ghost_spell", "cast_spell",
                             "ghost.die", "die"
                     );
                     HashMap<String, String> animationMap = new HashMap<>();

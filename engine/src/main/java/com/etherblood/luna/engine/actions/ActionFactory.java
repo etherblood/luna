@@ -2,6 +2,7 @@ package com.etherblood.luna.engine.actions;
 
 import com.etherblood.luna.engine.actions.amara.BladeOfChaos;
 import com.etherblood.luna.engine.actions.amara.GazeOfDarkness;
+import com.etherblood.luna.engine.actions.amara.GhostSpell;
 import com.etherblood.luna.engine.actions.ghost.MeleeAttack;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class ActionFactory {
                 "ghost.fly_forward", new Walk(3000),
                 "ghost.melee_attack", new MeleeAttack(48, 72, 72,
                         750, 500, 3_000),
-                "ghost.blade_of_chaos", new BladeOfChaos(),
+                "ghost.ghost_spell", new GhostSpell(),
                 "ghost.die", new Fallen(100)
         );
         actionMappings = new HashMap<>();
