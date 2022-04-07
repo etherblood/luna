@@ -21,30 +21,14 @@ public class GhostBehaviorSystem implements GameSystem {
                 Position position = data.get(entity, Position.class);
                 Position otherPosition = data.get(best, Position.class);
                 Vector2 delta = otherPosition.vector().sub(position.vector());
+                Direction direction = Direction.of(delta.x(), delta.y());
 
-                // <hacky workaround>
-                Direction direction;
-                int milli_sin_of_pi_eights = 383;// Math.round(1000 * Math.sin(PI / 8))
-                if (milli_sin_of_pi_eights * Math.abs(delta.x()) >= 1000 * Math.abs(delta.y())) {
-                    if (delta.x() >= 0) {
-                        direction = Direction.RIGHT;
-                    } else {
-                        direction = Direction.LEFT;
-                    }
-                } else if (milli_sin_of_pi_eights * Math.abs(delta.y()) >= 1000 * Math.abs(delta.x())) {
-                    if (delta.y() >= 0) {
-                        direction = Direction.UP;
-                    } else {
-                        direction = Direction.DOWN;
-                    }
-                } else {
-                    direction = Direction.of(delta.x(), delta.y());
-                }
-                // </hacky workaround>
-
-                int attackRange = 1000;
-                if (delta.squaredLength() < attackRange * attackRange) {
+                int meleeRange = 1000;
+                int rangedRange = 3000;
+                if (delta.squaredLength() < meleeRange * meleeRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK1));
+                } else if (delta.squaredLength() < rangedRange * rangedRange) {
+                    data.set(entity, new ActorInput(direction, ActionKey.ATTACK2));
                 } else {
                     data.set(entity, new ActorInput(direction, ActionKey.WALK));
                 }

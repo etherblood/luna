@@ -28,4 +28,13 @@ public record Vector2(
     public Vector2 sub(Vector2 other) {
         return add(-other.x(), -other.y());
     }
+
+    public Vector2 mult(long factor) {
+        return new Vector2(factor * x, factor * y);
+    }
+
+    public Vector2 floorDiv(long denominator) {
+        return new Vector2(Math.floorDiv(x, denominator), Math.floorDiv(y, denominator));
+    }
+
 }

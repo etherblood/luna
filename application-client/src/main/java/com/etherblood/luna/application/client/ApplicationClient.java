@@ -368,19 +368,24 @@ public class ApplicationClient extends Application {
 
                 ActorState actorState = data.get(entity, ActorState.class);
                 if (actorState != null) {
-                    Map<String, String> animationMap = Map.of(
+                    Map<String, String> amaraMap = Map.of(
                             "amara.idle", "idle",
                             "amara.walk", "walk",
                             "amara.dash", "dash",
                             "amara.gaze_of_darkness", "attack1",
                             "amara.blade_of_chaos", "attack2",
-                            "amara.fallen", "death",
-
+                            "amara.fallen", "death"
+                    );
+                    Map<String, String> ghostMap = Map.of(
                             "ghost.idle", "idle",
                             "ghost.fly_forward", "fly_forward",
                             "ghost.melee_attack", "melee_attack",
+                            "ghost.blade_of_chaos", "cast_spell",
                             "ghost.die", "die"
                     );
+                    HashMap<String, String> animationMap = new HashMap<>();
+                    animationMap.putAll(amaraMap);
+                    animationMap.putAll(ghostMap);
                     String animation = animationMap.get(actorState.actionId());
                     wrapper.setAnimation(animation);
                     float fps = snapshot.getRules().getFramesPerSecond();
@@ -440,7 +445,7 @@ public class ApplicationClient extends Application {
                 || keyCodes.contains(GLFW.GLFW_KEY_KP_7)) {
             x--;
         }
-        Direction direction = Direction.of(x, y);
+        Direction direction = Direction.eightDirOf(x, y);
         ActionKey action = ActionKey.IDLE;
         if (direction != null) {
             action = ActionKey.WALK;

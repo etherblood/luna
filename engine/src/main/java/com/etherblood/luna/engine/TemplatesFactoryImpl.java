@@ -47,6 +47,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                                 ActionKey.IDLE, "ghost.idle",
                                 ActionKey.WALK, "ghost.fly_forward",
                                 ActionKey.ATTACK1, "ghost.melee_attack",
+                                ActionKey.ATTACK2, "ghost.blade_of_chaos",
 
                                 ActionKey.FALLEN, "ghost.die"
                         ))
