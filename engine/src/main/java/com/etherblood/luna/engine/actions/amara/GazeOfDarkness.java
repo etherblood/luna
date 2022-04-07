@@ -10,9 +10,9 @@ import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.engine.damage.Team;
 
 public class GazeOfDarkness extends Action {
-    private static final long DAMAGE_FRAME = 100;
-    private static final long INTERRUPT_RESIST_FRAMES = 160;
-    private static final long DURATION_FRAMES = 280;
+    private static final long DAMAGE_FRAME = 100 / 2;
+    private static final long INTERRUPT_RESIST_FRAMES = 160 / 2;
+    private static final long DURATION_FRAMES = 280 / 2;
     private static final long RANGE = 1_500;
 
     @Override
@@ -21,8 +21,8 @@ public class GazeOfDarkness extends Action {
     }
 
     @Override
-    public boolean hasEnded(GameEngine game, int actor) {
-        return getElapsedFrames(game, actor) > DURATION_FRAMES;
+    public Long durationFrames(GameEngine game, int actor) {
+        return DURATION_FRAMES;
     }
 
     @Override

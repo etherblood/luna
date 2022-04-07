@@ -26,6 +26,8 @@ import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Vector2;
+import com.etherblood.luna.engine.actions.Action;
+import com.etherblood.luna.engine.actions.ActionFactory;
 import com.etherblood.luna.engine.actions.ActionKey;
 import com.etherblood.luna.engine.damage.Damagebox;
 import com.etherblood.luna.engine.damage.Hitbox;
@@ -368,6 +370,13 @@ public class ApplicationClient extends Application {
 
                 ActorState actorState = data.get(entity, ActorState.class);
                 if (actorState != null) {
+                    Map<String, Double> animationSeconds = Map.of(
+                            "amara.gaze_of_darkness", 280 / 60d,
+                            "amara.blade_of_chaos", 160 / 60d,
+                            "ghost.melee_attack", 72 / 60d,
+                            "ghost.blade_of_chaos", 92 / 60d
+                    );
+
                     Map<String, String> amaraMap = Map.of(
                             "amara.idle", "idle",
                             "amara.walk", "walk",
@@ -390,7 +399,17 @@ public class ApplicationClient extends Application {
                     wrapper.setAnimation(animation);
                     float fps = snapshot.getRules().getFramesPerSecond();
                     long animationFrames = snapshot.getFrame() - actorState.startFrame();
-                    wrapper.setAnimationTime(animationFrames / fps);
+
+                    if (animationSeconds.containsKey(actorState.actionId())) {
+                        ActionFactory actionFactory = new ActionFactory();
+                        Action action = actionFactory.getAction(actorState.actionId());
+                        long targetFrames = action.durationFrames(snapshot, entity);
+                        double targetSeconds = (double) targetFrames / snapshot.getRules().getFramesPerSecond();
+                        double baseSeconds = animationSeconds.get(actorState.actionId());
+                        wrapper.setAnimationTime((float) ((baseSeconds / targetSeconds) * (animationFrames / fps)));
+                    } else {
+                        wrapper.setAnimationTime(animationFrames / fps);
+                    }
                 }
             }
         }

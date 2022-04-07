@@ -17,6 +17,11 @@ public class Walk extends Action {
     }
 
     @Override
+    public Long durationFrames(GameEngine game, int actor) {
+        return null;
+    }
+
+    @Override
     public boolean hasEnded(GameEngine game, int actor) {
         return false;
     }

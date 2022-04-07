@@ -7,7 +7,11 @@ public abstract class Action {
 
     public abstract ActionKey getKey();
 
-    public abstract boolean hasEnded(GameEngine game, int actor);
+    public abstract Long durationFrames(GameEngine game, int actor);
+
+    public boolean hasEnded(GameEngine game, int actor) {
+        return getElapsedFrames(game, actor) > durationFrames(game, actor);
+    }
 
     public boolean isInterruptedBy(GameEngine game, int actor, ActionKey key) {
         return getKey() != key && key.interruptStrength() >= interruptResistance(game, actor);

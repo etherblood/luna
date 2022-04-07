@@ -36,8 +36,8 @@ public class MeleeAttack extends Action {
     }
 
     @Override
-    public boolean hasEnded(GameEngine game, int actor) {
-        return getElapsedFrames(game, actor) > durationFrames;
+    public Long durationFrames(GameEngine game, int actor) {
+        return durationFrames;
     }
 
     @Override
