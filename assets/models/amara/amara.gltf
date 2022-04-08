@@ -27024,7 +27024,7 @@
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "amara_texture.png",
+            "name" : "amara_texture",
             "uri" : "amara_texture.png"
         }
     ],
