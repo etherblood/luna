@@ -3,6 +3,7 @@ package com.etherblood.luna.application.client;
 import com.destrostudios.icetea.core.Application;
 import com.destrostudios.icetea.core.animation.AnimationControl;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
+import com.destrostudios.icetea.core.clone.CloneContext;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
@@ -331,9 +332,9 @@ public class ApplicationClient extends Application {
                 if (!models.containsKey(entity)) {
                     long nanos = System.nanoTime();
                     // hard coded amara model
-                    Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
-                    AnimationControl a = (AnimationControl) model.getControls().iterator().next();
-                    if (!a.getAnimations().isEmpty()) {
+                    Node model = assetManager.loadModel("models/" + name + "/" + name + ".gltf", CloneContext.reuseAll());
+                    AnimationControl a = model.getFirstControl(AnimationControl.class);
+                    if (a != null) {
                         // workaround for scale issue when exporting from blender with animations
                         model.scale(new Vector3f(0.01f));
                     }

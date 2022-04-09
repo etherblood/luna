@@ -80,34 +80,7 @@
         <dependency>
             <groupId>com.github.destrostudios.ice-tea-engine</groupId>
             <artifactId>ice-tea-engine-core</artifactId>
-            <version>4272d44ed28adaa9f9a5c3316c815c44b65cdb10</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.lwjgl</groupId>
-                    <artifactId>lwjgl-natives-linux</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.lwjgl</groupId>
-                    <artifactId>lwjgl-assimp-natives-linux</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.lwjgl</groupId>
-                    <artifactId>lwjgl-glfw-natives-linux</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.lwjgl</groupId>
-                    <artifactId>lwjgl-openal-natives-linux</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.lwjgl</groupId>
-                    <artifactId>lwjgl-shaderc-natives-linux</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.lwjgl</groupId>
-                    <artifactId>lwjgl-stb-natives-linux</artifactId>
-                </exclusion>
-
-            </exclusions>
+            <version>0ad9c00dca6b0f947907a29ab6a05f36650d8436</version>
         </dependency>
         <dependency>
             <groupId>com.etherblood.luna</groupId>

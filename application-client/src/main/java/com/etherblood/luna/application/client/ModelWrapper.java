@@ -14,12 +14,12 @@ public class ModelWrapper {
     }
 
     public void setAnimationTime(float seconds) {
-        AnimationControl a = (AnimationControl) node.getControls().iterator().next();
+        AnimationControl a = node.getFirstControl(AnimationControl.class);
         a.setTime(seconds);
     }
 
     public void setAnimation(String animation) {
-        AnimationControl a = (AnimationControl) node.getControls().iterator().next();
+        AnimationControl a = node.getFirstControl(AnimationControl.class);
         a.play(animation);
         a.setPlaying(false);
     }
