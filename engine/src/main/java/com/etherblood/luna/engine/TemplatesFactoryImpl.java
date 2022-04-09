@@ -164,13 +164,10 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 break;
             }
             case "fallen_action": {
-                data.set(entity, new ActionDuration(179));// default, should be overwritten by caller
-                data.set(entity, new ActionEvent(179, "suicide"));// default, should be overwritten by caller
+                data.set(entity, new ActionDuration(0));// default, should be overwritten by caller
+                data.set(entity, new ActionEvent(0, "suicide"));// default, should be overwritten by caller
                 data.set(entity, new ActionInterruptStrength(ActionInterruptResist.MAX));
                 data.set(entity, new ActionInterruptResist(Long.MAX_VALUE, ActionInterruptResist.NONE));
-
-                data.set(entity, new ActionRange(500));
-                data.set(entity, new ActionCooldown(300));
                 break;
             }
             case "gaze_of_darkness_action": {

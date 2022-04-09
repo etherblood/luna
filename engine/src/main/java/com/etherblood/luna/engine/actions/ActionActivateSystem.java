@@ -25,12 +25,12 @@ public class ActionActivateSystem implements GameSystem {
         EntityData data = game.getData();
         for (int entity : data.list(ActiveAction.class)) {
             ActiveAction state = data.get(entity, ActiveAction.class);
+            int idleAction = getAction(data, entity, ActionKey.IDLE);// assume IDLE always exists
             int activeAction = state.action();
 
             // handle ended actions
             ActionDuration duration = data.get(activeAction, ActionDuration.class);
             if (duration != null && game.getFrame() - state.startFrame() > duration.frames()) {
-                int idleAction = getAction(data, entity, ActionKey.IDLE);// assume IDLE always exists
                 activeAction = switchAction(game, entity, activeAction, idleAction);
             }
 
@@ -42,14 +42,22 @@ public class ActionActivateSystem implements GameSystem {
             Integer fallenAction = getAction(data, entity, ActionKey.FALLEN);
             if (health != null && health.value() <= 0 && fallenAction != null) {
                 Direction direction = input == null ? null : input.direction();
-                // TODO: this is hacky, improve
+                // TODO: this is hacky, improve?
                 // overwrite user input with FALLEN action
                 input = new ActorInput(direction, ActionKey.FALLEN);
             }
 
             Integer inputAction = input != null ? getAction(data, entity, input.action()) : null;
             if (inputAction != null) {
-                // TODO: if an action on cooldown is used while a direction is being held, it should be handled as if the input was WALK
+                // fall back to walk/idle if inputAction is on cooldown
+                if (data.has(inputAction, ActiveCooldown.class)) {
+                    Integer walkAction = getAction(data, entity, ActionKey.WALK);
+                    if (input.direction() != null && walkAction != null) {
+                        inputAction = walkAction;
+                    } else {
+                        inputAction = idleAction;
+                    }
+                }
                 if (!data.has(inputAction, ActiveCooldown.class) && isInterrupt(data, activeAction, inputAction)) {
                     activeAction = switchAction(game, entity, activeAction, inputAction);
                     if (input.direction() != null) {
