@@ -195,7 +195,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             }
             case "ghost_melee_action": {
                 data.set(entity, new ActionDuration(72));
-                data.set(entity, new ActionEvent(48, "ghost_spell"));
+                data.set(entity, new ActionEvent(48, "ghost_melee"));
                 data.set(entity, new ActionInterruptStrength(ActionInterruptResist.LOW));
                 data.set(entity, new ActionInterruptResist(Long.MAX_VALUE, ActionInterruptResist.MEDIUM));
 
@@ -236,6 +236,11 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new Speed(milliMetresPerFrame));
                 data.set(entity, new ModelKey("ghost_spell"));
                 data.set(entity, new DeleteSelfAfterDamageTrigger());
+                break;
+            }
+            case "ghost_melee": {
+                data.set(entity, new Damagebox(new Circle(0, 0, 500), DamageTrigger.PER_FRAME, 3_000));
+                data.set(entity, new PendingDelete(game.getFrame()));
                 break;
             }
             case "suicide": {
