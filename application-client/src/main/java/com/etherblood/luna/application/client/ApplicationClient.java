@@ -376,6 +376,7 @@ public class ApplicationClient extends Application {
                     Map<String, Double> animationSeconds = Map.of(
                             "attack1", 280 / 60d,
                             "attack2", 160 / 60d,
+                            "agonizing", 698 / 60d,
                             "melee_attack", 72 / 60d,
                             "ghost_spell", 92 / 60d
                     );

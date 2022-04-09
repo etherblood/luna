@@ -12,6 +12,7 @@ import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.damage.DamageTrigger;
 import com.etherblood.luna.engine.damage.Damagebox;
@@ -197,10 +198,10 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 break;
             }
             case "wave_of_quick_healing_action": {
-                data.set(entity, new ActionDuration(150));
-                data.set(entity, new ActionEvent(60, "wave_of_quick_healing"));
-                data.set(entity, new ActionInterruptStrength(ActionInterruptResist.LOW));
-                data.set(entity, new ActionInterruptResist(80, ActionInterruptResist.HIGH));
+                data.set(entity, new ActionDuration(500));
+                data.set(entity, new ActionEvent(30, "wave_of_quick_healing"));
+                data.set(entity, new ActionInterruptStrength(ActionInterruptResist.MEDIUM));
+                data.set(entity, new ActionInterruptResist(210, ActionInterruptResist.MEDIUM));
 
                 data.set(entity, new ActionCooldown(1200));
                 break;
@@ -241,8 +242,11 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 break;
             }
             case "wave_of_quick_healing": {
-                data.set(entity, new Damagebox(new Circle(0, 0, 1_000), DamageTrigger.PER_FRAME, -5_000, true, false));
-                data.set(entity, new PendingDelete(game.getFrame()));
+                long frames = 180;
+                data.set(entity, new Damagebox(new Circle(0, 0, 1_000), DamageTrigger.PER_FRAME, Math.floorDiv(-5_000, frames), true, false));
+                data.set(entity, new PendingDelete(game.getFrame() + frames));
+                data.set(entity, new DeleteAfterActorAction());
+                data.set(entity, new ModelKey("gaze_of_darkness"));
                 break;
             }
             case "ghost_spell": {

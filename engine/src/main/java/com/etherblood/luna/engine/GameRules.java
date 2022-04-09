@@ -15,6 +15,7 @@ import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
+import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
 import com.etherblood.luna.engine.damage.Damagebox;
@@ -68,6 +69,7 @@ public class GameRules {
                             GhostBehavior.class,
                             DeleteSelfAfterDamageTrigger.class,
                             OwnedBy.class,
+                            DeleteAfterActorAction.class,
 
                             ActionKey.class,
                             ActionAnimation.class,

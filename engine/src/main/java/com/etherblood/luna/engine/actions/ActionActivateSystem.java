@@ -6,6 +6,8 @@ import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameSystem;
+import com.etherblood.luna.engine.OwnedBy;
+import com.etherblood.luna.engine.PendingDelete;
 import com.etherblood.luna.engine.actions.data.ActionCooldown;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
@@ -15,6 +17,7 @@ import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
+import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Speed;
 
@@ -58,7 +61,7 @@ public class ActionActivateSystem implements GameSystem {
                         inputAction = idleAction;
                     }
                 }
-                if (!data.has(inputAction, ActiveCooldown.class) && isInterrupt(data, activeAction, inputAction)) {
+                if (!data.has(inputAction, ActiveCooldown.class) && isInterrupt(game, entity, activeAction, inputAction)) {
                     activeAction = switchAction(game, entity, activeAction, inputAction);
                     if (input.direction() != null) {
                         data.set(entity, input.direction());
@@ -96,16 +99,25 @@ public class ActionActivateSystem implements GameSystem {
     private void actorCleanupAfterAction(GameEngine game, int entity, int action) {
         EntityData data = game.getData();
         data.remove(entity, Speed.class);
+        for (int other : data.findByValue(new OwnedBy(entity))) {
+            if (data.has(other, DeleteAfterActorAction.class)) {
+                data.set(other, new PendingDelete(game.getFrame()));
+            }
+        }
     }
 
-    private boolean isInterrupt(EntityData data, int activeAction, int inputAction) {
+    private boolean isInterrupt(GameEngine game, int actor, int activeAction, int inputAction) {
         if (activeAction == inputAction) {
             return false;
         }
+        EntityData data = game.getData();
         ActionInterruptStrength strength = data.get(inputAction, ActionInterruptStrength.class);
         int strengthLevel = strength == null ? ActionInterruptResist.NONE : strength.level();
         ActionInterruptResist resist = data.get(activeAction, ActionInterruptResist.class);
-        int resistLevel = resist == null ? ActionInterruptResist.NONE : resist.level();
+        int resistLevel = ActionInterruptResist.NONE;
+        if (resist != null && resist.frames() > game.getFrame() - data.get(actor, ActiveAction.class).startFrame()) {
+            resistLevel = resist.level();
+        }
         return strengthLevel >= resistLevel;
     }
 
