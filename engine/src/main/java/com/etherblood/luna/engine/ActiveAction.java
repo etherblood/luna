@@ -1,7 +1,7 @@
 package com.etherblood.luna.engine;
 
-public record ActorState(
-        String actionId,
+public record ActiveAction(
+        int action,
         long startFrame
 ) {
 }

@@ -16,7 +16,7 @@ public class ClientEventMessageBuilder {
 
     public synchronized void enqueueAction(EventMessagePart part) {
         if (part.frame() <= lockFrame) {
-            throw new IllegalStateException("Tried to request input for frame " + part.frame() + " when " + lockFrame + " frames were already locked.");
+            throw new IllegalStateException("Tried to request input for frame " + part.frame() + " when " + lockFrame + " frame were already locked.");
         }
         pendingQueue.put(part, seq);
         lockFrame = part.frame();

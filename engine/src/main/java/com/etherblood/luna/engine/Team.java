@@ -1,4 +1,4 @@
-package com.etherblood.luna.engine.damage;
+package com.etherblood.luna.engine;
 
 public record Team(
         int id

@@ -1,6 +1,7 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.Application;
+import com.destrostudios.icetea.core.animation.AnimationControl;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
@@ -15,8 +16,8 @@ import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
+import com.etherblood.luna.engine.ActiveAction;
 import com.etherblood.luna.engine.ActorName;
-import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
@@ -26,9 +27,9 @@ import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Vector2;
-import com.etherblood.luna.engine.actions.Action;
-import com.etherblood.luna.engine.actions.ActionFactory;
-import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionAnimation;
+import com.etherblood.luna.engine.actions.data.ActionDuration;
+import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.damage.Damagebox;
 import com.etherblood.luna.engine.damage.Hitbox;
 import com.etherblood.luna.engine.damage.MilliHealth;
@@ -331,9 +332,12 @@ public class ApplicationClient extends Application {
                     long nanos = System.nanoTime();
                     // hard coded amara model
                     Node model = (Node) assetManager.loadModel("models/" + name + "/" + name + ".gltf");
-                    if (name.equals("amara") || name.equals("ghost")) {
+                    AnimationControl a = (AnimationControl) model.getControls().iterator().next();
+                    if (!a.getAnimations().isEmpty()) {
+                        // workaround for scale issue when exporting from blender with animations
                         model.scale(new Vector3f(0.01f));
-                    } else {
+                    }
+                    if (name.equals("gaze_of_darkness") || name.equals("blade_of_chaos")) {
                         model.setRenderBucket(RenderBucketType.TRANSPARENT);
                         model.forEachGeometry(geometry -> {
                             geometry.getMaterial().setTransparent(true);
@@ -367,44 +371,24 @@ public class ApplicationClient extends Application {
                     wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
                 }
 
-                ActorState actorState = data.get(entity, ActorState.class);
-                if (actorState != null) {
+                ActiveAction activeAction = data.get(entity, ActiveAction.class);
+                if (activeAction != null) {
                     Map<String, Double> animationSeconds = Map.of(
-                            "amara.gaze_of_darkness", 280 / 60d,
-                            "amara.blade_of_chaos", 160 / 60d,
-                            "ghost.melee_attack", 72 / 60d,
-                            "ghost.ghost_spell", 92 / 60d
+                            "attack1", 280 / 60d,
+                            "attack2", 160 / 60d,
+                            "melee_attack", 72 / 60d,
+                            "ghost_spell", 92 / 60d
                     );
-
-                    Map<String, String> amaraMap = Map.of(
-                            "amara.idle", "idle",
-                            "amara.walk", "walk",
-                            "amara.dash", "dash",
-                            "amara.gaze_of_darkness", "attack1",
-                            "amara.blade_of_chaos", "attack2",
-                            "amara.fallen", "death"
-                    );
-                    Map<String, String> ghostMap = Map.of(
-                            "ghost.idle", "idle",
-                            "ghost.fly_forward", "fly_forward",
-                            "ghost.melee_attack", "melee_attack",
-                            "ghost.ghost_spell", "cast_spell",
-                            "ghost.die", "die"
-                    );
-                    HashMap<String, String> animationMap = new HashMap<>();
-                    animationMap.putAll(amaraMap);
-                    animationMap.putAll(ghostMap);
-                    String animation = animationMap.get(actorState.actionId());
+                    String animation = data.get(activeAction.action(), ActionAnimation.class).animationName();
                     wrapper.setAnimation(animation);
                     float fps = snapshot.getRules().getFramesPerSecond();
-                    long animationFrames = snapshot.getFrame() - actorState.startFrame();
+                    long animationFrames = snapshot.getFrame() - activeAction.startFrame();
 
-                    if (animationSeconds.containsKey(actorState.actionId())) {
-                        ActionFactory actionFactory = new ActionFactory();
-                        Action action = actionFactory.getAction(actorState.actionId());
-                        long targetFrames = action.durationFrames(snapshot, entity);
+                    ActionDuration duration = data.get(activeAction.action(), ActionDuration.class);
+                    if (animationSeconds.containsKey(animation) && duration != null) {
+                        long targetFrames = duration.frames();
                         double targetSeconds = (double) targetFrames / snapshot.getRules().getFramesPerSecond();
-                        double baseSeconds = animationSeconds.get(actorState.actionId());
+                        double baseSeconds = animationSeconds.get(animation);
                         wrapper.setAnimationTime((float) ((baseSeconds / targetSeconds) * (animationFrames / fps)));
                     } else {
                         wrapper.setAnimationTime(animationFrames / fps);

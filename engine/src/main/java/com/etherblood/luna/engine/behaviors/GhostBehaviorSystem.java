@@ -6,17 +6,17 @@ import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameSystem;
 import com.etherblood.luna.engine.Position;
+import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
-import com.etherblood.luna.engine.actions.ActionKey;
-import com.etherblood.luna.engine.actions.Attack1Cooldown;
-import com.etherblood.luna.engine.actions.Attack2Cooldown;
+import com.etherblood.luna.engine.actions.data.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionOf;
+import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.damage.MilliHealth;
-import com.etherblood.luna.engine.damage.Team;
 
 public class GhostBehaviorSystem implements GameSystem {
     @Override
-    public void tick(GameEngine engine) {
-        EntityData data = engine.getData();
+    public void tick(GameEngine game) {
+        EntityData data = game.getData();
         for (int entity : data.list(GhostBehavior.class)) {
             Integer best = findNearestEnemy(data, entity);
             if (best != null) {
@@ -25,11 +25,14 @@ public class GhostBehaviorSystem implements GameSystem {
                 Vector2 delta = otherPosition.vector().sub(position.vector());
                 Direction direction = Direction.of(delta.x(), delta.y());
 
+                int meleeAction = getAction(data, entity, ActionKey.ATTACK1);
+                int rangeAction = getAction(data, entity, ActionKey.ATTACK2);
+
                 int meleeRange = 1000;
                 int rangedRange = 5000;
-                if (!data.has(entity, Attack1Cooldown.class) && delta.squaredLength() < meleeRange * meleeRange) {
+                if (!data.has(meleeAction, ActiveCooldown.class) && delta.squaredLength() < meleeRange * meleeRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK1));
-                } else if (!data.has(entity, Attack2Cooldown.class) && delta.squaredLength() < rangedRange * rangedRange) {
+                } else if (!data.has(rangeAction, ActiveCooldown.class) && delta.squaredLength() < rangedRange * rangedRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK2));
                 } else {
                     data.set(entity, new ActorInput(direction, ActionKey.WALK));
@@ -64,5 +67,14 @@ public class GhostBehaviorSystem implements GameSystem {
             }
         }
         return best;
+    }
+
+    private Integer getAction(EntityData data, int actor, ActionKey key) {
+        for (int action : data.findByValue(new ActionOf(actor))) {
+            if (data.get(action, ActionKey.class) == key) {
+                return action;
+            }
+        }
+        return null;
     }
 }

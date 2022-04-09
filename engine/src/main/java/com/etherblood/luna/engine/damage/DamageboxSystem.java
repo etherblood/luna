@@ -15,10 +15,10 @@ public class DamageboxSystem implements GameSystem {
     }
 
     @Override
-    public void tick(GameEngine engine) {
-        EntityData data = engine.getData();
+    public void tick(GameEngine game) {
+        EntityData data = game.getData();
         List<DamageCollisionPair> cachedCollisions = collisionSystem.getCachedCollisions();
-        List<DamageCollisionPair> newCollisions = collisionSystem.calculateCollisions(engine);
+        List<DamageCollisionPair> newCollisions = collisionSystem.calculateCollisions(game);
 
         for (DamageCollisionPair collision : newCollisions) {
             int entity = collision.damageEntity();
@@ -34,7 +34,7 @@ public class DamageboxSystem implements GameSystem {
                 triggered = true;
             }
             if (triggered && data.has(entity, DeleteSelfAfterDamageTrigger.class)) {
-                data.set(entity, new PendingDelete(engine.getFrame()));
+                data.set(entity, new PendingDelete(game.getFrame()));
             }
         }
         cachedCollisions.clear();

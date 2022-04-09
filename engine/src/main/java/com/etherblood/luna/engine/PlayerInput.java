@@ -1,6 +1,6 @@
 package com.etherblood.luna.engine;
 
-import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionKey;
 
 public record PlayerInput(
         long player,

@@ -2,7 +2,6 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.data.EntityDataImpl;
-import com.etherblood.luna.engine.damage.Team;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

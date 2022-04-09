@@ -8,8 +8,8 @@ import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
+import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
-import com.etherblood.luna.engine.damage.Team;
 import com.etherblood.luna.engine.movement.Obstaclebox;
 
 public class LocalMain {

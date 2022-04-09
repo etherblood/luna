@@ -1,4 +1,4 @@
-package com.etherblood.luna.engine.actions;
+package com.etherblood.luna.engine.actions.data;
 
 public enum ActionKey {
     IDLE,

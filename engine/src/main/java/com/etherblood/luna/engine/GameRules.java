@@ -1,8 +1,20 @@
 package com.etherblood.luna.engine;
 
-import com.etherblood.luna.engine.actions.ActionFactory;
-import com.etherblood.luna.engine.actions.Attack1Cooldown;
-import com.etherblood.luna.engine.actions.Attack2Cooldown;
+import com.etherblood.luna.engine.actions.ActionActivateSystem;
+import com.etherblood.luna.engine.actions.ActionCooldownExpireSystem;
+import com.etherblood.luna.engine.actions.ActionEventSystem;
+import com.etherblood.luna.engine.actions.data.ActionAnimation;
+import com.etherblood.luna.engine.actions.data.ActionCooldown;
+import com.etherblood.luna.engine.actions.data.ActionDuration;
+import com.etherblood.luna.engine.actions.data.ActionEvent;
+import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
+import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
+import com.etherblood.luna.engine.actions.data.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionOf;
+import com.etherblood.luna.engine.actions.data.ActionRange;
+import com.etherblood.luna.engine.actions.data.ActionSpeed;
+import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
 import com.etherblood.luna.engine.damage.Damagebox;
@@ -11,7 +23,6 @@ import com.etherblood.luna.engine.damage.DamageboxSystem;
 import com.etherblood.luna.engine.damage.DeleteSelfAfterDamageTrigger;
 import com.etherblood.luna.engine.damage.Hitbox;
 import com.etherblood.luna.engine.damage.MilliHealth;
-import com.etherblood.luna.engine.damage.Team;
 import com.etherblood.luna.engine.movement.Movebox;
 import com.etherblood.luna.engine.movement.MovementSystem;
 import com.etherblood.luna.engine.movement.Obstaclebox;
@@ -34,7 +45,6 @@ public class GameRules {
 
     static {
         RULES_MAP = Map.of(DEFAULT_RULES_ID, () -> {
-            ActionFactory actionFactory = new ActionFactory();
             DamageboxCollisionSystem collisionSystem = new DamageboxCollisionSystem(true);
             return new GameRules(
                     DEFAULT_RULES_ID,
@@ -45,7 +55,7 @@ public class GameRules {
                             Obstaclebox.class,
                             Hitbox.class,
                             Damagebox.class,
-                            ActorState.class,
+                            ActiveAction.class,
                             ActorInput.class,
                             PlayerId.class,
                             ActorName.class,
@@ -53,23 +63,35 @@ public class GameRules {
                             MilliHealth.class,
                             ModelKey.class,
                             PendingDelete.class,
+                            PendingDeleteOwner.class,
                             Team.class,
                             GhostBehavior.class,
-                            SkillSet.class,
-                            Attack1Cooldown.class,
-                            Attack2Cooldown.class,
-                            DeleteSelfAfterDamageTrigger.class
+                            DeleteSelfAfterDamageTrigger.class,
+                            OwnedBy.class,
+
+                            ActionKey.class,
+                            ActionAnimation.class,
+                            ActionCooldown.class,
+                            ActionDuration.class,
+                            ActionEvent.class,
+                            ActionInterruptResist.class,
+                            ActionInterruptStrength.class,
+                            ActionOf.class,
+                            ActionRange.class,
+                            ActionSpeed.class,
+                            ActionTurnable.class,
+                            ActiveCooldown.class
                     ),
                     List.of(
                             collisionSystem,// cache collisions
                             new SpawnGhostSystem(),
                             new GhostBehaviorSystem(),
-                            new UpdateActorStateSystem(actionFactory),
-                            new ApplyActionSystem(actionFactory),
+                            new ActionActivateSystem(),
+                            new ActionEventSystem(),
                             new MovementSystem(),
                             new DamageboxSystem(collisionSystem),
                             new PendingDeleteSystem(),
-                            new CooldownExpireSystem()
+                            new ActionCooldownExpireSystem()
                     ),
                     new TemplatesFactoryImpl(),
                     60);

@@ -9,32 +9,42 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.etherblood.luna.engine.ActiveAction;
 import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.ActorName;
-import com.etherblood.luna.engine.ActorState;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.ModelKey;
+import com.etherblood.luna.engine.OwnedBy;
 import com.etherblood.luna.engine.PendingDelete;
+import com.etherblood.luna.engine.PendingDeleteOwner;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Rectangle;
-import com.etherblood.luna.engine.SkillSet;
+import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
-import com.etherblood.luna.engine.actions.ActionKey;
-import com.etherblood.luna.engine.actions.Attack1Cooldown;
-import com.etherblood.luna.engine.actions.Attack2Cooldown;
+import com.etherblood.luna.engine.actions.data.ActionAnimation;
+import com.etherblood.luna.engine.actions.data.ActionCooldown;
+import com.etherblood.luna.engine.actions.data.ActionDuration;
+import com.etherblood.luna.engine.actions.data.ActionEvent;
+import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
+import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
+import com.etherblood.luna.engine.actions.data.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionOf;
+import com.etherblood.luna.engine.actions.data.ActionRange;
+import com.etherblood.luna.engine.actions.data.ActionSpeed;
+import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.damage.DamageTrigger;
 import com.etherblood.luna.engine.damage.Damagebox;
 import com.etherblood.luna.engine.damage.DeleteSelfAfterDamageTrigger;
 import com.etherblood.luna.engine.damage.Hitbox;
 import com.etherblood.luna.engine.damage.MilliHealth;
-import com.etherblood.luna.engine.damage.Team;
 import com.etherblood.luna.engine.movement.Movebox;
 import com.etherblood.luna.engine.movement.Obstaclebox;
 import com.etherblood.luna.engine.movement.Speed;
@@ -42,7 +52,6 @@ import com.etherblood.luna.network.api.serialization.EnumSerializer;
 import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
 import com.etherblood.luna.network.api.serialization.RecordSerializer;
-import java.util.EnumMap;
 
 public abstract class GameModule extends NetworkModule {
     @Override
@@ -60,15 +69,27 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Hitbox.class, new RecordSerializer<>());
         kryo.register(Damagebox.class, new RecordSerializer<>());
         kryo.register(DamageTrigger.class, new EnumSerializer<>(DamageTrigger.class));
-        kryo.register(ActorState.class, new RecordSerializer<>());
+        kryo.register(ActiveAction.class, new RecordSerializer<>());
         kryo.register(MilliHealth.class, new RecordSerializer<>());
         kryo.register(ModelKey.class, new RecordSerializer<>());
         kryo.register(PendingDelete.class, new RecordSerializer<>());
+        kryo.register(PendingDeleteOwner.class, new RecordSerializer<>());
         kryo.register(Team.class, new RecordSerializer<>());
         kryo.register(GhostBehavior.class, new RecordSerializer<>());
-        kryo.register(Attack1Cooldown.class, new RecordSerializer<>());
-        kryo.register(Attack2Cooldown.class, new RecordSerializer<>());
         kryo.register(DeleteSelfAfterDamageTrigger.class, new RecordSerializer<>());
+        kryo.register(OwnedBy.class, new RecordSerializer<>());
+
+        kryo.register(ActionAnimation.class, new RecordSerializer<>());
+        kryo.register(ActionCooldown.class, new RecordSerializer<>());
+        kryo.register(ActionDuration.class, new RecordSerializer<>());
+        kryo.register(ActionEvent.class, new RecordSerializer<>());
+        kryo.register(ActionInterruptResist.class, new RecordSerializer<>());
+        kryo.register(ActionInterruptStrength.class, new RecordSerializer<>());
+        kryo.register(ActionOf.class, new RecordSerializer<>());
+        kryo.register(ActionRange.class, new RecordSerializer<>());
+        kryo.register(ActionSpeed.class, new RecordSerializer<>());
+        kryo.register(ActionTurnable.class, new RecordSerializer<>());
+        kryo.register(ActiveCooldown.class, new RecordSerializer<>());
 
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());
@@ -79,27 +100,6 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(PlayerId.class, new RecordSerializer<>());
         kryo.register(ActorName.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
-
-        kryo.register(SkillSet.class, new Serializer<SkillSet>() {
-            @Override
-            public void write(Kryo kryo, Output output, SkillSet object) {
-                for (ActionKey key : ActionKey.values()) {
-                    output.writeString(object.skillMap().get(key));
-                }
-            }
-
-            @Override
-            public SkillSet read(Kryo kryo, Input input, Class<SkillSet> type) {
-                EnumMap<ActionKey, String> map = new EnumMap<>(ActionKey.class);
-                for (ActionKey key : ActionKey.values()) {
-                    String value = input.readString();
-                    if (value != null) {
-                        map.put(key, value);
-                    }
-                }
-                return new SkillSet(map);
-            }
-        });
 
         // workaround for broken default serializers
         // TODO: move elsewhere (or better: fix library)

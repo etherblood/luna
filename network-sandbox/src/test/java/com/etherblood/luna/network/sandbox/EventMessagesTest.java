@@ -2,7 +2,7 @@ package com.etherblood.luna.network.sandbox;
 
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
-import com.etherblood.luna.engine.actions.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
 import com.etherblood.luna.network.api.PlaybackBuffer;

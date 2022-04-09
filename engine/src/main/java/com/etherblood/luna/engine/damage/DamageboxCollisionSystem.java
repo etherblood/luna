@@ -5,6 +5,7 @@ import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameSystem;
 import com.etherblood.luna.engine.Position;
+import com.etherblood.luna.engine.Team;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,15 +19,15 @@ public class DamageboxCollisionSystem implements GameSystem {
     }
 
     @Override
-    public void tick(GameEngine engine) {
+    public void tick(GameEngine game) {
         if (!cacheCollisions) {
             return;
         }
         if (!cachedCollisions.isEmpty()) {
-            // we want to make sure no state carries over between frames
+            // we want to make sure no state carries over between frame
             throw new AssertionError("cached collisions must be cleared after use.");
         }
-        cachedCollisions.addAll(calculateCollisions(engine));
+        cachedCollisions.addAll(calculateCollisions(game));
     }
 
     public List<DamageCollisionPair> getCachedCollisions() {
@@ -41,6 +42,9 @@ public class DamageboxCollisionSystem implements GameSystem {
         EntityData data = engine.getData();
         for (int entity : data.list(Damagebox.class)) {
             Position position = data.get(entity, Position.class);
+            if (position == null) {
+                continue;
+            }
             Damagebox damagebox = data.get(entity, Damagebox.class);
             Circle damageCircle = damagebox.shape().translate(position.vector());
             Team team = data.get(entity, Team.class);
