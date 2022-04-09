@@ -29,7 +29,6 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
         int fps = game.getRules().getFramesPerSecond();
         switch (templateKey) {
             case "amara": {
-                // create actions
                 int idleAction = data.createEntity();
                 {
                     apply(game, idleAction, "idle_action");
@@ -38,8 +37,8 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                     data.set(idleAction, new ActionAnimation("idle"));
                 }
 
-                int walkAction = data.createEntity();
                 {
+                    int walkAction = data.createEntity();
                     apply(game, walkAction, "walk_action");
                     data.set(walkAction, new ActionOf(entity));
                     data.set(walkAction, ActionKey.WALK);
@@ -47,8 +46,8 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                     data.set(walkAction, new ActionAnimation("walk"));
                 }
 
-                int dashAction = data.createEntity();
                 {
+                    int dashAction = data.createEntity();
                     apply(game, dashAction, "dash_action");
                     data.set(dashAction, new ActionOf(entity));
                     data.set(dashAction, ActionKey.DASH);
@@ -57,24 +56,32 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                     data.set(dashAction, new ActionAnimation("dash"));
                 }
 
-                int gazeOfDarknessAction = data.createEntity();
                 {
+                    int gazeOfDarknessAction = data.createEntity();
                     apply(game, gazeOfDarknessAction, "gaze_of_darkness_action");
                     data.set(gazeOfDarknessAction, new ActionOf(entity));
                     data.set(gazeOfDarknessAction, ActionKey.ATTACK1);
                     data.set(gazeOfDarknessAction, new ActionAnimation("attack1"));
                 }
 
-                int bladeOfChaosAction = data.createEntity();
                 {
+                    int bladeOfChaosAction = data.createEntity();
                     apply(game, bladeOfChaosAction, "blade_of_chaos_action");
                     data.set(bladeOfChaosAction, new ActionOf(entity));
                     data.set(bladeOfChaosAction, ActionKey.ATTACK2);
                     data.set(bladeOfChaosAction, new ActionAnimation("attack2"));
                 }
 
-                int fallenAction = data.createEntity();
                 {
+                    int waveOfQuickHealingAction = data.createEntity();
+                    apply(game, waveOfQuickHealingAction, "wave_of_quick_healing_action");
+                    data.set(waveOfQuickHealingAction, new ActionOf(entity));
+                    data.set(waveOfQuickHealingAction, ActionKey.ATTACK3);
+                    data.set(waveOfQuickHealingAction, new ActionAnimation("agonizing"));
+                }
+
+                {
+                    int fallenAction = data.createEntity();
                     apply(game, fallenAction, "fallen_action");
                     data.set(fallenAction, new ActionOf(entity));
                     data.set(fallenAction, ActionKey.FALLEN);
@@ -93,7 +100,6 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 break;
             }
             case "ghost": {
-                // create actions
                 int idleAction = data.createEntity();
                 {
                     apply(game, idleAction, "idle_action");
@@ -102,8 +108,8 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                     data.set(idleAction, new ActionAnimation("idle"));
                 }
 
-                int walkAction = data.createEntity();
                 {
+                    int walkAction = data.createEntity();
                     apply(game, walkAction, "walk_action");
                     data.set(walkAction, new ActionOf(entity));
                     data.set(walkAction, ActionKey.WALK);
@@ -111,24 +117,24 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                     data.set(walkAction, new ActionAnimation("fly_forward"));
                 }
 
-                int ghostMeleeAction = data.createEntity();
                 {
+                    int ghostMeleeAction = data.createEntity();
                     apply(game, ghostMeleeAction, "ghost_melee_action");
                     data.set(ghostMeleeAction, new ActionOf(entity));
                     data.set(ghostMeleeAction, ActionKey.ATTACK1);
                     data.set(ghostMeleeAction, new ActionAnimation("melee_attack"));
                 }
 
-                int ghostSpellAction = data.createEntity();
                 {
+                    int ghostSpellAction = data.createEntity();
                     apply(game, ghostSpellAction, "ghost_spell_action");
                     data.set(ghostSpellAction, new ActionOf(entity));
                     data.set(ghostSpellAction, ActionKey.ATTACK2);
                     data.set(ghostSpellAction, new ActionAnimation("cast_spell"));
                 }
 
-                int fallenAction = data.createEntity();
                 {
+                    int fallenAction = data.createEntity();
                     apply(game, fallenAction, "fallen_action");
                     data.set(fallenAction, new ActionOf(entity));
                     data.set(fallenAction, ActionKey.FALLEN);
@@ -190,6 +196,15 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new ActionCooldown(300));
                 break;
             }
+            case "wave_of_quick_healing_action": {
+                data.set(entity, new ActionDuration(150));
+                data.set(entity, new ActionEvent(60, "wave_of_quick_healing"));
+                data.set(entity, new ActionInterruptStrength(ActionInterruptResist.LOW));
+                data.set(entity, new ActionInterruptResist(80, ActionInterruptResist.HIGH));
+
+                data.set(entity, new ActionCooldown(1200));
+                break;
+            }
             case "ghost_melee_action": {
                 data.set(entity, new ActionDuration(72));
                 data.set(entity, new ActionEvent(48, "ghost_melee"));
@@ -223,6 +238,11 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 long milliMetresPerFrame = 6_000L / game.getRules().getFramesPerSecond();
                 data.set(entity, new Speed(milliMetresPerFrame));
                 data.set(entity, new ModelKey("blade_of_chaos"));
+                break;
+            }
+            case "wave_of_quick_healing": {
+                data.set(entity, new Damagebox(new Circle(0, 0, 1_000), DamageTrigger.PER_FRAME, -5_000, true, false));
+                data.set(entity, new PendingDelete(game.getFrame()));
                 break;
             }
             case "ghost_spell": {

@@ -259,7 +259,7 @@ public class ApplicationClient extends Application {
             }
             for (int entity : data.list(Hitbox.class)) {
                 if (!hitboxes.containsKey(entity)) {
-                    Circle shape = data.get(entity, Hitbox.class).shape();
+                    Circle shape = data.get(entity, Hitbox.class).area();
 
                     CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
                     Geometry geometry = new Geometry();
@@ -292,7 +292,7 @@ public class ApplicationClient extends Application {
             }
             for (int entity : data.list(Damagebox.class)) {
                 if (!damageboxes.containsKey(entity)) {
-                    Circle shape = data.get(entity, Damagebox.class).shape();
+                    Circle shape = data.get(entity, Damagebox.class).area();
 
                     CircleMesh circle = new CircleMesh(convert(new Vector2(shape.x(), shape.y())), shape.radius() / 1000f, 32);
                     Geometry geometry = new Geometry();
@@ -457,12 +457,19 @@ public class ApplicationClient extends Application {
             action = ActionKey.DASH;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_1)
-                || keyCodes.contains(GLFW.GLFW_KEY_Q)) {
+                || keyCodes.contains(GLFW.GLFW_KEY_Q)
+                || keyCodes.contains(GLFW.GLFW_KEY_A)) {
             action = ActionKey.ATTACK1;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_2)
-                || keyCodes.contains(GLFW.GLFW_KEY_W)) {
+                || keyCodes.contains(GLFW.GLFW_KEY_W)
+                || keyCodes.contains(GLFW.GLFW_KEY_S)) {
             action = ActionKey.ATTACK2;
+        }
+        if (keyCodes.contains(GLFW.GLFW_KEY_3)
+                || keyCodes.contains(GLFW.GLFW_KEY_E)
+                || keyCodes.contains(GLFW.GLFW_KEY_D)) {
+            action = ActionKey.ATTACK3;
         }
         return new PlayerInput(player, direction, action);
     }

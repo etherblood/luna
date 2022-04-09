@@ -46,7 +46,7 @@ public class DamageboxCollisionSystem implements GameSystem {
                 continue;
             }
             Damagebox damagebox = data.get(entity, Damagebox.class);
-            Circle damageCircle = damagebox.shape().translate(position.vector());
+            Circle damageCircle = damagebox.area().translate(position.vector());
             Team team = data.get(entity, Team.class);
 
             for (int other : data.list(Hitbox.class)) {
@@ -54,12 +54,16 @@ public class DamageboxCollisionSystem implements GameSystem {
                     continue;
                 }
                 Team otherTeam = data.get(other, Team.class);
-                if (team != null && team.equals(otherTeam)) {
+                boolean sameTeam = team != null && team.equals(otherTeam);
+                if (sameTeam && !damagebox.targetAllies()) {
+                    continue;
+                }
+                if (!sameTeam && !damagebox.targetOther()) {
                     continue;
                 }
                 Position otherPosition = data.get(other, Position.class);
                 if (otherPosition != null) {
-                    Circle hitbox = data.get(other, Hitbox.class).shape().translate(otherPosition.vector());
+                    Circle hitbox = data.get(other, Hitbox.class).area().translate(otherPosition.vector());
                     if (damageCircle.intersects(hitbox)) {
                         collisions.add(new DamageCollisionPair(entity, other));
                     }
