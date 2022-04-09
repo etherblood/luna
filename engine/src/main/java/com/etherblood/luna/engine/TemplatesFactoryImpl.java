@@ -79,8 +79,8 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                     data.set(fallenAction, new ActionOf(entity));
                     data.set(fallenAction, ActionKey.FALLEN);
                     data.set(fallenAction, new ActionAnimation("death"));
-                    data.set(entity, new ActionDuration(179));
-                    data.set(entity, new ActionEvent(179, "suicide"));
+                    data.set(fallenAction, new ActionDuration(179));
+                    data.set(fallenAction, new ActionEvent(179, "suicide"));
                 }
 
 
@@ -241,7 +241,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 break;
             }
             case "suicide": {
-                data.set(entity, new PendingDeleteOwner(0));
+                data.set(entity, new PendingDeleteOwner(game.getFrame()));
                 break;
             }
             default:

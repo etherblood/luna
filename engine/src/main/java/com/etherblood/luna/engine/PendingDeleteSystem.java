@@ -9,7 +9,7 @@ public class PendingDeleteSystem implements GameSystem {
         for (int entity : data.list(PendingDeleteOwner.class)) {
             PendingDeleteOwner pendingDeleteOwner = data.get(entity, PendingDeleteOwner.class);
             OwnedBy ownedBy = data.get(entity, OwnedBy.class);
-            data.set(ownedBy.owner(), new PendingDelete(game.getFrame() + pendingDeleteOwner.delayFrames()));
+            data.set(ownedBy.owner(), new PendingDelete(pendingDeleteOwner.frame()));
             data.remove(entity, PendingDeleteOwner.class);
         }
 
