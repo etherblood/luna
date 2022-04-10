@@ -165,6 +165,10 @@ public class ApplicationClient extends Application {
     @Override
     protected void update(float tpf) {
         GameEngine snapshot = gameProxy.getEngineSnapshot();
+        if (snapshot == null) {
+            // game has not started yet, skip update
+            return;
+        }
         EntityData data = snapshot.getData();
 
         // TODO: cleanup spaghetti
@@ -349,7 +353,10 @@ public class ApplicationClient extends Application {
                     model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
 
                     models.put(entity, new ModelWrapper(entity, model));
-                    System.out.println("load " + name + " in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
+                    long loadMillis = (System.nanoTime() - nanos) / 1_000_000;
+                    if (loadMillis >= 1) {
+                        System.out.println("load " + name + " in: " + loadMillis + "ms");
+                    }
                 }
                 ModelWrapper wrapper = models.get(entity);
                 Position position = data.get(entity, Position.class);
