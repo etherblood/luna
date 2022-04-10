@@ -81,7 +81,7 @@ public class ActionActivateSystem implements GameSystem {
         actorCleanupAfterAction(game, entity, activeAction);
         data.set(entity, new ActiveAction(newAction, game.getFrame()));
         actorSetupBeforeAction(game, entity, newAction);
-        return activeAction;
+        return newAction;
     }
 
     private void actorSetupBeforeAction(GameEngine game, int entity, int action) {
