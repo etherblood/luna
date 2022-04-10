@@ -16,8 +16,8 @@ import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
-import com.etherblood.luna.engine.behaviors.GhostBehavior;
-import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
+import com.etherblood.luna.engine.behaviors.SimpleBehavior;
+import com.etherblood.luna.engine.behaviors.SimpleBehaviorSystem;
 import com.etherblood.luna.engine.controlflow.SpawnSystem;
 import com.etherblood.luna.engine.controlflow.Spawner;
 import com.etherblood.luna.engine.controlflow.TriggerSystem;
@@ -71,7 +71,7 @@ public class GameRules {
                             PendingDelete.class,
                             PendingDeleteOwner.class,
                             Team.class,
-                            GhostBehavior.class,
+                            SimpleBehavior.class,
                             DeleteSelfAfterDamageTrigger.class,
                             OwnedBy.class,
                             DeleteAfterActorAction.class,
@@ -96,7 +96,7 @@ public class GameRules {
                             collisionSystem,// cache collisions
                             new TriggerSystem(),
                             new SpawnSystem(),
-                            new GhostBehaviorSystem(),
+                            new SimpleBehaviorSystem(),
                             new ActionActivateSystem(),
                             new ActionEventSystem(),
                             new MovementSystem(),

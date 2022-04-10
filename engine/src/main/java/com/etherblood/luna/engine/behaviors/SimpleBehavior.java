@@ -1,4 +1,4 @@
 package com.etherblood.luna.engine.behaviors;
 
-public record GhostBehavior() {
+public record SimpleBehavior() {
 }

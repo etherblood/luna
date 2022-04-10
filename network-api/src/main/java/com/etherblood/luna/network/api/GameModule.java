@@ -40,7 +40,7 @@ import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
-import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import com.etherblood.luna.engine.behaviors.SimpleBehavior;
 import com.etherblood.luna.engine.controlflow.Spawner;
 import com.etherblood.luna.engine.controlflow.Triggerbox;
 import com.etherblood.luna.engine.controlflow.WaitForTrigger;
@@ -79,7 +79,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(PendingDelete.class, new RecordSerializer<>());
         kryo.register(PendingDeleteOwner.class, new RecordSerializer<>());
         kryo.register(Team.class, new RecordSerializer<>());
-        kryo.register(GhostBehavior.class, new RecordSerializer<>());
+        kryo.register(SimpleBehavior.class, new RecordSerializer<>());
         kryo.register(DeleteSelfAfterDamageTrigger.class, new RecordSerializer<>());
         kryo.register(OwnedBy.class, new RecordSerializer<>());
         kryo.register(DeleteAfterActorAction.class, new RecordSerializer<>());

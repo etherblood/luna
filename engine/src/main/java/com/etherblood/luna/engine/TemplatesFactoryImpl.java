@@ -13,7 +13,7 @@ import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
-import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import com.etherblood.luna.engine.behaviors.SimpleBehavior;
 import com.etherblood.luna.engine.controlflow.Spawner;
 import com.etherblood.luna.engine.controlflow.Triggerbox;
 import com.etherblood.luna.engine.controlflow.WaitForTrigger;
@@ -33,6 +33,11 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
         EntityData data = game.getData();
         int fps = game.getRules().getFramesPerSecond();
         switch (templateKey) {
+            case "ghost_amara": {
+                game.applyTemplate(entity, "amara");
+                data.set(entity, new SimpleBehavior());
+                break;
+            }
             case "challenge_room": {
                 data.set(data.createEntity(), new Obstaclebox(new Rectangle(5_000, -5_000, 10_000, 10_000)));
                 data.set(data.createEntity(), new Obstaclebox(new Rectangle(-15_000, -5_000, 10_000, 10_000)));
@@ -84,7 +89,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(spawner4, Team.OPPONENTS);
 
                 int spawner5 = data.createEntity();
-                data.set(spawner5, new Spawner("ghost"));
+                data.set(spawner5, new Spawner("ghost_amara"));
                 data.set(spawner5, new Position(0, 25_000));
                 data.set(spawner5, new WaitForTrigger(trigger2));
                 data.set(spawner5, Team.OPPONENTS);
@@ -236,7 +241,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, Direction.DOWN);
                 data.set(entity, new MilliHealth(10_000));
                 data.set(entity, new ModelKey("ghost"));
-                data.set(entity, new GhostBehavior());
+                data.set(entity, new SimpleBehavior());
                 break;
             }
             case "idle_action": {
