@@ -1,6 +1,6 @@
 package com.etherblood.luna.engine.actions.data;
 
-public record ActionCooldown(
+public record BaseCooldown(
         long frames
 ) {
 }

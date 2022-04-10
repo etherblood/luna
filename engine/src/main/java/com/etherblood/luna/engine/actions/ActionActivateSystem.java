@@ -8,7 +8,6 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameSystem;
 import com.etherblood.luna.engine.OwnedBy;
 import com.etherblood.luna.engine.PendingDelete;
-import com.etherblood.luna.engine.actions.data.ActionCooldown;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
 import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
@@ -17,6 +16,7 @@ import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
+import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Speed;
@@ -90,7 +90,7 @@ public class ActionActivateSystem implements GameSystem {
         if (speed != null) {
             data.set(entity, new Speed(speed.milliMetresPerFrame()));
         }
-        ActionCooldown cooldown = data.get(action, ActionCooldown.class);
+        BaseCooldown cooldown = data.get(action, BaseCooldown.class);
         if (cooldown != null) {
             data.set(action, new ActiveCooldown(game.getFrame() + cooldown.frames()));
         }

@@ -50,4 +50,9 @@ public record Rectangle(
                 && minY() < pos.y() && pos.y() < maxY();
     }
 
+    public boolean containsIncludeBounds(Vector2 pos) {
+        return minX() <= pos.x() && pos.x() <= maxX()
+                && minY() <= pos.y() && pos.y() <= maxY();
+    }
+
 }

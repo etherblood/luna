@@ -4,7 +4,6 @@ import com.etherblood.luna.engine.actions.ActionActivateSystem;
 import com.etherblood.luna.engine.actions.ActionCooldownExpireSystem;
 import com.etherblood.luna.engine.actions.ActionEventSystem;
 import com.etherblood.luna.engine.actions.data.ActionAnimation;
-import com.etherblood.luna.engine.actions.data.ActionCooldown;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionEvent;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
@@ -15,9 +14,15 @@ import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
+import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
 import com.etherblood.luna.engine.behaviors.GhostBehaviorSystem;
+import com.etherblood.luna.engine.controlflow.SpawnSystem;
+import com.etherblood.luna.engine.controlflow.Spawner;
+import com.etherblood.luna.engine.controlflow.TriggerSystem;
+import com.etherblood.luna.engine.controlflow.Triggerbox;
+import com.etherblood.luna.engine.controlflow.WaitForTrigger;
 import com.etherblood.luna.engine.damage.Damagebox;
 import com.etherblood.luna.engine.damage.DamageboxCollisionSystem;
 import com.etherblood.luna.engine.damage.DamageboxSystem;
@@ -70,10 +75,13 @@ public class GameRules {
                             DeleteSelfAfterDamageTrigger.class,
                             OwnedBy.class,
                             DeleteAfterActorAction.class,
+                            Spawner.class,
+                            WaitForTrigger.class,
+                            Triggerbox.class,
 
                             ActionKey.class,
                             ActionAnimation.class,
-                            ActionCooldown.class,
+                            BaseCooldown.class,
                             ActionDuration.class,
                             ActionEvent.class,
                             ActionInterruptResist.class,
@@ -86,7 +94,8 @@ public class GameRules {
                     ),
                     List.of(
                             collisionSystem,// cache collisions
-                            new SpawnGhostSystem(),
+                            new TriggerSystem(),
+                            new SpawnSystem(),
                             new GhostBehaviorSystem(),
                             new ActionActivateSystem(),
                             new ActionEventSystem(),

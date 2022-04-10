@@ -112,14 +112,14 @@ public class ApplicationClient extends Application {
 
         bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
 
-        screenStatsText = new BitmapText(bitmapFont, "Hello World.");
+        screenStatsText = new BitmapText(bitmapFont, "Connecting...");
         screenStatsText.move(new Vector3f(0, 0, 1));
         guiNode.add(screenStatsText);
 
 
         // Ground
 
-        Quad meshGround = new Quad(10, 10);
+        Quad meshGround = new Quad(10, 30);
 
         Material materialGround = new Material();
         materialGround.setVertexShader(vertexShaderDefault);
@@ -167,6 +167,8 @@ public class ApplicationClient extends Application {
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         if (snapshot == null) {
             // game has not started yet, skip update
+            // we use this opportunity to preload amara
+            assetManager.loadModel("models/amara/amara.gltf", CloneContext.reuseAll());
             return;
         }
         EntityData data = snapshot.getData();
@@ -247,8 +249,14 @@ public class ApplicationClient extends Application {
                     obstacleboxes.put(entity, new HitboxWrapper(entity, geometry));
                     debugNode.add(geometry);
                 }
-                Vector2 position = data.get(entity, Position.class).vector().add(shape.x(), shape.y());
-                obstacleboxes.get(entity).getNode().setLocalTranslation(convert(position));
+                Position obstaclePosition = data.get(entity, Position.class);
+                Vector2 position;
+                if (obstaclePosition != null) {
+                    position = obstaclePosition.vector();
+                } else {
+                    position = new Vector2(0, 0);
+                }
+                obstacleboxes.get(entity).getNode().setLocalTranslation(convert(position.add(shape.x(), shape.y())));
             }
         }
 

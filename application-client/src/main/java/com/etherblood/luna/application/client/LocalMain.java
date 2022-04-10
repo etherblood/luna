@@ -7,10 +7,7 @@ import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.Position;
-import com.etherblood.luna.engine.Rectangle;
 import com.etherblood.luna.engine.Team;
-import com.etherblood.luna.engine.Vector2;
-import com.etherblood.luna.engine.movement.Obstaclebox;
 
 public class LocalMain {
 
@@ -31,20 +28,7 @@ public class LocalMain {
         data.set(player, new Position(0, 0));
         data.set(player, Team.PLAYERS);
 
-        // TODO: this does not belong here
-        Obstaclebox obstaclebox = new Obstaclebox(new Rectangle(-10_000, -10_000, 20_000, 20_000));
-        int leftObstacle = data.createEntity();
-        data.set(leftObstacle, obstaclebox);
-        data.set(leftObstacle, new Position(new Vector2(-15_000, 0)));
-        int rightObstacle = data.createEntity();
-        data.set(rightObstacle, obstaclebox);
-        data.set(rightObstacle, new Position(new Vector2(15_000, 0)));
-        int bottomObstacle = data.createEntity();
-        data.set(bottomObstacle, obstaclebox);
-        data.set(bottomObstacle, new Position(new Vector2(0, -15_000)));
-        int topObstacle = data.createEntity();
-        data.set(topObstacle, obstaclebox);
-        data.set(topObstacle, new Position(new Vector2(0, 15_000)));
+        game.applyTemplate(data.createEntity(), "test_room");
 
         return new LocalGameProxy(game, user);
     }

@@ -2,7 +2,6 @@ package com.etherblood.luna.engine;
 
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.actions.data.ActionAnimation;
-import com.etherblood.luna.engine.actions.data.ActionCooldown;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionEvent;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
@@ -12,14 +11,19 @@ import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.behaviors.GhostBehavior;
+import com.etherblood.luna.engine.controlflow.Spawner;
+import com.etherblood.luna.engine.controlflow.Triggerbox;
+import com.etherblood.luna.engine.controlflow.WaitForTrigger;
 import com.etherblood.luna.engine.damage.DamageTrigger;
 import com.etherblood.luna.engine.damage.Damagebox;
 import com.etherblood.luna.engine.damage.DeleteSelfAfterDamageTrigger;
 import com.etherblood.luna.engine.damage.Hitbox;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Movebox;
+import com.etherblood.luna.engine.movement.Obstaclebox;
 import com.etherblood.luna.engine.movement.Speed;
 
 public class TemplatesFactoryImpl implements TemplatesFactory {
@@ -29,6 +33,88 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
         EntityData data = game.getData();
         int fps = game.getRules().getFramesPerSecond();
         switch (templateKey) {
+            case "challenge_room": {
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(5_000, -5_000, 10_000, 10_000)));
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(-15_000, -5_000, 10_000, 10_000)));
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, 5_000, 10_000, 10_000)));
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, -15_000, 10_000, 10_000)));
+
+                int spawner1 = data.createEntity();
+                data.set(spawner1, new Spawner("ghost"));
+                data.set(spawner1, new Position(0, 15_000));
+                data.set(spawner1, Team.OPPONENTS);
+                data.set(spawner1, new BaseCooldown(569));
+                break;
+            }
+            case "test_room": {
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(5_000, -5_000, 10_000, 30_000)));
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(-15_000, -5_000, 10_000, 30_000)));
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, 25_000, 10_000, 10_000)));
+                data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, -15_000, 10_000, 10_000)));
+
+                int trigger1 = 1;
+                data.set(data.createEntity(), new Triggerbox(trigger1, new Rectangle(-5_000, 5_000, 10_000, 10_000)));
+
+                int spawner1 = data.createEntity();
+                data.set(spawner1, new Spawner("ghost"));
+                data.set(spawner1, new Position(-3_000, 14_000));
+                data.set(spawner1, new WaitForTrigger(trigger1));
+                data.set(spawner1, Team.OPPONENTS);
+
+                int spawner2 = data.createEntity();
+                data.set(spawner2, new Spawner("ghost"));
+                data.set(spawner2, new Position(0, 15_000));
+                data.set(spawner2, new WaitForTrigger(trigger1));
+                data.set(spawner2, Team.OPPONENTS);
+
+                int spawner3 = data.createEntity();
+                data.set(spawner3, new Spawner("ghost"));
+                data.set(spawner3, new Position(3_000, 14_000));
+                data.set(spawner3, new WaitForTrigger(trigger1));
+                data.set(spawner3, Team.OPPONENTS);
+
+
+                int trigger2 = 2;
+                data.set(data.createEntity(), new Triggerbox(trigger2, new Rectangle(-5_000, 15_000, 10_000, 10_000)));
+
+                int spawner4 = data.createEntity();
+                data.set(spawner4, new Spawner("ghost"));
+                data.set(spawner4, new Position(-3_000, 24_000));
+                data.set(spawner4, new WaitForTrigger(trigger2));
+                data.set(spawner4, Team.OPPONENTS);
+
+                int spawner5 = data.createEntity();
+                data.set(spawner5, new Spawner("ghost"));
+                data.set(spawner5, new Position(0, 25_000));
+                data.set(spawner5, new WaitForTrigger(trigger2));
+                data.set(spawner5, Team.OPPONENTS);
+
+                int spawner6 = data.createEntity();
+                data.set(spawner6, new Spawner("ghost"));
+                data.set(spawner6, new Position(3_000, 24_000));
+                data.set(spawner6, new WaitForTrigger(trigger2));
+                data.set(spawner6, Team.OPPONENTS);
+
+                int spawner7 = data.createEntity();
+                data.set(spawner7, new Spawner("ghost"));
+                data.set(spawner7, new Position(-3_000, 11_000));
+                data.set(spawner7, new WaitForTrigger(trigger2));
+                data.set(spawner7, Team.OPPONENTS);
+
+                int spawner8 = data.createEntity();
+                data.set(spawner8, new Spawner("ghost"));
+                data.set(spawner8, new Position(0, 10_000));
+                data.set(spawner8, new WaitForTrigger(trigger2));
+                data.set(spawner8, Team.OPPONENTS);
+
+                int spawner9 = data.createEntity();
+                data.set(spawner9, new Spawner("ghost"));
+                data.set(spawner9, new Position(3_000, 11_000));
+                data.set(spawner9, new WaitForTrigger(trigger2));
+                data.set(spawner9, Team.OPPONENTS);
+
+                break;
+            }
             case "amara": {
                 int idleAction = data.createEntity();
                 {
@@ -184,7 +270,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new ActionInterruptResist(80, ActionInterruptResist.MEDIUM));
 
                 data.set(entity, new ActionRange(1500));
-                data.set(entity, new ActionCooldown(300));
+                data.set(entity, new BaseCooldown(300));
                 break;
             }
             case "blade_of_chaos_action": {
@@ -194,7 +280,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new ActionInterruptResist(50, ActionInterruptResist.MEDIUM));
 
                 data.set(entity, new ActionRange(500));
-                data.set(entity, new ActionCooldown(300));
+                data.set(entity, new BaseCooldown(300));
                 break;
             }
             case "wave_of_quick_healing_action": {
@@ -203,7 +289,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new ActionInterruptStrength(ActionInterruptResist.MEDIUM));
                 data.set(entity, new ActionInterruptResist(210, ActionInterruptResist.MEDIUM));
 
-                data.set(entity, new ActionCooldown(1200));
+                data.set(entity, new BaseCooldown(1200));
                 break;
             }
             case "ghost_melee_action": {
@@ -222,7 +308,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(entity, new ActionInterruptResist(50, ActionInterruptResist.MEDIUM));
 
                 data.set(entity, new ActionRange(500));
-                data.set(entity, new ActionCooldown(240));
+                data.set(entity, new BaseCooldown(240));
                 break;
             }
 

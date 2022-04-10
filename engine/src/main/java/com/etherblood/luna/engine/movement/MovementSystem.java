@@ -46,7 +46,12 @@ public class MovementSystem implements GameSystem {
                 body = new Body();
                 body.simulatedTime = Fraction.ofLong(0);
                 body.speed = speeds.getOrDefault(entity, new Vector2(0, 0));
-                body.setPosition(data.get(entity, Position.class).vector());
+                Position position = data.get(entity, Position.class);
+                if (position != null) {
+                    body.setPosition(position.vector());
+                } else {
+                    body.setPosition(new Vector2(0, 0));
+                }
                 body.id = entity;
                 body.hitbox = data.get(entity, Obstaclebox.class).shape();
             }
