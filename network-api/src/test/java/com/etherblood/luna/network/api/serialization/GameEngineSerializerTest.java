@@ -17,6 +17,8 @@ public class GameEngineSerializerTest {
     @Test
     public void copyGame() {
         Kryo kryo = new Kryo();
+        kryo.setReferences(false);
+        kryo.setCopyReferences(false);
         kryo.register(GameEngine.class, new GameEngineSerializer());
         kryo.register(Position.class, new RecordSerializer<>());
         kryo.register(Speed.class, new RecordSerializer<>());

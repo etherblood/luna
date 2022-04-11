@@ -15,17 +15,6 @@ public record Direction(Vector2 kiloVector) {
 
     public Vector2 toLengthVector(long length) {
         return kiloVector.mult(length).floorDiv(1000);
-//        long diagonalSideLength = length * THOUSAND_SQRT_HALFS / 1000;// length * Math.sqrt(0.5)
-//        return switch (this) {
-//            case UP -> new Vector2(0, length);
-//            case DOWN -> new Vector2(0, -length);
-//            case RIGHT -> new Vector2(length, 0);
-//            case LEFT -> new Vector2(-length, 0);
-//            case UP_RIGHT -> new Vector2(diagonalSideLength, diagonalSideLength);
-//            case DOWN_RIGHT -> new Vector2(diagonalSideLength, -diagonalSideLength);
-//            case UP_LEFT -> new Vector2(-diagonalSideLength, diagonalSideLength);
-//            case DOWN_LEFT -> new Vector2(-diagonalSideLength, -diagonalSideLength);
-//        };
     }
 
     public static Direction of(long x, long y) {
