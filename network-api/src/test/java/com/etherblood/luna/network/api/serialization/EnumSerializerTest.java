@@ -1,5 +1,6 @@
 package com.etherblood.luna.network.api.serialization;
 
+import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.etherblood.luna.engine.Direction;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ public class EnumSerializerTest {
     @Test
     public void copyDirection() {
         Kryo kryo = new Kryo();
-        kryo.register(Direction.class, new EnumSerializer(Direction.class));
+        kryo.register(Direction.class, new RecordSerializer<>());
 
         Direction direction = Direction.DOWN_RIGHT;
 

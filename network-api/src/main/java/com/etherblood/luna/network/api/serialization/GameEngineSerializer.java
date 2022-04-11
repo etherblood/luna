@@ -1,5 +1,6 @@
 package com.etherblood.luna.network.api.serialization;
 
+import com.destrostudios.gametools.network.shared.serializers.CopySerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -30,7 +31,7 @@ public class GameEngineSerializer extends CopySerializer<GameEngine> {
     }
 
     @Override
-    public GameEngine read(Kryo kryo, Input input, Class type) {
+    public GameEngine read(Kryo kryo, Input input, Class<GameEngine> type) {
         String ruleId = input.readString();
         GameRules rules = GameRules.get(ruleId);
         long startEpochMillis = input.readLong();

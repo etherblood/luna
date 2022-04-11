@@ -1,14 +1,9 @@
 package com.etherblood.luna.network.api;
 
-import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.destrostudios.gametools.network.shared.modules.NetworkModule;
-import com.destrostudios.gametools.network.shared.modules.jwt.messages.Login;
-import com.destrostudios.gametools.network.shared.modules.jwt.messages.UserLogin;
-import com.destrostudios.gametools.network.shared.modules.jwt.messages.UserLogout;
+import com.destrostudios.gametools.network.shared.serializers.EnumSerializer;
+import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
 import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.ActiveAction;
 import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.ActorName;
@@ -52,10 +47,8 @@ import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Movebox;
 import com.etherblood.luna.engine.movement.Obstaclebox;
 import com.etherblood.luna.engine.movement.Speed;
-import com.etherblood.luna.network.api.serialization.EnumSerializer;
 import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
-import com.etherblood.luna.network.api.serialization.RecordSerializer;
 
 public abstract class GameModule extends NetworkModule {
     @Override
@@ -109,54 +102,5 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(ActorName.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
 
-        // workaround for broken default serializers
-        // TODO: move elsewhere (or better: fix library)
-        kryo.register(Login.class, new Serializer<Login>() {
-            @Override
-            public void write(Kryo kryo, Output output, Login object) {
-                output.writeString(object.jwt);
-            }
-
-            @Override
-            public Login read(Kryo kryo, Input input, Class<Login> type) {
-                return new Login(input.readString());
-            }
-        });
-
-        kryo.register(UserLogin.class, new Serializer<UserLogin>() {
-            @Override
-            public void write(Kryo kryo, Output output, UserLogin object) {
-                kryo.writeObject(output, object.user);
-            }
-
-            @Override
-            public UserLogin read(Kryo kryo, Input input, Class<UserLogin> type) {
-                return new UserLogin(kryo.readObject(input, JwtAuthenticationUser.class));
-            }
-        });
-        kryo.register(UserLogout.class, new Serializer<UserLogout>() {
-            @Override
-            public void write(Kryo kryo, Output output, UserLogout object) {
-                kryo.writeObject(output, object.user);
-            }
-
-            @Override
-            public UserLogout read(Kryo kryo, Input input, Class<UserLogout> type) {
-                return new UserLogout(kryo.readObject(input, JwtAuthenticationUser.class));
-            }
-        });
-
-        kryo.register(JwtAuthenticationUser.class, new Serializer<JwtAuthenticationUser>() {
-            @Override
-            public void write(Kryo kryo, Output output, JwtAuthenticationUser object) {
-                output.writeLong(object.id);
-                output.writeString(object.login);
-            }
-
-            @Override
-            public JwtAuthenticationUser read(Kryo kryo, Input input, Class<JwtAuthenticationUser> type) {
-                return new JwtAuthenticationUser(input.readLong(), input.readString());
-            }
-        });
     }
 }

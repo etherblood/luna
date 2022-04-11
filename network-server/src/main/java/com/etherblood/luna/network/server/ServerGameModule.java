@@ -61,7 +61,7 @@ public class ServerGameModule extends GameModule {
             }
         }
         if (object instanceof Login login) {
-            JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt).user;
+            JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt()).user;
             synchronized (lock) {
                 long frame = state.getFrame();
                 System.out.println("User " + user.login + " connected on frame " + frame);

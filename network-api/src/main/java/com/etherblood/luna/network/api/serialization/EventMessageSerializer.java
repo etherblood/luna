@@ -1,5 +1,6 @@
 package com.etherblood.luna.network.api.serialization;
 
+import com.destrostudios.gametools.network.shared.serializers.CopySerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -22,7 +23,7 @@ public class EventMessageSerializer extends CopySerializer<EventMessage> {
     }
 
     @Override
-    public EventMessage read(Kryo kryo, Input input, Class type) {
+    public EventMessage read(Kryo kryo, Input input, Class<EventMessage> type) {
         long lockFrame = input.readLong();
         long seq = input.readLong();
         long ack = input.readLong();

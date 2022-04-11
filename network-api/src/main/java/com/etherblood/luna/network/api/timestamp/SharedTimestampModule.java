@@ -1,8 +1,8 @@
 package com.etherblood.luna.network.api.timestamp;
 
 import com.destrostudios.gametools.network.shared.modules.NetworkModule;
+import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
 import com.esotericsoftware.kryo.Kryo;
-import com.etherblood.luna.network.api.serialization.RecordSerializer;
 
 public class SharedTimestampModule extends NetworkModule {
     @Override

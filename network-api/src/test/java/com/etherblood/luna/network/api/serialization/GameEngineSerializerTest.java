@@ -1,5 +1,6 @@
 package com.etherblood.luna.network.api.serialization;
 
+import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
