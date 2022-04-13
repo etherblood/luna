@@ -78,14 +78,14 @@ public class ApplicationClient extends Application {
 
     public ApplicationClient(GameProxy gameProxy) {
         super();
-        setPreferredPresentMode(KHRSurface.VK_PRESENT_MODE_FIFO_KHR);
+        config.setClearColor(new Vector4f(0.2f, 0.15f, 0.15f, 1));
+        config.setPreferredPresentMode(KHRSurface.VK_PRESENT_MODE_FIFO_KHR);
         this.gameProxy = gameProxy;
     }
 
     @Override
     protected void initScene() {
         long nanos = System.nanoTime();
-        getSwapChain().getRenderJobManager().getSceneRenderJob().getClearColor().set(0.2f, 0.15f, 0.15f, 1);
         GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
         assetManager.addLocator(new FileLocator("./assets"));
 
