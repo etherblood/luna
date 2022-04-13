@@ -54,7 +54,6 @@ import org.lwjgl.vulkan.VK10;
 public class ApplicationClient extends Application {
 
     private final float CAMERA_DISTANCE = 10;
-    private final float CAMERA_LOOKAT_HEIGHT = 0f;
     private final float CAMERA_ANGLE = (float) (30 * Math.PI / 180);
 
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -180,7 +179,7 @@ public class ApplicationClient extends Application {
         for (int player : players) {
             Position position = data.get(player, Position.class);
             if (position != null) {
-                Vector3f lookAt = convert(position.vector()).add(0, CAMERA_LOOKAT_HEIGHT, 0);
+                Vector3f lookAt = convert(position.vector());
                 Vector3f cameraOffset = new Vector3f(0, 0, CAMERA_DISTANCE);
                 cameraOffset.rotate(new Quaternionf(new AxisAngle4f(-CAMERA_ANGLE, 1, 0, 0)));
                 Vector3f lookFrom = lookAt.add(cameraOffset, new Vector3f());
