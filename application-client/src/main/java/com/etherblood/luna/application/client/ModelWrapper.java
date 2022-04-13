@@ -13,15 +13,16 @@ public class ModelWrapper {
         this.node = node;
     }
 
-    public void setAnimationTime(float seconds) {
+    public void setAnimationProgress(String animation, float progress) {
         AnimationControl a = node.getFirstControl(AnimationControl.class);
-        a.setTime(seconds);
+        setAnimationTime(animation, progress * a.getAnimation(animation).getDuration());
     }
 
-    public void setAnimation(String animation) {
+    public void setAnimationTime(String animation, float seconds) {
         AnimationControl a = node.getFirstControl(AnimationControl.class);
         a.play(animation);
         a.setPlaying(false);
+        a.setTime(seconds);
     }
 
     public int getEntity() {

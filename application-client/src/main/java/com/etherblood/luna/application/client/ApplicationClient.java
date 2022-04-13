@@ -388,26 +388,18 @@ public class ApplicationClient extends Application {
 
                 ActiveAction activeAction = data.get(entity, ActiveAction.class);
                 if (activeAction != null) {
-                    Map<String, Double> animationSeconds = Map.of(
-                            "attack1", 280 / 60d,
-                            "attack2", 160 / 60d,
-                            "agonizing", 698 / 60d,
-                            "melee_attack", 72 / 60d,
-                            "ghost_spell", 92 / 60d
-                    );
                     String animation = data.get(activeAction.action(), ActionAnimation.class).animationName();
-                    wrapper.setAnimation(animation);
                     float fps = snapshot.getRules().getFramesPerSecond();
-                    long animationFrames = snapshot.getFrame() - activeAction.startFrame();
+                    // - 1 because tick count increases after game update & before render
+                    long animationFrames = snapshot.getFrame() - activeAction.startFrame() - 1;
 
                     ActionDuration duration = data.get(activeAction.action(), ActionDuration.class);
-                    if (animationSeconds.containsKey(animation) && duration != null) {
+                    if (duration != null) {
                         long targetFrames = duration.frames();
-                        double targetSeconds = (double) targetFrames / snapshot.getRules().getFramesPerSecond();
-                        double baseSeconds = animationSeconds.get(animation);
-                        wrapper.setAnimationTime((float) ((baseSeconds / targetSeconds) * (animationFrames / fps)));
+                        float progress = (float) animationFrames / targetFrames;
+                        wrapper.setAnimationProgress(animation, progress);
                     } else {
-                        wrapper.setAnimationTime(animationFrames / fps);
+                        wrapper.setAnimationTime(animation, animationFrames / fps);
                     }
                 }
             }
