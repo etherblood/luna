@@ -75,6 +75,8 @@ public class ApplicationClient extends Application {
     Shader fragShaderDefault;
     Node debugNode = new Node();
 
+    boolean loaded = false;
+
     public ApplicationClient(GameProxy gameProxy) {
         super();
         config.setClearColor(new Vector4f(0.2f, 0.15f, 0.15f, 1));
@@ -169,6 +171,26 @@ public class ApplicationClient extends Application {
             // we use this opportunity to preload amara
             assetManager.loadModel("models/amara/amara.gltf", CloneContext.reuseAll());
             return;
+        }
+        if (!loaded) {
+            System.out.println("preloading...");
+            // very hacky...
+            GameEngine preloadGame = snapshot.getRules().createGame();
+            for (String templateKey : preloadGame.getTemplates().templateKeys()) {
+                int entity = preloadGame.getData().createEntity();
+                preloadGame.applyTemplate(entity, templateKey);
+            }
+            for (int entity : preloadGame.getData().list(ModelKey.class)) {
+                ModelKey modelKey = preloadGame.getData().get(entity, ModelKey.class);
+                long nanos = System.nanoTime();
+                assetManager.loadModel("models/" + modelKey.name() + "/" + modelKey.name() + ".gltf", CloneContext.reuseAll());
+                long loadMillis = (System.nanoTime() - nanos) / 1_000_000;
+                if (loadMillis >= 1) {
+                    System.out.println("load " + modelKey.name() + " in: " + loadMillis + "ms");
+                }
+            }
+            loaded = true;
+            System.out.println("preloaded");
         }
         EntityData data = snapshot.getData();
 
@@ -342,7 +364,6 @@ public class ApplicationClient extends Application {
                 String name = data.get(entity, ModelKey.class).name();
                 if (!models.containsKey(entity)) {
                     long nanos = System.nanoTime();
-                    // hard coded amara model
                     Node model = assetManager.loadModel("models/" + name + "/" + name + ".gltf", CloneContext.reuseAll());
                     AnimationControl a = model.getFirstControl(AnimationControl.class);
                     if (a != null) {
