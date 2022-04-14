@@ -113,7 +113,8 @@ public class ApplicationClient extends Application {
 
         bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
 
-        screenStatsText = new BitmapText(bitmapFont, "Connecting...");
+//        screenStatsText = new BitmapText(bitmapFont, "Connecting...");
+        screenStatsText = new BitmapText(bitmapFont, "No texts today (:");
         screenStatsText.move(new Vector3f(0, 0, 1));
         guiNode.add(screenStatsText);
 
@@ -209,7 +210,7 @@ public class ApplicationClient extends Application {
             }
         }
 
-        {
+        if (false) {
             // status huds
             Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
             while (iterator.hasNext()) {
@@ -436,7 +437,7 @@ public class ApplicationClient extends Application {
             runningFrameSecond = frameSecond;
         }
         runningFrameCount++;
-        screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
+//        screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
     }
 
     private float directionToAngle(Direction direction) {
