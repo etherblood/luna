@@ -31,7 +31,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
     @Override
     public void apply(GameEngine game, int entity, String templateKey) {
         EntityData data = game.getData();
-        int fps = game.getRules().getFramesPerSecond();
+        long fps = game.getRules().getFramesPerSecond();
         switch (templateKey) {
             case "ghost_amara": {
                 game.applyTemplate(entity, "amara");

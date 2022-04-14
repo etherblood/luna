@@ -11,7 +11,6 @@ public class StatusHudWrapper {
     private final Node node;
     private final BitmapText nameNode;
     private final BitmapText healthNode;
-    private final float MAGIC = 9f;
 
     public StatusHudWrapper(int entity, BitmapFont font) {
         this.entity = entity;
@@ -28,7 +27,7 @@ public class StatusHudWrapper {
             name = "Nameless";
         }
         nameNode.setText(name);
-        nameNode.setLocalTranslation(new Vector3f(-name.length() / 2f * MAGIC, 10, 0));
+        nameNode.setLocalTranslation(new Vector3f(nameNode.getTextWidth() / -2f, 10, 0));
     }
 
     public void setHealth(Long milliHealth) {
@@ -37,7 +36,7 @@ public class StatusHudWrapper {
         } else {
             String text = Long.toString(Math.max(0, MathUtil.ceilDiv(milliHealth, 1000)));
             healthNode.setText(text);
-            healthNode.setLocalTranslation(new Vector3f(-text.length() / 2f * MAGIC, 30, 0));
+            healthNode.setLocalTranslation(new Vector3f(healthNode.getTextWidth() / -2f, 30, 0));
         }
     }
 
