@@ -113,10 +113,9 @@ public class ApplicationClient extends Application {
 
         bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
 
-//        screenStatsText = new BitmapText(bitmapFont, "Connecting...");
-        screenStatsText = new BitmapText(bitmapFont, "No texts today (:");
+        screenStatsText = new BitmapText(bitmapFont, "Connecting...");
         screenStatsText.move(new Vector3f(0, 0, 1));
-        guiNode.add(screenStatsText);
+        debugNode.add(screenStatsText);
 
 
         // Ground
@@ -210,14 +209,14 @@ public class ApplicationClient extends Application {
             }
         }
 
-        if (false) {
+        {
             // status huds
             Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
             while (iterator.hasNext()) {
                 StatusHudWrapper wrapper = iterator.next();
                 if (!data.has(wrapper.getEntity(), ActorName.class)
                         && !data.has(wrapper.getEntity(), MilliHealth.class)) {
-                    guiNode.remove(wrapper.getNode());
+                    debugNode.remove(wrapper.getNode());
                     iterator.remove();
                 }
             }
@@ -228,7 +227,7 @@ public class ApplicationClient extends Application {
                 if (!statusHuds.containsKey(entity)) {
                     StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
                     statusHuds.put(entity, wrapper);
-                    guiNode.add(wrapper.getNode());
+                    debugNode.add(wrapper.getNode());
                 }
                 Vector2 position = data.get(entity, Position.class).vector();
                 ActorName actorName = data.get(entity, ActorName.class);
@@ -437,7 +436,7 @@ public class ApplicationClient extends Application {
             runningFrameSecond = frameSecond;
         }
         runningFrameCount++;
-//        screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
+        screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
     }
 
     private float directionToAngle(Direction direction) {
