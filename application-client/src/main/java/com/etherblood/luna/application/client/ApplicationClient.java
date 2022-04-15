@@ -1,9 +1,8 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.Application;
-import com.destrostudios.icetea.core.animation.AnimationControl;
+import com.destrostudios.icetea.core.asset.loader.GltfLoaderSettings;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
-import com.destrostudios.icetea.core.clone.CloneContext;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.light.DirectionalLight;
@@ -14,7 +13,9 @@ import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
+import com.destrostudios.icetea.core.scene.Spatial;
 import com.destrostudios.icetea.core.shader.Shader;
+import com.destrostudios.icetea.core.texture.Texture;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActiveAction;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -169,9 +171,11 @@ public class ApplicationClient extends Application {
         if (snapshot == null) {
             // game has not started yet, skip update
             // we use this opportunity to preload amara
-            assetManager.loadModel("models/amara/amara.gltf", CloneContext.reuseAll());
+            loadModel("amara");
             return;
         }
+        gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
+
         if (!loaded) {
             System.out.println("preloading...");
             // very hacky...
@@ -183,7 +187,18 @@ public class ApplicationClient extends Application {
             for (int entity : preloadGame.getData().list(ModelKey.class)) {
                 ModelKey modelKey = preloadGame.getData().get(entity, ModelKey.class);
                 long nanos = System.nanoTime();
-                assetManager.loadModel("models/" + modelKey.name() + "/" + modelKey.name() + ".gltf", CloneContext.reuseAll());
+                Geometry geometry = (Geometry) loadModel(modelKey.name());
+                if (!geometry.getMesh().isInitialized()) {
+                    geometry.getMesh().init(this);
+                    geometry.getMesh().recreateBuffersIfNecessary();
+                }
+                for (Supplier<Texture> supplier : geometry.getMaterial().getTextureSuppliers().values()) {
+                    Texture texture = supplier.get();
+                    if (!texture.isInitialized()) {
+                        texture.init(this);
+                    }
+                }
+
                 long loadMillis = (System.nanoTime() - nanos) / 1_000_000;
                 if (loadMillis >= 1) {
                     System.out.println("load " + modelKey.name() + " in: " + loadMillis + "ms");
@@ -364,19 +379,12 @@ public class ApplicationClient extends Application {
                 String name = data.get(entity, ModelKey.class).name();
                 if (!models.containsKey(entity)) {
                     long nanos = System.nanoTime();
-                    Node model = assetManager.loadModel("models/" + name + "/" + name + ".gltf", CloneContext.reuseAll());
-                    AnimationControl a = model.getFirstControl(AnimationControl.class);
-                    if (a != null) {
-                        // workaround for scale issue when exporting from blender with animations
-                        model.scale(new Vector3f(0.01f));
-                    }
+                    Geometry model = (Geometry) loadModel(name);
                     if (name.equals("gaze_of_darkness") || name.equals("blade_of_chaos")) {
                         model.setRenderBucket(RenderBucketType.TRANSPARENT);
-                        model.forEachGeometry(geometry -> {
-                            geometry.getMaterial().setTransparent(true);
-                            geometry.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
-                            geometry.getMaterial().setDepthWrite(false);
-                        });
+                        model.getMaterial().setTransparent(true);
+                        model.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
+                        model.getMaterial().setDepthWrite(false);
                     }
                     model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
 
@@ -426,9 +434,6 @@ public class ApplicationClient extends Application {
             }
         }
 
-        long player = gameProxy.getPlayer().id;
-        gameProxy.update(toInput(player, pressedKeys));
-
         long frameSecond = Math.floorDiv(System.nanoTime(), 1_000_000_000L);
         if (runningFrameSecond != frameSecond) {
             frameCount = runningFrameCount;
@@ -437,6 +442,11 @@ public class ApplicationClient extends Application {
         }
         runningFrameCount++;
         screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
+    }
+
+    private Spatial loadModel(String name) {
+        return assetManager.loadModel("models/" + name + "/" + name + ".gltf", GltfLoaderSettings.builder()
+                .bakeGeometries(true).build());
     }
 
     private float directionToAngle(Direction direction) {

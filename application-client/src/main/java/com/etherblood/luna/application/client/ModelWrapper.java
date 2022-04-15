@@ -1,14 +1,14 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.animation.AnimationControl;
-import com.destrostudios.icetea.core.scene.Node;
+import com.destrostudios.icetea.core.scene.Spatial;
 
 public class ModelWrapper {
 
     private final int entity;
-    private final Node node;
+    private final Spatial node;
 
-    public ModelWrapper(int entity, Node node) {
+    public ModelWrapper(int entity, Spatial node) {
         this.entity = entity;
         this.node = node;
     }
@@ -29,7 +29,7 @@ public class ModelWrapper {
         return entity;
     }
 
-    public Node getNode() {
+    public Spatial getNode() {
         return node;
     }
 }
