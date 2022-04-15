@@ -9,10 +9,12 @@ import com.etherblood.luna.data.EntityDataImpl;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameRules;
 import java.util.List;
+import java.util.UUID;
 
 public class GameEngineSerializer extends CopySerializer<GameEngine> {
     @Override
     public void write(Kryo kryo, Output output, GameEngine object) {
+        kryo.writeObject(output, object.getId());
         output.writeString(object.getRules().getId());
         output.writeLong(object.getStartEpochMillis());
         output.writeLong(object.getFrame());
@@ -32,6 +34,7 @@ public class GameEngineSerializer extends CopySerializer<GameEngine> {
 
     @Override
     public GameEngine read(Kryo kryo, Input input, Class<GameEngine> type) {
+        UUID gameId = kryo.readObject(input, UUID.class);
         String ruleId = input.readString();
         GameRules rules = GameRules.get(ruleId);
         long startEpochMillis = input.readLong();
@@ -47,6 +50,6 @@ public class GameEngineSerializer extends CopySerializer<GameEngine> {
                 data.set(entity, value);
             }
         }
-        return new GameEngine(rules, startEpochMillis, data, frame);
+        return new GameEngine(gameId, rules, startEpochMillis, data, frame);
     }
 }

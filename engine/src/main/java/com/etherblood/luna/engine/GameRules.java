@@ -36,6 +36,7 @@ import com.etherblood.luna.engine.movement.Speed;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class GameRules {
@@ -130,7 +131,7 @@ public class GameRules {
     }
 
     public GameEngine createGame() {
-        return new GameEngine(this, System.currentTimeMillis(), 0);
+        return new GameEngine(UUID.randomUUID(), this, System.currentTimeMillis(), 0);
     }
 
     public String getId() {

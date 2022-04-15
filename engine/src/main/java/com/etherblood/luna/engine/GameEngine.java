@@ -5,9 +5,11 @@ import com.etherblood.luna.data.EntityDataImpl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class GameEngine {
 
+    private final UUID id;
     private final GameRules rules;
     private final long startEpochMillis;
     private long frame;
@@ -15,11 +17,12 @@ public class GameEngine {
     private final List<GameSystem> systems;
     private final TemplatesFactory templates;
 
-    public GameEngine(GameRules rules, long startEpochMillis, long frame) {
-        this(rules, startEpochMillis, new EntityDataImpl(rules.getComponentTypes()), frame);
+    public GameEngine(UUID id, GameRules rules, long startEpochMillis, long frame) {
+        this(id, rules, startEpochMillis, new EntityDataImpl(rules.getComponentTypes()), frame);
     }
 
-    public GameEngine(GameRules rules, long startEpochMillis, EntityData data, long frame) {
+    public GameEngine(UUID id, GameRules rules, long startEpochMillis, EntityData data, long frame) {
+        this.id = id;
         this.rules = rules;
         this.startEpochMillis = startEpochMillis;
         this.data = data;
@@ -81,6 +84,10 @@ public class GameEngine {
 
     public void applyTemplate(int entity, String template) {
         templates.apply(this, entity, template);
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public GameRules getRules() {

@@ -1,6 +1,7 @@
 package com.etherblood.luna.network.api.serialization;
 
 import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
+import com.destrostudios.gametools.network.shared.serializers.UuidSerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
@@ -8,6 +9,7 @@ import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.movement.Speed;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,6 +22,7 @@ public class GameEngineSerializerTest {
         kryo.setReferences(false);
         kryo.setCopyReferences(false);
         kryo.register(GameEngine.class, new GameEngineSerializer());
+        kryo.register(UUID.class, new UuidSerializer());
         kryo.register(Position.class, new RecordSerializer<>());
         kryo.register(Speed.class, new RecordSerializer<>());
         kryo.register(Vector2.class, new RecordSerializer<>());

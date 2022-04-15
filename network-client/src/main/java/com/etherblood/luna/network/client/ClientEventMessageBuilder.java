@@ -5,18 +5,25 @@ import com.etherblood.luna.network.api.EventMessagePart;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public class ClientEventMessageBuilder {
 
+    private final UUID gameId;
     private long lockFrame = -1;
     private long seq = 0;
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
+    public ClientEventMessageBuilder(UUID gameId) {
+        this.gameId = Objects.requireNonNull(gameId);
+    }
+
 
     public synchronized void enqueueAction(EventMessagePart part) {
         if (part.frame() <= lockFrame) {
-            throw new IllegalStateException("Tried to request input for frame " + part.frame() + " when " + lockFrame + " frame were already locked.");
+            throw new IllegalStateException("Game " + gameId + ": Tried to request input for frame " + part.frame() + " when " + lockFrame + " frame was already locked.");
         }
         pendingQueue.put(part, seq);
         lockFrame = part.frame();
@@ -28,7 +35,7 @@ public class ClientEventMessageBuilder {
     }
 
     public synchronized EventMessage build() {
-        EventMessage result = new EventMessage(lockFrame, seq, ack, pendingQueue.keySet().stream()
+        EventMessage result = new EventMessage(gameId, lockFrame, seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;

@@ -9,6 +9,7 @@ import com.etherblood.luna.network.api.PlaybackBuffer;
 import com.etherblood.luna.network.client.ClientEventMessageBuilder;
 import com.etherblood.luna.network.server.ServerEventMessageBuilder;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -19,8 +20,9 @@ public class EventMessagesTest {
     @Test
     public void simpleRequest() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
@@ -38,8 +40,9 @@ public class EventMessagesTest {
     @Test
     public void duplicatedRequest() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
@@ -59,8 +62,9 @@ public class EventMessagesTest {
     @Test
     public void droppedRequest_withFollowUpInput() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
@@ -81,8 +85,9 @@ public class EventMessagesTest {
     @Test
     public void droppedRequest_withoutFollowUpInput() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
@@ -101,8 +106,9 @@ public class EventMessagesTest {
     @Test
     public void outOfOrderRequest() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
@@ -125,14 +131,15 @@ public class EventMessagesTest {
     @Test
     public void simpleUpdate() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
 
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
-        EventMessage message = new EventMessage(0, 0, -1, new EventMessagePart[]{input0});
+        EventMessage message = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message);
         server.broadcast(message.parts());
         EventMessage update = server.build();
@@ -145,13 +152,14 @@ public class EventMessagesTest {
     @Test
     public void duplicatedUpdate() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
-        EventMessage message = new EventMessage(0, 0, -1, new EventMessagePart[]{input0});
+        EventMessage message = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message);
         server.broadcast(message.parts());
         EventMessage update = server.build();
@@ -165,18 +173,19 @@ public class EventMessagesTest {
     @Test
     public void outOfOrderUpdate() {
         // given
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder();
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder();
+        UUID gameId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
         // when
-        EventMessage message1 = new EventMessage(0, 0, -1, new EventMessagePart[]{input0});
+        EventMessage message1 = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message1);
         server.broadcast(message1.parts());
         EventMessage update0 = server.build();
-        EventMessage message = new EventMessage(0, 1, -1, new EventMessagePart[]{input1});
+        EventMessage message = new EventMessage(gameId, 0, 1, -1, new EventMessagePart[]{input1});
         server.updateAck(message);
         server.broadcast(message.parts());
         EventMessage update1 = server.build();

@@ -7,10 +7,12 @@ import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
+import java.util.UUID;
 
 public class EventMessageSerializer extends CopySerializer<EventMessage> {
     @Override
     public void write(Kryo kryo, Output output, EventMessage object) {
+        kryo.writeObject(output, object.gameId());
         output.writeLong(object.lockFrame());
         output.writeLong(object.seq());
         output.writeLong(object.ack());
@@ -24,6 +26,7 @@ public class EventMessageSerializer extends CopySerializer<EventMessage> {
 
     @Override
     public EventMessage read(Kryo kryo, Input input, Class<EventMessage> type) {
+        UUID gameId = kryo.readObject(input, UUID.class);
         long lockFrame = input.readLong();
         long seq = input.readLong();
         long ack = input.readLong();
@@ -33,6 +36,6 @@ public class EventMessageSerializer extends CopySerializer<EventMessage> {
         for (int i = 0; i < length; i++) {
             parts[i] = new EventMessagePart(input.readLong(), kryo.readObject(input, GameEvent.class));
         }
-        return new EventMessage(lockFrame, seq, ack, parts);
+        return new EventMessage(gameId, lockFrame, seq, ack, parts);
     }
 }

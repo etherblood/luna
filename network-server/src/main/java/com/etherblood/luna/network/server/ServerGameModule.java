@@ -6,8 +6,10 @@ import com.destrostudios.gametools.network.shared.modules.jwt.messages.Login;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryonet.Connection;
+import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
+import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.network.api.EventMessage;
 import com.etherblood.luna.network.api.EventMessagePart;
@@ -17,21 +19,19 @@ import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerGameModule extends GameModule {
 
+    private static final long MILLIS_PER_SECOND = 1000;
     private final Object lock = new Object();
-    private final GameEngine state;
-    private final Map<Integer, ServerEventMessageBuilder> builders = new ConcurrentHashMap<>();
     private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
-    private final PlaybackBuffer buffer = new PlaybackBuffer();
 
-    public ServerGameModule(GameEngine state) {
-        this.state = state;
-    }
+    private final Map<UUID, ServerGame> games = new HashMap<>();
 
     @Override
     public void connected(Connection connection) {
@@ -39,7 +39,9 @@ public class ServerGameModule extends GameModule {
 
     @Override
     public void disconnected(Connection connection) {
-        builders.remove(connection.getID());
+        for (ServerGame serverGame : games.values()) {
+            serverGame.getBuilders().remove(connection.getID());
+        }
         connections.remove(connection.getID());
     }
 
@@ -47,15 +49,20 @@ public class ServerGameModule extends GameModule {
     public void received(Connection connection, Object object) {
         if (object instanceof EventMessage message) {
             synchronized (lock) {
-                ServerEventMessageBuilder builder = builders.get(connection.getID());
-                builder.updateAck(message);
-                for (EventMessagePart part : message.parts()) {
-                    if (buffer.buffer(part.frame(), part.event())) {
-                        for (ServerEventMessageBuilder other : builders.values()) {
-                            other.broadcast(new EventMessagePart(part.frame(), part.event()));
+                ServerGame serverGame = games.get(message.gameId());
+                if (serverGame != null) {
+                    Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
+                    PlaybackBuffer buffer = serverGame.getBuffer();
+                    ServerEventMessageBuilder builder = builders.get(connection.getID());
+                    builder.updateAck(message);
+                    for (EventMessagePart part : message.parts()) {
+                        if (buffer.buffer(part.frame(), part.event())) {
+                            for (ServerEventMessageBuilder other : builders.values()) {
+                                other.broadcast(new EventMessagePart(part.frame(), part.event()));
+                            }
+                        } else {
+                            // this is likely a duplicate of already handled input, do nothing
                         }
-                    } else {
-                        // this is likely a duplicate of already handled input, do nothing
                     }
                 }
             }
@@ -63,11 +70,23 @@ public class ServerGameModule extends GameModule {
         if (object instanceof Login login) {
             JwtAuthenticationUser user = new NoValidateJwtService().decode(login.jwt()).user;
             synchronized (lock) {
+                connections.put(connection.getID(), connection);
+
+                GameEngine state = GameRules.getDefault().createGame();
+
+                EntityData data = state.getData();
+                state.applyTemplate(data.createEntity(), "test_room");
+                System.out.println("started game " + state.getId());
+
+                ServerGame serverGame = new ServerGame(state);
+                games.put(serverGame.getState().getId(), serverGame);
+                Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
+                PlaybackBuffer buffer = serverGame.getBuffer();
+
                 long frame = state.getFrame();
                 System.out.println("User " + user.login + " connected on frame " + frame);
                 connection.sendTCP(state);
-                builders.put(connection.getID(), new ServerEventMessageBuilder());
-                connections.put(connection.getID(), connection);
+                builders.put(connection.getID(), new ServerEventMessageBuilder(state.getId()));
 
                 GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, true));
                 buffer.buffer(frame, event);
@@ -80,19 +99,39 @@ public class ServerGameModule extends GameModule {
 
     public void update() {
         synchronized (lock) {
-            long frame = state.getFrame();
-            Set<GameEvent> events = buffer.peek(frame);
-            buffer.clear(frame);
-            state.tick(events);
-            for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
-                Connection connection = connections.get(entry.getKey());
-                ServerEventMessageBuilder builder = builders.get(entry.getKey());
-                builder.lockFrame(frame);
-                connection.sendUDP(builder.build());
-            }
+            for (ServerGame serverGame : games.values()) {
+                GameEngine state = serverGame.getState();
+                PlaybackBuffer buffer = serverGame.getBuffer();
+                Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
 
-            if (state.getFrame() % 1200 == 0) {
-                logStateHash();
+                long servertime = System.currentTimeMillis();
+                long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
+                if (state.getFrame() < nextFrame) {
+                    do {
+                        long frame = state.getFrame();
+                        Set<GameEvent> events = buffer.peek(frame);
+                        buffer.clear(frame);
+                        state.tick(events);
+                    } while (state.getFrame() < nextFrame);
+
+                    for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
+                        Connection connection = connections.get(entry.getKey());
+                        ServerEventMessageBuilder builder = builders.get(entry.getKey());
+                        builder.lockFrame(nextFrame);
+                        connection.sendUDP(builder.build());
+                    }
+                }
+
+//                long frame = state.getFrame();
+//                Set<GameEvent> events = buffer.peek(frame);
+//                buffer.clear(frame);
+//                state.tick(events);
+//                for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
+//                    Connection connection = connections.get(entry.getKey());
+//                    ServerEventMessageBuilder builder = builders.get(entry.getKey());
+//                    builder.lockFrame(frame);
+//                    connection.sendUDP(builder.build());
+//                }
             }
         }
     }
@@ -105,7 +144,7 @@ public class ServerGameModule extends GameModule {
         return kryo;
     }
 
-    private void logStateHash() {
+    private void logStateHash(GameEngine state) {
         Kryo kryo = getKryo();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);

@@ -5,15 +5,20 @@ import com.etherblood.luna.network.api.EventMessagePart;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public class ServerEventMessageBuilder {
 
-    // TODO: also send latest locked frame index to clients
-
+    private final UUID gameId;
     private long lockFrame = -1;
     private long seq = 0;
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
+
+    public ServerEventMessageBuilder(UUID gameId) {
+        this.gameId = Objects.requireNonNull(gameId);
+    }
 
     public synchronized void updateAck(EventMessage message) {
         ack = Math.max(ack, message.seq());
@@ -38,7 +43,7 @@ public class ServerEventMessageBuilder {
     }
 
     public synchronized EventMessage build() {
-        EventMessage result = new EventMessage(lockFrame, seq, ack, pendingQueue.keySet().stream()
+        EventMessage result = new EventMessage(gameId, lockFrame, seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;

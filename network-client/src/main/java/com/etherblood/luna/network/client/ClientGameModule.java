@@ -17,12 +17,9 @@ import java.util.Formatter;
 public class ClientGameModule extends GameModule {
 
     public static final int MILLIS_PER_SECOND = 1000;
-    private GameEngine state = null;
-    private final ClientEventMessageBuilder builder = new ClientEventMessageBuilder();
-    private final PlaybackBuffer buffer = new PlaybackBuffer();
     private final Connection connection;
     private final int inputDelayFrames = 2;
-    private long serverFrame = -1;
+    private ClientGame clientGame;
 
     public ClientGameModule(Connection connection) {
         this.connection = connection;
@@ -30,41 +27,49 @@ public class ClientGameModule extends GameModule {
 
     @Override
     public synchronized void received(Connection connection, Object object) {
-        if (object instanceof GameEngine state) {
-            this.state = state;
-            this.serverFrame = state.getFrame();
+        if (object instanceof GameEngine game) {
+            clientGame = new ClientGame(game);
         } else if (object instanceof EventMessage message) {
-            builder.updateAck(message);
-            for (EventMessagePart part : message.parts()) {
-                if (!buffer.buffer(part.frame(), part.event())) {
-                    // drop part, it is a duplicate of an already handled one
+            if (clientGame != null && clientGame.getState().getId().equals(message.gameId())) {
+                ClientEventMessageBuilder builder = clientGame.getBuilder();
+                PlaybackBuffer buffer = clientGame.getBuffer();
+                GameEngine state = clientGame.getState();
+                builder.updateAck(message);
+                for (EventMessagePart part : message.parts()) {
+                    if (!buffer.buffer(part.frame(), part.event())) {
+                        // drop part, it is a duplicate of an already handled one
+                    }
                 }
-            }
-            for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
-                state.tick(buffer.peek(frame));
-                buffer.clear(frame);
-                if (state.getFrame() % 1200 == 0) {
-                    logStateHash();
+                for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
+                    state.tick(buffer.peek(frame));
+                    buffer.clear(frame);
                 }
             }
         }
     }
 
     public synchronized void run(long servertime, GameEvent input) {
-        long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
-        if (serverFrame < nextFrame) {
-            do {
-                serverFrame++;
-                builder.enqueueAction(new EventMessagePart(serverFrame + inputDelayFrames, input));
-            } while (serverFrame < nextFrame);
-            connection.sendUDP(builder.build());
+        if (clientGame != null) {
+            ClientEventMessageBuilder builder = clientGame.getBuilder();
+            GameEngine state = clientGame.getState();
+            long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
+            if (clientGame.getServerFrame() < nextFrame) {
+                do {
+                    clientGame.incServerFrame();
+                    builder.enqueueAction(new EventMessagePart(clientGame.getServerFrame() + inputDelayFrames, input));
+                } while (clientGame.getServerFrame() < nextFrame);
+                connection.sendUDP(builder.build());
+            }
         }
     }
 
     public synchronized GameEngine getStateSnapshot() {
-        if (state == null) {
+        if (clientGame == null) {
             return null;
         }
+        PlaybackBuffer buffer = clientGame.getBuffer();
+        GameEngine state = clientGame.getState();
+        long serverFrame = clientGame.getServerFrame();
         Kryo kryo = getKryo();
         GameEngine copy = kryo.copy(state);
         for (long frame = state.getFrame(); frame < serverFrame; frame++) {
@@ -81,7 +86,7 @@ public class ClientGameModule extends GameModule {
         return kryo;
     }
 
-    private void logStateHash() {
+    private void logStateHash(GameEngine state) {
         Kryo kryo = getKryo();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
