@@ -26,16 +26,20 @@ public class StatusHudWrapper {
         if (name == null) {
             name = "Nameless";
         }
-        nameNode.setText(name);
+        if (!nameNode.getText().equals(name)) {
+            nameNode.setText(name);
+        }
         nameNode.setLocalTranslation(new Vector3f(nameNode.getTextWidth() / -2f, 10, 0));
     }
 
     public void setHealth(Long milliHealth) {
         if (milliHealth == null) {
-            healthNode.setText("");
+            healthNode.setText("-");
         } else {
             String text = Long.toString(Math.max(0, MathUtil.ceilDiv(milliHealth, 1000)));
-            healthNode.setText(text);
+            if (!healthNode.getText().equals(text)) {
+                healthNode.setText(text);
+            }
             healthNode.setLocalTranslation(new Vector3f(healthNode.getTextWidth() / -2f, 30, 0));
         }
     }

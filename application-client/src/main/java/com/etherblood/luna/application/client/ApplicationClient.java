@@ -15,7 +15,6 @@ import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.scene.Spatial;
 import com.destrostudios.icetea.core.shader.Shader;
-import com.destrostudios.icetea.core.texture.Texture;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActiveAction;
@@ -39,12 +38,12 @@ import com.etherblood.luna.engine.movement.Obstaclebox;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -117,7 +116,7 @@ public class ApplicationClient extends Application {
 
         screenStatsText = new BitmapText(bitmapFont, "Connecting...");
         screenStatsText.move(new Vector3f(0, 0, 1));
-        debugNode.add(screenStatsText);
+        guiNode.add(screenStatsText);
 
 
         // Ground
@@ -149,9 +148,9 @@ public class ApplicationClient extends Application {
                 switch (keyEvent.getKey()) {
                     case GLFW.GLFW_KEY_F1:
                         if (debugNode.hasParent(sceneNode)) {
-                            sceneNode.remove(debugNode);
+                            getRootNode().remove(debugNode);
                         } else {
-                            sceneNode.add(debugNode);
+                            getRootNode().add(debugNode);
                         }
                         break;
                 }
@@ -184,26 +183,20 @@ public class ApplicationClient extends Application {
                 int entity = preloadGame.getData().createEntity();
                 preloadGame.applyTemplate(entity, templateKey);
             }
-            for (int entity : preloadGame.getData().list(ModelKey.class)) {
+            Node prenode = new Node();
+            for (int entity : new HashSet<>(preloadGame.getData().list(ModelKey.class))) {
                 ModelKey modelKey = preloadGame.getData().get(entity, ModelKey.class);
                 long nanos = System.nanoTime();
                 Geometry geometry = (Geometry) loadModel(modelKey.name());
-                if (!geometry.getMesh().isInitialized()) {
-                    geometry.getMesh().init(this);
-                    geometry.getMesh().recreateBuffersIfNecessary();
-                }
-                for (Supplier<Texture> supplier : geometry.getMaterial().getTextureSuppliers().values()) {
-                    Texture texture = supplier.get();
-                    if (!texture.isInitialized()) {
-                        texture.init(this);
-                    }
-                }
-
-                long loadMillis = (System.nanoTime() - nanos) / 1_000_000;
-                if (loadMillis >= 1) {
-                    System.out.println("load " + modelKey.name() + " in: " + loadMillis + "ms");
+                prenode.add(geometry);
+                long modelMillis = (System.nanoTime() - nanos) / 1_000_000;
+                if (modelMillis >= 1) {
+                    System.out.println("load " + modelKey.name() + " in: " + modelMillis + "ms");
                 }
             }
+            sceneNode.add(prenode);
+            updateRenderDependencies(0);
+            sceneNode.remove(prenode);
             loaded = true;
             System.out.println("preloaded");
         }
@@ -231,7 +224,7 @@ public class ApplicationClient extends Application {
                 StatusHudWrapper wrapper = iterator.next();
                 if (!data.has(wrapper.getEntity(), ActorName.class)
                         && !data.has(wrapper.getEntity(), MilliHealth.class)) {
-                    debugNode.remove(wrapper.getNode());
+                    guiNode.remove(wrapper.getNode());
                     iterator.remove();
                 }
             }
@@ -242,7 +235,7 @@ public class ApplicationClient extends Application {
                 if (!statusHuds.containsKey(entity)) {
                     StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
                     statusHuds.put(entity, wrapper);
-                    debugNode.add(wrapper.getNode());
+                    guiNode.add(wrapper.getNode());
                 }
                 Vector2 position = data.get(entity, Position.class).vector();
                 ActorName actorName = data.get(entity, ActorName.class);
@@ -441,7 +434,7 @@ public class ApplicationClient extends Application {
             runningFrameSecond = frameSecond;
         }
         runningFrameCount++;
-        screenStatsText.setText("fps: " + frameCount + "   ping: " + gameProxy.getLatency() + "ms");
+        screenStatsText.setText("fps: " + frameCount + "\nping: " + gameProxy.getLatency() + "ms");
     }
 
     private Spatial loadModel(String name) {
