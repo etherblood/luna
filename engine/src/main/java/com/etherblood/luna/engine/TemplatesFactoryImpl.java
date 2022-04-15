@@ -191,7 +191,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(entity, new Hitbox(new Circle(0, 0, 250)));
             data.set(entity, new ActiveAction(idleAction, game.getFrame()));
             data.set(entity, Direction.UP);
-            data.set(entity, new MilliHealth(50_000));
+            data.set(entity, new MilliHealth(20_000));
             data.set(entity, new ModelKey("amara"));
         });
         templates.put("ghost", (GameEngine game, int entity) -> {

@@ -147,7 +147,7 @@ public class ApplicationClient extends Application {
             if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
                 switch (keyEvent.getKey()) {
                     case GLFW.GLFW_KEY_F1:
-                        if (debugNode.hasParent(sceneNode)) {
+                        if (debugNode.hasParent(getRootNode())) {
                             getRootNode().remove(debugNode);
                         } else {
                             getRootNode().add(debugNode);
