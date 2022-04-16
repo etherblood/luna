@@ -9,6 +9,7 @@ import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.engine.GameLoop;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.server.ServerGameModule;
+import com.etherblood.luna.network.server.chat.ServerChatModule;
 import com.etherblood.luna.network.server.timestamp.ServerTimestampModule;
 import java.io.IOException;
 import java.util.Date;
@@ -26,7 +27,8 @@ public class Main {
         JwtServerModule jwtModule = new JwtServerModule(jwtService, server::getConnections);
         ServerTimestampModule timestampModule = new ServerTimestampModule();
         ServerGameModule gameModule = new ServerGameModule();
-        ToolsServer toolsServer = new ToolsServer(server, jwtModule, timestampModule, gameModule);
+        ServerChatModule chatModule = new ServerChatModule(server::getConnections);
+        ToolsServer toolsServer = new ToolsServer(server, jwtModule, timestampModule, gameModule, chatModule);
 
         server.start();
         server.bind(NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
