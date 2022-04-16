@@ -13,7 +13,6 @@ import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
-import com.destrostudios.icetea.core.scene.Spatial;
 import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
@@ -44,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -79,7 +79,6 @@ public class ApplicationClient extends Application {
     boolean loaded = false;
 
     public ApplicationClient(GameProxy gameProxy) {
-        super();
         config.setClearColor(new Vector4f(0.2f, 0.15f, 0.15f, 1));
         config.setPreferredPresentMode(KHRSurface.VK_PRESENT_MODE_FIFO_KHR);
         this.gameProxy = gameProxy;
@@ -87,119 +86,88 @@ public class ApplicationClient extends Application {
 
     @Override
     protected void initScene() {
-        long nanos = System.nanoTime();
-        GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
-        assetManager.addLocator(new FileLocator("./assets"));
+        try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
+            GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
+            assetManager.addLocator(new FileLocator("./assets"));
 
-        DirectionalLight directionalLight = new DirectionalLight();
-        directionalLight.getAmbientColor().set(0.8f);
-        directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
-        directionalLight.addAffectedSpatial(sceneNode);
-        directionalLight.addShadows(4096);
-        setLight(directionalLight);
+            DirectionalLight directionalLight = new DirectionalLight();
+            directionalLight.getAmbientColor().set(0.8f);
+            directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
+            directionalLight.addAffectedSpatial(sceneNode);
+            directionalLight.addShadows(4096);
+            setLight(directionalLight);
 
-        sceneCamera.setLocation(new Vector3f(0, 2, 10));
-        sceneCamera.setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
+            sceneCamera.setLocation(new Vector3f(0, 2, 10));
+            sceneCamera.setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
 
-        vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
-                "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-        });
-        fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
-                "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-        });
+            vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
+                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
+                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
+            });
+            fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
+                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
+                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
+            });
 
-        // text
+            // text
+            bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
 
-        bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
-
-        screenStatsText = new BitmapText(bitmapFont, "Connecting...");
-        screenStatsText.move(new Vector3f(0, 0, 1));
-        guiNode.add(screenStatsText);
+            screenStatsText = new BitmapText(bitmapFont, "Connecting...");
+            screenStatsText.move(new Vector3f(0, 0, 1));
+            guiNode.add(screenStatsText);
 
 
-        // Ground
+            // Ground
+            Quad meshGround = new Quad(10, 30);
 
-        Quad meshGround = new Quad(10, 30);
+            Material materialGround = new Material();
+            materialGround.setVertexShader(vertexShaderDefault);
+            materialGround.setFragmentShader(fragShaderDefault);
+            materialGround.getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
 
-        Material materialGround = new Material();
-        materialGround.setVertexShader(vertexShaderDefault);
-        materialGround.setFragmentShader(fragShaderDefault);
-        materialGround.getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
+            geometryGround = new Geometry();
+            geometryGround.setMesh(meshGround);
+            geometryGround.setMaterial(materialGround);
+            geometryGround.move(new Vector3f(-5, 0, 5));
+            geometryGround.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / -2), 1, 0, 0)));
+            geometryGround.setShadowMode(ShadowMode.RECEIVE);
+            sceneNode.add(geometryGround);
 
-        geometryGround = new Geometry();
-        geometryGround.setMesh(meshGround);
-        geometryGround.setMaterial(materialGround);
-        geometryGround.move(new Vector3f(-5, 0, 5));
-        geometryGround.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / -2), 1, 0, 0)));
-        geometryGround.setShadowMode(ShadowMode.RECEIVE);
-        sceneNode.add(geometryGround);
-
-        // Inputs
-
-        inputManager.addKeyListener(keyEvent -> {
-            if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
-                pressedKeys.remove(keyEvent.getKey());
-            } else {
-                pressedKeys.add(keyEvent.getKey());
-            }
-            if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
-                switch (keyEvent.getKey()) {
-                    case GLFW.GLFW_KEY_F1:
-                        if (debugNode.hasParent(getRootNode())) {
-                            getRootNode().remove(debugNode);
-                        } else {
-                            getRootNode().add(debugNode);
-                        }
-                        break;
+            // Inputs
+            inputManager.addKeyListener(keyEvent -> {
+                if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
+                    pressedKeys.remove(keyEvent.getKey());
+                } else {
+                    pressedKeys.add(keyEvent.getKey());
                 }
-            }
-        });
-        inputManager.addMouseButtonListener(mouseButtonEvent -> {
-            if (mouseButtonEvent.getAction() == GLFW.GLFW_PRESS) {
-                // placeholder
-            }
-        });
-        System.out.println("init() in: " + (System.nanoTime() - nanos) / 1_000_000 + "ms");
+                if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
+                    switch (keyEvent.getKey()) {
+                        case GLFW.GLFW_KEY_F1:
+                            if (debugNode.hasParent(getRootNode())) {
+                                getRootNode().remove(debugNode);
+                            } else {
+                                getRootNode().add(debugNode);
+                            }
+                            break;
+                    }
+                }
+            });
+            inputManager.addMouseButtonListener(mouseButtonEvent -> {
+                if (mouseButtonEvent.getAction() == GLFW.GLFW_PRESS) {
+                    // placeholder
+                }
+            });
+        }
     }
 
     @Override
     protected void update(float tpf) {
+        gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         if (snapshot == null) {
-            // game has not started yet, skip update
-            // we use this opportunity to preload amara
-            loadModel("amara");
             return;
         }
-        gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
-
-        if (!loaded) {
-            System.out.println("preloading...");
-            // very hacky...
-            GameEngine preloadGame = snapshot.getRules().createGame();
-            for (String templateKey : preloadGame.getTemplates().templateKeys()) {
-                int entity = preloadGame.getData().createEntity();
-                preloadGame.applyTemplate(entity, templateKey);
-            }
-            Node prenode = new Node();
-            for (int entity : new HashSet<>(preloadGame.getData().list(ModelKey.class))) {
-                ModelKey modelKey = preloadGame.getData().get(entity, ModelKey.class);
-                long nanos = System.nanoTime();
-                Geometry geometry = (Geometry) loadModel(modelKey.name());
-                prenode.add(geometry);
-                long modelMillis = (System.nanoTime() - nanos) / 1_000_000;
-                if (modelMillis >= 1) {
-                    System.out.println("load " + modelKey.name() + " in: " + modelMillis + "ms");
-                }
-            }
-            sceneNode.add(prenode);
-            updateRenderDependencies(0);
-            sceneNode.remove(prenode);
-            loaded = true;
-            System.out.println("preloaded");
-        }
+        preloadIfRequired(snapshot);
         EntityData data = snapshot.getData();
 
         // TODO: cleanup spaghetti
@@ -371,21 +339,8 @@ public class ApplicationClient extends Application {
             for (int entity : data.list(ModelKey.class)) {
                 String name = data.get(entity, ModelKey.class).name();
                 if (!models.containsKey(entity)) {
-                    long nanos = System.nanoTime();
-                    Geometry model = (Geometry) loadModel(name);
-                    if (name.equals("gaze_of_darkness") || name.equals("blade_of_chaos")) {
-                        model.setRenderBucket(RenderBucketType.TRANSPARENT);
-                        model.getMaterial().setTransparent(true);
-                        model.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
-                        model.getMaterial().setDepthWrite(false);
-                    }
-                    model.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
-
+                    Geometry model = loadModel(name);
                     models.put(entity, new ModelWrapper(entity, model));
-                    long loadMillis = (System.nanoTime() - nanos) / 1_000_000;
-                    if (loadMillis >= 1) {
-                        System.out.println("load " + name + " in: " + loadMillis + "ms");
-                    }
                 }
                 ModelWrapper wrapper = models.get(entity);
                 Position position = data.get(entity, Position.class);
@@ -437,9 +392,46 @@ public class ApplicationClient extends Application {
         screenStatsText.setText("fps: " + frameCount + "\nping: " + gameProxy.getLatency() + "ms");
     }
 
-    private Spatial loadModel(String name) {
-        return assetManager.loadModel("models/" + name + "/" + name + ".gltf", GltfLoaderSettings.builder()
-                .bakeGeometries(true).build());
+    private void preloadIfRequired(GameEngine snapshot) {
+        if (!loaded) {
+            try (PrintStopwatch stopwatch = new PrintStopwatch("preload total")) {
+                // very hacky...
+                GameEngine preloadGame = snapshot.getRules().createGame();
+                for (String templateKey : new HashSet<>(preloadGame.getTemplates().templateKeys())) {
+                    int entity = preloadGame.getData().createEntity();
+                    preloadGame.applyTemplate(entity, templateKey);
+                }
+                Node preloadNode = new Node();
+                for (String name : preloadGame.getData().list(ModelKey.class).stream()
+                        .map(entity -> preloadGame.getData().get(entity, ModelKey.class).name())
+                        .collect(Collectors.toSet())) {
+                    try (PrintStopwatch sub = new PrintStopwatch("preload " + name)) {
+                        Geometry geometry = (Geometry) loadModel(name);
+                        preloadNode.add(geometry);
+                    }
+                }
+                try (PrintStopwatch sub = new PrintStopwatch("preload to GPU")) {
+                    sceneNode.add(preloadNode);
+                    updateRenderDependencies(0);
+                    sceneNode.remove(preloadNode);
+                }
+                loaded = true;
+            }
+        }
+    }
+
+    private Geometry loadModel(String name) {
+        Geometry geometry = (Geometry) assetManager.loadModel(
+                "models/" + name + "/" + name + ".gltf",
+                GltfLoaderSettings.builder().bakeGeometries(true).build());
+        if (name.equals("gaze_of_darkness") || name.equals("blade_of_chaos")) {
+            geometry.setRenderBucket(RenderBucketType.TRANSPARENT);
+            geometry.getMaterial().setTransparent(true);
+            geometry.getMaterial().setCullMode(VK10.VK_CULL_MODE_NONE);
+            geometry.getMaterial().setDepthWrite(false);
+        }
+        geometry.setShadowMode(ShadowMode.CAST_AND_RECEIVE);
+        return geometry;
     }
 
     private float directionToAngle(Direction direction) {
