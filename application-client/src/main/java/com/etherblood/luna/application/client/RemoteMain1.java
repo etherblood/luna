@@ -1,7 +1,6 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.ToolsClient;
-import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
 import java.io.IOException;
 
@@ -14,7 +13,7 @@ public class RemoteMain1 {
             @Override
             protected void init() {
                 super.init();
-                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), toolsClient.getModule(JwtClientModule.class)));
+                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class)));
             }
         };
         app.start();

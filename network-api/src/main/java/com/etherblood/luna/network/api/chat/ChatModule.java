@@ -9,6 +9,7 @@ public class ChatModule extends NetworkModule {
     @Override
     public void initialize(Kryo kryo) {
         kryo.register(ChatMessage.class, new RecordSerializer<>());
+        kryo.register(ChatMessageRequest.class, new RecordSerializer<>());
     }
 
 }

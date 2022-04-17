@@ -2,6 +2,7 @@ package com.etherblood.luna.network.client.chat;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.network.api.chat.ChatMessage;
+import com.etherblood.luna.network.api.chat.ChatMessageRequest;
 import com.etherblood.luna.network.api.chat.ChatModule;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ClientChatModule extends ChatModule {
         }
     }
 
-    public void send(ChatMessage message) {
+    public void send(ChatMessageRequest message) {
         connection.sendTCP(message);
     }
 

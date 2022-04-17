@@ -1,13 +1,12 @@
 package com.etherblood.luna.application.client;
 
-import com.destrostudios.authtoken.JwtAuthenticationUser;
-import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
 import com.destrostudios.icetea.core.Application;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.KeyListener;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.etherblood.luna.network.api.chat.ChatMessage;
+import com.etherblood.luna.network.api.chat.ChatMessageRequest;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,15 +19,13 @@ import org.lwjgl.glfw.GLFW;
 public class ChatSystem extends LifecycleObject {
 
     private final ClientChatModule chatModule;
-    private final JwtClientModule jwtModule;
     private final Consumer<ChatMessage> onMessage = this::onChatMessage;
     private final KeyListener onKey = this::onKey;
     private final List<ChatMessage> messages = new CopyOnWriteArrayList<>();
     private BitmapText chatText;
 
-    public ChatSystem(ClientChatModule chatModule, JwtClientModule jwtModule) {
+    public ChatSystem(ClientChatModule chatModule) {
         this.chatModule = chatModule;
-        this.jwtModule = jwtModule;
     }
 
     @Override
@@ -72,8 +69,11 @@ public class ChatSystem extends LifecycleObject {
                     if ((keyEvent.getModifiers() & GLFW.GLFW_MOD_CONTROL) != 0) {
                         String string = GLFW.glfwGetClipboardString(application.getWindow());
                         if (string != null) {
-                            JwtAuthenticationUser user = jwtModule.getOwnAuthentication().user;
-                            chatModule.send(new ChatMessage(user.id, user.login, string));
+                            if (string.startsWith("/")) {
+                                // TODO: command magic
+                            } else {
+                                chatModule.send(new ChatMessageRequest(string));
+                            }
                         }
                     }
                     break;

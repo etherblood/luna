@@ -27,7 +27,7 @@ public class Main {
         JwtServerModule jwtModule = new JwtServerModule(jwtService, server::getConnections);
         ServerTimestampModule timestampModule = new ServerTimestampModule();
         ServerGameModule gameModule = new ServerGameModule();
-        ServerChatModule chatModule = new ServerChatModule(server::getConnections);
+        ServerChatModule chatModule = new ServerChatModule(jwtModule, server::getConnections);
         ToolsServer toolsServer = new ToolsServer(server, jwtModule, timestampModule, gameModule, chatModule);
 
         server.start();

@@ -46,7 +46,7 @@ public class Main {
             @Override
             protected void init() {
                 super.init();
-                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), toolsClient.getModule(JwtClientModule.class)));
+                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class)));
             }
         };
         app.start();
