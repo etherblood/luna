@@ -42,8 +42,13 @@ public class Main {
             throw new IllegalArgumentException("First argument must be a jwt.");
         }
         ToolsClient toolsClient = createToolsClient();
-        ApplicationClient app = new ApplicationClient(remoteProxy(toolsClient, "destrostudios.com", args[0]));
-        app.addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), toolsClient.getModule(JwtClientModule.class)));
+        ApplicationClient app = new ApplicationClient(Main.remoteProxy(toolsClient, "destrostudios.com", args[0])) {
+            @Override
+            protected void init() {
+                super.init();
+                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), toolsClient.getModule(JwtClientModule.class)));
+            }
+        };
         app.start();
     }
 

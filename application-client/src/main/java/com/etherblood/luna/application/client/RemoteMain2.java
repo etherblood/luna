@@ -10,8 +10,13 @@ public class RemoteMain2 {
     public static void main(String... args) throws IOException {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         ToolsClient toolsClient = Main.createToolsClient();
-        ApplicationClient app = new ApplicationClient(Main.remoteProxy(toolsClient, "localhost", Main.getTestJwt(2)));
-        app.addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), toolsClient.getModule(JwtClientModule.class)));
+        ApplicationClient app = new ApplicationClient(Main.remoteProxy(toolsClient, "localhost", Main.getTestJwt(2))) {
+            @Override
+            protected void init() {
+                super.init();
+                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), toolsClient.getModule(JwtClientModule.class)));
+            }
+        };
         app.start();
     }
 }

@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.github.destrostudios.ice-tea-engine</groupId>
             <artifactId>ice-tea-engine-core</artifactId>
-            <version>f9f6f6f2cf52cf2434976429898e203e7105c2fc</version>
+            <version>2c339e79aa51f963e7a8edd94bd39bc8d06041aa</version>
         </dependency>
         <dependency>
             <groupId>com.etherblood.luna</groupId>

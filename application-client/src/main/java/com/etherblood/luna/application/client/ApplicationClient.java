@@ -14,7 +14,6 @@ import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
-import com.destrostudios.icetea.core.system.AppSystem;
 import com.etherblood.luna.application.client.meshes.CircleMesh;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActiveAction;
@@ -77,8 +76,6 @@ public class ApplicationClient extends Application {
     private Shader fragShaderDefault;
     private final Node debugNode = new Node();
 
-    private List<AppSystem> delayedSystems = new ArrayList<>();
-
     private boolean loaded = false;
 
     public ApplicationClient(GameProxy gameProxy) {
@@ -88,18 +85,10 @@ public class ApplicationClient extends Application {
     }
 
     @Override
-    public void addSystem(AppSystem system) {
-        if (getSystems() == null) {
-            delayedSystems.add(system);
-        } else {
-            super.addSystem(system);
-        }
-    }
-
-    @Override
-    protected void initScene() {
-        super.initScene();
+    protected void init() {
         try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
+            super.init();
+
             GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
             assetManager.addLocator(new FileLocator("./assets"));
 
@@ -174,12 +163,8 @@ public class ApplicationClient extends Application {
     }
 
     @Override
-    protected void update(float tpf) {
-        super.update(tpf);
-        for (AppSystem delayedSystem : delayedSystems) {
-            super.addSystem(delayedSystem);
-        }
-        delayedSystems.clear();
+    protected void update(int imageIndex, float tpf) {
+        super.update(imageIndex, tpf);
         gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         if (snapshot == null) {
