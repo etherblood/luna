@@ -121,6 +121,12 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(spawner9, new Position(3_000, 11_000));
             data.set(spawner9, new WaitForTrigger(trigger2));
             data.set(spawner9, Team.OPPONENTS);
+
+            int spawner10 = data.createEntity();
+            data.set(spawner10, new Spawner("metalon"));
+            data.set(spawner10, new Position(0, -7_000));
+            data.set(spawner10, new WaitForTrigger(trigger2));
+            data.set(spawner10, Team.OPPONENTS);
         });
         templates.put("amara", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
@@ -247,6 +253,41 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(entity, new ModelKey("ghost"));
             data.set(entity, new SimpleBehavior());
         });
+        templates.put("metalon", (GameEngine game, int entity) -> {
+            EntityData data = game.getData();
+            int idleAction = data.createEntity();
+            {
+                apply(game, idleAction, "idle_action");
+                data.set(idleAction, new ActionOf(entity));
+                data.set(idleAction, ActionKey.IDLE);
+                data.set(idleAction, new ActionAnimation("idle"));
+            }
+
+            {
+                int walkAction = data.createEntity();
+                apply(game, walkAction, "walk_action");
+                data.set(walkAction, new ActionOf(entity));
+                data.set(walkAction, ActionKey.WALK);
+                data.set(walkAction, new ActionSpeed(100));
+                data.set(walkAction, new ActionAnimation("run"));
+            }
+
+            {
+                int metalonMeleeAction = data.createEntity();
+                apply(game, metalonMeleeAction, "metalon_smash_action");
+                data.set(metalonMeleeAction, new ActionOf(entity));
+                data.set(metalonMeleeAction, ActionKey.ATTACK1);
+                data.set(metalonMeleeAction, new ActionAnimation("smash"));
+            }
+
+            data.set(entity, new Movebox(new Rectangle(-750, -750, 1500, 1500)));
+            data.set(entity, new Hitbox(new Circle(0, 0, 750)));
+            data.set(entity, new ActiveAction(idleAction, game.getFrame()));
+            data.set(entity, Direction.DOWN);
+            data.set(entity, new MilliHealth(30_000));
+            data.set(entity, new ModelKey("metalon"));
+            data.set(entity, new SimpleBehavior());
+        });
         templates.put("idle_action", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
             // not much to do here...
@@ -309,6 +350,15 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
 
             data.set(entity, new ActionRange(750));
         });
+        templates.put("metalon_smash_action", (GameEngine game, int entity) -> {
+            EntityData data = game.getData();
+            data.set(entity, new ActionDuration(36));
+            data.set(entity, new ActionEvent(21, "metalon_smash"));
+            data.set(entity, new ActionInterruptStrength(ActionInterruptResist.LOW));
+            data.set(entity, new ActionInterruptResist(Long.MAX_VALUE, ActionInterruptResist.MEDIUM));
+
+            data.set(entity, new ActionRange(1600));
+        });
         templates.put("ghost_spell_action", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
             data.set(entity, new ActionDuration(80));
@@ -358,6 +408,11 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
         templates.put("ghost_melee", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
             data.set(entity, new Damagebox(new Circle(0, 0, 500), DamageTrigger.PER_FRAME, 3_000));
+            data.set(entity, new PendingDelete(game.getFrame()));
+        });
+        templates.put("metalon_smash", (GameEngine game, int entity) -> {
+            EntityData data = game.getData();
+            data.set(entity, new Damagebox(new Circle(0, 0, 700), DamageTrigger.PER_FRAME, 7_000));
             data.set(entity, new PendingDelete(game.getFrame()));
         });
         templates.put("suicide", (GameEngine game, int entity) -> {

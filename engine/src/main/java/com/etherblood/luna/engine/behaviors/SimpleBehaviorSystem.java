@@ -33,16 +33,16 @@ public class SimpleBehaviorSystem implements GameSystem {
                 Vector2 delta = otherPosition.vector().sub(position.vector());
                 Direction direction = Direction.of(delta.x(), delta.y());
 
-                int meleeAction = getAction(data, entity, ActionKey.ATTACK1);
-                int rangeAction = getAction(data, entity, ActionKey.ATTACK2);
+                Integer meleeAction = getAction(data, entity, ActionKey.ATTACK1);
+                Integer rangeAction = getAction(data, entity, ActionKey.ATTACK2);
                 Integer dashAction = getAction(data, entity, ActionKey.DASH);
 
                 int meleeRange = 1000;
                 int rangedRange = 5000;
                 int dashRange = 4000;
-                if (!data.has(meleeAction, ActiveCooldown.class) && delta.squaredLength() < meleeRange * meleeRange) {
+                if (meleeAction != null && !data.has(meleeAction, ActiveCooldown.class) && delta.squaredLength() < meleeRange * meleeRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK1));
-                } else if (!data.has(rangeAction, ActiveCooldown.class) && delta.squaredLength() < rangedRange * rangedRange) {
+                } else if (rangeAction != null && !data.has(rangeAction, ActiveCooldown.class) && delta.squaredLength() < rangedRange * rangedRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.ATTACK2));
                 } else if (dashAction != null && !data.has(dashAction, ActiveCooldown.class) && delta.squaredLength() > dashRange * dashRange) {
                     data.set(entity, new ActorInput(direction, ActionKey.DASH));

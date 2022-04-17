@@ -103,7 +103,7 @@ public class ApplicationClient extends Application {
             assetManager.addLocator(new FileLocator("./assets"));
 
             DirectionalLight directionalLight = new DirectionalLight();
-            directionalLight.getAmbientColor().set(0.8f);
+            directionalLight.getAmbientColor().set(1);
             directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
             directionalLight.addAffectedSpatial(sceneNode);
             directionalLight.addShadows(4096);
