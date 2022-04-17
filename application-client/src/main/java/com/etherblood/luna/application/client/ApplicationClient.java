@@ -98,6 +98,7 @@ public class ApplicationClient extends Application {
 
     @Override
     protected void initScene() {
+        super.initScene();
         try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
             GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
             assetManager.addLocator(new FileLocator("./assets"));
@@ -174,6 +175,7 @@ public class ApplicationClient extends Application {
 
     @Override
     protected void update(float tpf) {
+        super.update(tpf);
         for (AppSystem delayedSystem : delayedSystems) {
             super.addSystem(delayedSystem);
         }
@@ -426,9 +428,9 @@ public class ApplicationClient extends Application {
                         preloadNode.add(geometry);
                     }
                 }
-                try (PrintStopwatch sub = new PrintStopwatch("preload to GPU")) {
+                try (PrintStopwatch sub = new PrintStopwatch("preload render dependencies")) {
                     sceneNode.add(preloadNode);
-                    updateRenderDependencies(0);
+                    preloadRenderDependencies();
                     sceneNode.remove(preloadNode);
                 }
                 loaded = true;
