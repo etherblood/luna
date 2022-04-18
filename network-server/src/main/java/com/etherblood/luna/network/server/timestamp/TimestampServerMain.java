@@ -8,7 +8,7 @@ public class TimestampServerMain {
 
     public static void main(String... args) throws InterruptedException, IOException {
         Server server = new Server(10_000, 10_000);
-        ServerTimestampModule module = new ServerTimestampModule();
+        TimestampServerModule module = new TimestampServerModule();
         module.initialize(server.getKryo());
         server.addListener(module);
 

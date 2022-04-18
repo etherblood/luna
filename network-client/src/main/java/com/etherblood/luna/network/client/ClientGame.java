@@ -2,6 +2,7 @@ package com.etherblood.luna.network.client;
 
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
 
 public class ClientGame {
     private GameEngine state;
@@ -9,9 +10,9 @@ public class ClientGame {
     private PlaybackBuffer buffer;
     private long serverFrame;
 
-    public ClientGame(GameEngine state) {
-        this.state = state;
-        builder = new ClientEventMessageBuilder(state.getId());
+    public ClientGame(SpectateGameResponse spectate) {
+        state = spectate.game();
+        builder = new ClientEventMessageBuilder(spectate.spectateId());
         buffer = new PlaybackBuffer();
         serverFrame = state.getFrame();
     }

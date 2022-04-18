@@ -5,7 +5,7 @@ import com.etherblood.luna.network.api.timestamp.SharedTimestampModule;
 import com.etherblood.luna.network.api.timestamp.TimestampPing;
 import com.etherblood.luna.network.api.timestamp.TimestampPong;
 
-public class ClientTimestampModule extends SharedTimestampModule {
+public class TimestampClientModule extends SharedTimestampModule {
 
     private final Connection connection;
     private final Object lock = new Object();
@@ -17,7 +17,7 @@ public class ClientTimestampModule extends SharedTimestampModule {
     private boolean pending = false;
     private long latency = 0;
 
-    public ClientTimestampModule(Connection connection, int bufferSize, int intervalMillis) {
+    public TimestampClientModule(Connection connection, int bufferSize, int intervalMillis) {
         this.connection = connection;
         this.deltas = new long[bufferSize];
         this.intervalMillis = intervalMillis;

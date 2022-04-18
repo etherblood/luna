@@ -1,7 +1,7 @@
 package com.etherblood.luna.network.server;
 
-import com.etherblood.luna.network.api.game.EventMessage;
-import com.etherblood.luna.network.api.game.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.EventMessagePart;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +10,14 @@ import java.util.UUID;
 
 public class ServerEventMessageBuilder {
 
-    private final UUID gameId;
+    private final UUID spectateId;
     private long lockFrame = -1;
     private long seq = 0;
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
-    public ServerEventMessageBuilder(UUID gameId) {
-        this.gameId = Objects.requireNonNull(gameId);
+    public ServerEventMessageBuilder(UUID spectateId) {
+        this.spectateId = Objects.requireNonNull(spectateId);
     }
 
     public synchronized void updateAck(EventMessage message) {
@@ -25,13 +25,13 @@ public class ServerEventMessageBuilder {
         pendingQueue.values().removeIf(x -> x <= message.ack());
     }
 
-    public synchronized boolean broadcast(EventMessagePart part) {
+    public synchronized void broadcast(EventMessagePart part) {
         if (part.frame() > lockFrame) {
             pendingQueue.putIfAbsent(part, seq);
-            return true;
+        } else {
+            // this should never happen, duplicate/late messages should be filtered by playback buffer
+            throw new IllegalStateException("Failed to broadcast " + part + " because builder is already locked.");
         }
-        // drop part, it is likely a late duplicate
-        return false;
     }
 
     public synchronized void lockFrame(long lockFrame) {
@@ -42,11 +42,14 @@ public class ServerEventMessageBuilder {
     }
 
     public synchronized EventMessage build() {
-        EventMessage result = new EventMessage(gameId, lockFrame, seq, ack, pendingQueue.keySet().stream()
+        EventMessage result = new EventMessage(spectateId, lockFrame, seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;
-//        System.out.println("parts: " + result.parts().length + ", seq: " + result.seq() + ", ack: " + result.ack());
         return result;
+    }
+
+    public UUID getSpectateId() {
+        return spectateId;
     }
 }

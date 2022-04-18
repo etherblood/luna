@@ -1,10 +1,10 @@
-package com.etherblood.luna.network.api.game;
+package com.etherblood.luna.network.api.game.messages;
 
 import java.util.Arrays;
 import java.util.UUID;
 
 public record EventMessage(
-        UUID gameId,
+        UUID spectateId,
         long lockFrame,
         long seq,
         long ack,
@@ -13,7 +13,7 @@ public record EventMessage(
     @Override
     public String toString() {
         return "EventMessage{" +
-                "gameId=" + gameId +
+                "spectateId=" + spectateId +
                 ", lockFrame=" + lockFrame +
                 ", seq=" + seq +
                 ", ack=" + ack +
@@ -32,7 +32,7 @@ public record EventMessage(
 
         EventMessage that = (EventMessage) o;
 
-        if (!gameId.equals(that.gameId)) {
+        if (!spectateId.equals(that.spectateId)) {
             return false;
         }
         if (lockFrame != that.lockFrame) {
@@ -49,7 +49,7 @@ public record EventMessage(
 
     @Override
     public int hashCode() {
-        int result = gameId.hashCode();
+        int result = spectateId.hashCode();
         result = 31 * result + Long.hashCode(lockFrame);
         result = 31 * result + Long.hashCode(seq);
         result = 31 * result + Long.hashCode(ack);

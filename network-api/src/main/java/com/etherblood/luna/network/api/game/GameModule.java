@@ -48,8 +48,13 @@ import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Movebox;
 import com.etherblood.luna.engine.movement.Obstaclebox;
 import com.etherblood.luna.engine.movement.Speed;
-import com.etherblood.luna.network.api.game.serialization.EventMessageSerializer;
-import com.etherblood.luna.network.api.game.serialization.GameEngineSerializer;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
+import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
+import com.etherblood.luna.network.api.game.messages.StartGameRequest;
+import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
+import com.etherblood.luna.network.api.game.messages.serialization.EventMessageSerializer;
+import com.etherblood.luna.network.api.game.messages.serialization.GameEngineSerializer;
 import java.util.UUID;
 
 public abstract class GameModule extends NetworkModule {
@@ -62,8 +67,10 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(GameEvent.class, new RecordSerializer<>());
         kryo.register(PlayerInput.class, new RecordSerializer<>());
         kryo.register(UUID.class, new UuidSerializer());
-        kryo.register(JoinRequest.class, new RecordSerializer<>());
         kryo.register(StartGameRequest.class, new RecordSerializer<>());
+        kryo.register(SpectateGameRequest.class, new RecordSerializer<>());
+        kryo.register(SpectateGameResponse.class, new RecordSerializer<>());
+        kryo.register(UnspectateGameRequest.class, new RecordSerializer<>());
 
         kryo.register(ActorInput.class, new RecordSerializer<>());
         kryo.register(Position.class, new RecordSerializer<>());

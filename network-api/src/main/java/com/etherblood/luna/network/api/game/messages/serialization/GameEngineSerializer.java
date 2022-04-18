@@ -1,4 +1,4 @@
-package com.etherblood.luna.network.api.game.serialization;
+package com.etherblood.luna.network.api.game.messages.serialization;
 
 import com.destrostudios.gametools.network.shared.serializers.CopySerializer;
 import com.esotericsoftware.kryo.Kryo;

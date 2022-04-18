@@ -11,9 +11,9 @@ import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.engine.GameLoop;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.api.lobby.LobbyInfo;
-import com.etherblood.luna.network.server.ServerGameModule;
+import com.etherblood.luna.network.server.GameServerModule;
 import com.etherblood.luna.network.server.chat.ServerChatModule;
-import com.etherblood.luna.network.server.timestamp.ServerTimestampModule;
+import com.etherblood.luna.network.server.timestamp.TimestampServerModule;
 import java.io.IOException;
 import java.util.Date;
 
@@ -27,8 +27,8 @@ public class Main {
 
         Server server = new Server(10_0000, 10_000);
         JwtServerModule jwtModule = new JwtServerModule(jwtService, server::getConnections);
-        ServerTimestampModule timestampModule = new ServerTimestampModule();
-        ServerGameModule gameModule = new ServerGameModule(jwtModule);
+        TimestampServerModule timestampModule = new TimestampServerModule();
+        GameServerModule gameModule = new GameServerModule(jwtModule);
         LobbyServerModule<Object> lobbyModule = new LobbyServerModule<>(kryo -> {
             kryo.register(LobbyInfo.class, new RecordSerializer<>());
         }, server::getConnections);

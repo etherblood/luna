@@ -5,7 +5,7 @@ import com.etherblood.luna.network.api.timestamp.SharedTimestampModule;
 import com.etherblood.luna.network.api.timestamp.TimestampPing;
 import com.etherblood.luna.network.api.timestamp.TimestampPong;
 
-public class ServerTimestampModule extends SharedTimestampModule {
+public class TimestampServerModule extends SharedTimestampModule {
 
     @Override
     public void received(Connection connection, Object object) {

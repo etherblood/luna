@@ -7,7 +7,7 @@ import java.io.IOException;
 public class TimestampClientMain {
     public static void main(String... args) throws InterruptedException, IOException {
         Client client = new Client(10_000, 10_000);
-        ClientTimestampModule module = new ClientTimestampModule(client, 10, 500);
+        TimestampClientModule module = new TimestampClientModule(client, 10, 500);
         module.initialize(client.getKryo());
         client.addListener(module);
 

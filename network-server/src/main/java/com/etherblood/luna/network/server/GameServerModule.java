@@ -9,33 +9,33 @@ import com.etherblood.luna.data.EntityDataImpl;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.GameRules;
-import com.etherblood.luna.engine.PlayerJoined;
-import com.etherblood.luna.network.api.game.EventMessage;
-import com.etherblood.luna.network.api.game.EventMessagePart;
 import com.etherblood.luna.network.api.game.GameModule;
-import com.etherblood.luna.network.api.game.JoinRequest;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
-import com.etherblood.luna.network.api.game.StartGameRequest;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
+import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
+import com.etherblood.luna.network.api.game.messages.StartGameRequest;
+import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ServerGameModule extends GameModule {
+public class GameServerModule extends GameModule {
 
     private static final long MILLIS_PER_SECOND = 1000;
-    private final Object lock = new Object();
+    private final Object lock = new Object();// TODO: use striped lock instead to lock gameIds
     private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
     private final JwtServerModule jwtModule;
 
-    private final Map<UUID, ServerGame> games = new HashMap<>();
+    private final Map<UUID, ServerGame> games = new ConcurrentHashMap<>();
 
-    public ServerGameModule(JwtServerModule jwtModule) {
+    public GameServerModule(JwtServerModule jwtModule) {
         this.jwtModule = jwtModule;
         GameEngine lobbyGame = new GameEngine(GameModule.LOBBY_GAME_ID, GameRules.getDefault(), System.currentTimeMillis(), 0);
         lobbyGame.applyTemplate(lobbyGame.getData().createEntity(), "lobby_room");
@@ -59,78 +59,56 @@ public class ServerGameModule extends GameModule {
     public void received(Connection connection, Object object) {
         if (object instanceof EventMessage message) {
             synchronized (lock) {
-                ServerGame serverGame = games.get(message.gameId());
-                if (serverGame != null) {
+                for (ServerGame serverGame : games.values()) {
+                    // TODO: permission checks?
                     Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
                     ServerEventMessageBuilder builder = builders.get(connection.getID());
-                    if (builder != null) {
+                    if (builder != null && builder.getSpectateId().equals(message.spectateId())) {
                         builder.updateAck(message);
-                    }
-                    PlaybackBuffer buffer = serverGame.getBuffer();
-                    for (EventMessagePart part : message.parts()) {
-                        if (buffer.buffer(part.frame(), part.event())) {
-                            for (ServerEventMessageBuilder other : builders.values()) {
-                                other.broadcast(new EventMessagePart(part.frame(), part.event()));
+                        PlaybackBuffer buffer = serverGame.getBuffer();
+                        for (EventMessagePart part : message.parts()) {
+                            if (buffer.buffer(part.frame(), part.event())) {
+                                for (ServerEventMessageBuilder other : builders.values()) {
+                                    other.broadcast(new EventMessagePart(part.frame(), part.event()));
+                                }
+                            } else {
+                                // this is likely a duplicate of already handled input, do nothing
                             }
-                        } else {
-                            // this is likely a duplicate of already handled input, do nothing
                         }
                     }
                 }
             }
+        } else if (object instanceof SpectateGameRequest request) {
+            synchronized (lock) {
+                // TODO: permission checks?
+                JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
+                ServerGame serverGame = games.get(request.gameId());
+                GameEngine state = serverGame.getState();
+                Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
+
+                System.out.println("User " + user.login + " spectates game " + state.getId());
+                UUID spectateId = UUID.randomUUID();
+                builders.put(connection.getID(), new ServerEventMessageBuilder(spectateId));
+                connection.sendTCP(new SpectateGameResponse(spectateId, state));
+            }
+        } else if (object instanceof UnspectateGameRequest request) {
+            synchronized (lock) {
+                // TODO: permission checks?
+                JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
+                ServerGame serverGame = games.get(request.gameId());
+                GameEngine state = serverGame.getState();
+                Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
+                builders.values().removeIf(builder -> builder.getSpectateId().equals(request.spectateId()));
+                System.out.println("User " + user.login + " unspectates game " + state.getId());
+            }
         } else if (object instanceof StartGameRequest request) {
             synchronized (lock) {
+                // TODO: permission checks?
                 GameRules rules = GameRules.get(request.gameRules());
                 GameEngine game = new GameEngine(request.gameId(), rules, System.currentTimeMillis(), new EntityDataImpl(rules.getComponentTypes()), 0);
                 game.applyTemplate(game.getData().createEntity(), request.gameTemplate());
                 if (games.putIfAbsent(request.gameId(), new ServerGame(game)) == null) {
                     System.out.println("Started " + request.gameTemplate() + " " + request.gameId());
-                }
-            }
-        } else if (object instanceof JoinRequest request) {
-            synchronized (lock) {
-                JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
-
-                // leave previous game
-                for (ServerGame other : games.values()) {
-                    Map<Integer, ServerEventMessageBuilder> builders = other.getBuilders();
-                    if (builders.containsKey(connection.getID())) {
-                        GameEngine state = other.getState();
-                        builders.remove(connection.getID());
-                        PlaybackBuffer buffer = other.getBuffer();
-                        long leaveFrame = state.getFrame() + 1;
-                        GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, null, false));
-                        for (ServerEventMessageBuilder builder : builders.values()) {
-                            if (!builder.broadcast(new EventMessagePart(leaveFrame, event))) {
-                                throw new IllegalStateException("Failed to broadcast leave.");
-                            }
-                        }
-                        if (!buffer.buffer(leaveFrame, event)) {
-                            throw new IllegalStateException("Failed to buffer leave.");
-                        }
-                        System.out.println("User " + user.login + " left " + state.getId() + " on frame " + leaveFrame);
-                    }
-                }
-
-                // join game
-                ServerGame serverGame = games.get(request.gameId());
-                GameEngine state = serverGame.getState();
-                Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
-                PlaybackBuffer buffer = serverGame.getBuffer();
-
-                long joinFrame = state.getFrame() + 1;
-                System.out.println("User " + user.login + " connected to " + serverGame.getState().getId() + " on frame " + joinFrame);
-                connection.sendTCP(state);
-                builders.put(connection.getID(), new ServerEventMessageBuilder(state.getId()));
-
-                GameEvent event = new GameEvent(null, new PlayerJoined(user.id, user.login, request.actorTemplate(), true));
-                for (ServerEventMessageBuilder builder : builders.values()) {
-                    if (!builder.broadcast(new EventMessagePart(joinFrame, event))) {
-                        throw new IllegalStateException("Failed to broadcast join.");
-                    }
-                }
-                if (!buffer.buffer(joinFrame, event)) {
-                    throw new IllegalStateException("Failed to buffer join.");
                 }
             }
         }
@@ -149,14 +127,14 @@ public class ServerGameModule extends GameModule {
                     do {
                         long frame = state.getFrame();
                         Set<GameEvent> events = buffer.peek(frame);
-                        buffer.clear(frame);
+                        buffer.lockFrame(frame);
                         state.tick(events);
                     } while (state.getFrame() < nextFrame);
 
                     for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
                         Connection connection = connections.get(entry.getKey());
                         ServerEventMessageBuilder builder = builders.get(entry.getKey());
-                        builder.lockFrame(nextFrame);
+                        builder.lockFrame(buffer.getLockedFrame());
                         connection.sendUDP(builder.build());
                     }
                 }

@@ -1,7 +1,7 @@
 package com.etherblood.luna.network.client;
 
-import com.etherblood.luna.network.api.game.EventMessage;
-import com.etherblood.luna.network.api.game.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.EventMessagePart;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,20 +10,19 @@ import java.util.UUID;
 
 public class ClientEventMessageBuilder {
 
-    private final UUID gameId;
+    private final UUID spectateId;
     private long lockFrame = -1;
     private long seq = 0;
     private long ack = -1;
     private final Map<EventMessagePart, Long> pendingQueue = new HashMap<>();
 
-    public ClientEventMessageBuilder(UUID gameId) {
-        this.gameId = Objects.requireNonNull(gameId);
+    public ClientEventMessageBuilder(UUID spectateId) {
+        this.spectateId = Objects.requireNonNull(spectateId);
     }
-
 
     public synchronized void enqueueAction(EventMessagePart part) {
         if (part.frame() <= lockFrame) {
-            throw new IllegalStateException("Game " + gameId + ": Tried to request input for frame " + part.frame() + " when " + lockFrame + " frame was already locked.");
+            throw new IllegalStateException("Tried to request input for frame " + part.frame() + " when " + lockFrame + " frame was already locked.");
         }
         pendingQueue.put(part, seq);
         lockFrame = part.frame();
@@ -35,11 +34,14 @@ public class ClientEventMessageBuilder {
     }
 
     public synchronized EventMessage build() {
-        EventMessage result = new EventMessage(gameId, lockFrame, seq, ack, pendingQueue.keySet().stream()
+        EventMessage result = new EventMessage(spectateId, lockFrame, seq, ack, pendingQueue.keySet().stream()
                 .sorted(Comparator.comparingLong(EventMessagePart::frame))
                 .toArray(EventMessagePart[]::new));
         seq++;
-//        System.out.println("parts: " + result.parts().length + ", seq: " + result.seq() + ", ack: " + result.ack());
         return result;
+    }
+
+    public UUID getSpectateId() {
+        return spectateId;
     }
 }

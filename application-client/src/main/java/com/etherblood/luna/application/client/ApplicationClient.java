@@ -96,7 +96,7 @@ public class ApplicationClient extends Application {
             System.out.println("A");
 
             DirectionalLight directionalLight = new DirectionalLight();
-            directionalLight.getAmbientColor().set(0.75f);
+            directionalLight.getAmbientColor().set(0.5f);
             directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
             directionalLight.addAffectedSpatial(sceneNode);
             directionalLight.addShadows(4096);

@@ -12,9 +12,9 @@ import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.api.game.GameModule;
 import com.etherblood.luna.network.api.lobby.LobbyInfo;
-import com.etherblood.luna.network.client.ClientGameModule;
+import com.etherblood.luna.network.client.GameClientModule;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
-import com.etherblood.luna.network.client.timestamp.ClientTimestampModule;
+import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -50,7 +50,11 @@ public class Main {
             @Override
             protected void init() {
                 super.init();
-                CommandService commandService = new CommandService(toolsClient.getModule(ClientGameModule.class), toolsClient.getModule(LobbyClientModule.class));
+                CommandService commandService = new CommandService(
+                        toolsClient.getModule(JwtClientModule.class),
+                        toolsClient.getModule(TimestampClientModule.class),
+                        toolsClient.getModule(GameClientModule.class),
+                        toolsClient.getModule(LobbyClientModule.class));
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
             }
         };
@@ -60,8 +64,8 @@ public class Main {
     static ToolsClient createToolsClient() {
         Client client = new Client(10_000, 10_000);
         JwtClientModule jwtModule = new JwtClientModule(client);
-        ClientTimestampModule timestampModule = new ClientTimestampModule(client, 40, 250);
-        ClientGameModule gameModule = new ClientGameModule(client);
+        TimestampClientModule timestampModule = new TimestampClientModule(client, 40, 250);
+        GameClientModule gameModule = new GameClientModule(client);
         LobbyClientModule<Object> lobbyModule = new LobbyClientModule<>(kryo -> {
             kryo.register(LobbyInfo.class, new RecordSerializer<>());
         }, client);
@@ -78,10 +82,10 @@ public class Main {
         client.connect(10_000, host, NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 
         toolsClient.getModule(JwtClientModule.class).login(jwt);
-        toolsClient.getModule(ClientGameModule.class).join(GameModule.LOBBY_GAME_ID, "amara");
+        toolsClient.getModule(GameClientModule.class).spectate(GameModule.LOBBY_GAME_ID);
         return new RemoteGameProxy(
-                toolsClient.getModule(ClientTimestampModule.class),
-                toolsClient.getModule(ClientGameModule.class),
+                toolsClient.getModule(TimestampClientModule.class),
+                toolsClient.getModule(GameClientModule.class),
                 new NoValidateJwtService().decode(jwt).user);
     }
 

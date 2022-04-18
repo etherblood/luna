@@ -3,9 +3,9 @@ package com.etherblood.luna.network.sandbox;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.actions.data.ActionKey;
-import com.etherblood.luna.network.api.game.EventMessage;
-import com.etherblood.luna.network.api.game.EventMessagePart;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.EventMessagePart;
 import com.etherblood.luna.network.client.ClientEventMessageBuilder;
 import com.etherblood.luna.network.server.ServerEventMessageBuilder;
 import java.util.Set;
@@ -20,9 +20,9 @@ public class EventMessagesTest {
     @Test
     public void simpleRequest() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
@@ -42,9 +42,9 @@ public class EventMessagesTest {
     @Test
     public void duplicatedRequest() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
@@ -68,9 +68,9 @@ public class EventMessagesTest {
     @Test
     public void droppedRequest_withFollowUpInput() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
@@ -93,9 +93,9 @@ public class EventMessagesTest {
     @Test
     public void droppedRequest_withoutFollowUpInput() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
@@ -116,9 +116,9 @@ public class EventMessagesTest {
     @Test
     public void outOfOrderRequest() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
@@ -145,15 +145,15 @@ public class EventMessagesTest {
     @Test
     public void simpleUpdate() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
 
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
-        EventMessage message = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
+        EventMessage message = new EventMessage(spectateId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message);
         for (EventMessagePart part : message.parts()) {
             server.broadcast(part);
@@ -168,14 +168,14 @@ public class EventMessagesTest {
     @Test
     public void duplicatedUpdate() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
 
         // when
-        EventMessage message = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
+        EventMessage message = new EventMessage(spectateId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message);
         for (EventMessagePart part : message.parts()) {
             server.broadcast(part);
@@ -191,21 +191,21 @@ public class EventMessagesTest {
     @Test
     public void outOfOrderUpdate() {
         // given
-        UUID gameId = UUID.randomUUID();
-        ServerEventMessageBuilder server = new ServerEventMessageBuilder(gameId);
-        ClientEventMessageBuilder client = new ClientEventMessageBuilder(gameId);
+        UUID spectateId = UUID.randomUUID();
+        ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
+        ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
         EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
         EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
 
         // when
-        EventMessage message1 = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
+        EventMessage message1 = new EventMessage(spectateId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message1);
         for (EventMessagePart part : message1.parts()) {
             server.broadcast(part);
         }
         EventMessage update0 = server.build();
-        EventMessage message = new EventMessage(gameId, 0, 1, -1, new EventMessagePart[]{input1});
+        EventMessage message = new EventMessage(spectateId, 0, 1, -1, new EventMessagePart[]{input1});
         server.updateAck(message);
         for (EventMessagePart part : message.parts()) {
             server.broadcast(part);

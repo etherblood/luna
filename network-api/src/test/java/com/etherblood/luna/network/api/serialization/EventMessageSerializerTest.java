@@ -10,9 +10,9 @@ import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.data.ActionKey;
-import com.etherblood.luna.network.api.game.EventMessage;
-import com.etherblood.luna.network.api.game.EventMessagePart;
-import com.etherblood.luna.network.api.game.serialization.EventMessageSerializer;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.serialization.EventMessageSerializer;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

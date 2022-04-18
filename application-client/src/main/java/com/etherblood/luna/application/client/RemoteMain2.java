@@ -2,8 +2,10 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.ToolsClient;
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
-import com.etherblood.luna.network.client.ClientGameModule;
+import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
+import com.etherblood.luna.network.client.GameClientModule;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
+import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
 import java.io.IOException;
 
 public class RemoteMain2 {
@@ -16,7 +18,11 @@ public class RemoteMain2 {
             @Override
             protected void init() {
                 super.init();
-                CommandService commandService = new CommandService(toolsClient.getModule(ClientGameModule.class), toolsClient.getModule(LobbyClientModule.class));
+                CommandService commandService = new CommandService(
+                        toolsClient.getModule(JwtClientModule.class),
+                        toolsClient.getModule(TimestampClientModule.class),
+                        toolsClient.getModule(GameClientModule.class),
+                        toolsClient.getModule(LobbyClientModule.class));
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
             }
         };

@@ -10,14 +10,14 @@ import java.util.Set;
 public class PlaybackBuffer {
 
     private final Map<Long, Set<GameEvent>> events = new HashMap<>();
-    private long clearedFrame = -1;
+    private long lockedFrame = -1;
 
     public synchronized boolean buffer(long frame, GameEvent event) {
-        if (clearedFrame >= frame) {
-            return false;
+        if (frame > lockedFrame) {
+            Set<GameEvent> frameEvents = events.computeIfAbsent(frame, k -> new HashSet<>());
+            return frameEvents.add(event);
         }
-        Set<GameEvent> frameEvents = events.computeIfAbsent(frame, k -> new HashSet<>());
-        return frameEvents.add(event);
+        return false;
     }
 
     public synchronized Set<GameEvent> peek(long frame) {
@@ -25,8 +25,12 @@ public class PlaybackBuffer {
         return Collections.unmodifiableSet(set);
     }
 
-    public synchronized void clear(long frame) {
-        clearedFrame = frame;
-        events.keySet().removeIf(key -> key <= frame);
+    public synchronized void lockFrame(long frame) {
+        lockedFrame = frame;
+        events.keySet().removeIf(key -> key <= lockedFrame);
+    }
+
+    public long getLockedFrame() {
+        return lockedFrame;
     }
 }

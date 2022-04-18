@@ -6,26 +6,28 @@ import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.GameRules;
-import com.etherblood.luna.network.api.game.EventMessage;
-import com.etherblood.luna.network.api.game.EventMessagePart;
 import com.etherblood.luna.network.api.game.GameModule;
-import com.etherblood.luna.network.api.game.JoinRequest;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
-import com.etherblood.luna.network.api.game.StartGameRequest;
+import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
+import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
+import com.etherblood.luna.network.api.game.messages.StartGameRequest;
+import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 import java.util.UUID;
 
-public class ClientGameModule extends GameModule {
+public class GameClientModule extends GameModule {
 
     public static final int MILLIS_PER_SECOND = 1000;
     private final Connection connection;
     private final int inputDelayFrames = 2;
     private ClientGame clientGame;
 
-    public ClientGameModule(Connection connection) {
+    public GameClientModule(Connection connection) {
         this.connection = connection;
     }
 
@@ -35,16 +37,17 @@ public class ClientGameModule extends GameModule {
         return gameId;
     }
 
-    public synchronized void join(UUID gameId, String actorTemplate) {
-        connection.sendTCP(new JoinRequest(gameId, actorTemplate));
+    public synchronized void spectate(UUID gameId) {
+        if (clientGame != null) {
+            connection.sendTCP(new UnspectateGameRequest(clientGame.getState().getId(), clientGame.getBuilder().getSpectateId()));
+        }
+        connection.sendTCP(new SpectateGameRequest(gameId));
     }
 
     @Override
     public synchronized void received(Connection connection, Object object) {
-        if (object instanceof GameEngine game) {
-            clientGame = new ClientGame(game);
-        } else if (object instanceof EventMessage message) {
-            if (clientGame != null && clientGame.getState().getId().equals(message.gameId())) {
+        if (object instanceof EventMessage message) {
+            if (clientGame != null && clientGame.getBuilder().getSpectateId().equals(message.spectateId())) {
                 ClientEventMessageBuilder builder = clientGame.getBuilder();
                 PlaybackBuffer buffer = clientGame.getBuffer();
                 GameEngine state = clientGame.getState();
@@ -56,9 +59,11 @@ public class ClientGameModule extends GameModule {
                 }
                 for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
                     state.tick(buffer.peek(frame));
-                    buffer.clear(frame);
+                    buffer.lockFrame(frame);
                 }
             }
+        } else if (object instanceof SpectateGameResponse response) {
+            clientGame = new ClientGame(response);
         }
     }
 
