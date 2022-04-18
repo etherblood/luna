@@ -296,6 +296,16 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(metalonMeleeAction, new ActionAnimation("smash"));
             }
 
+            {
+                int fallenAction = data.createEntity();
+                apply(game, fallenAction, "fallen_action");
+                data.set(fallenAction, new ActionOf(entity));
+                data.set(fallenAction, ActionKey.FALLEN);
+                data.set(fallenAction, new ActionAnimation("die"));
+                data.set(fallenAction, new ActionDuration(120));
+                data.set(fallenAction, new ActionEvent(120, "suicide"));
+            }
+
             data.set(entity, new Movebox(new Rectangle(-750, -750, 1500, 1500)));
             data.set(entity, new Hitbox(new Circle(0, 0, 750)));
             data.set(entity, new ActiveAction(idleAction, game.getFrame()));

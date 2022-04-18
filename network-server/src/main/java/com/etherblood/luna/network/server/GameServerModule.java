@@ -98,7 +98,7 @@ public class GameServerModule extends GameModule {
                 ServerGame serverGame = games.get(request.gameId());
                 GameEngine state = serverGame.getState();
                 Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
-                builders.values().removeIf(builder -> builder.getSpectateId().equals(request.spectateId()));
+                builders.remove(connection.getID());
                 System.out.println("User " + user.login + " unspectates game " + state.getId());
             }
         } else if (object instanceof StartGameRequest request) {
@@ -133,7 +133,7 @@ public class GameServerModule extends GameModule {
 
                     for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
                         Connection connection = connections.get(entry.getKey());
-                        ServerEventMessageBuilder builder = builders.get(entry.getKey());
+                        ServerEventMessageBuilder builder = entry.getValue();
                         builder.lockFrame(buffer.getLockedFrame());
                         connection.sendUDP(builder.build());
                     }
