@@ -87,17 +87,21 @@ public class ApplicationClient extends Application {
     @Override
     protected void init() {
         try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
+            System.out.println("init start");
             super.init();
+            System.out.println("finished super init");
 
             GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
             assetManager.addLocator(new FileLocator("./assets"));
+            System.out.println("A");
 
             DirectionalLight directionalLight = new DirectionalLight();
-            directionalLight.getAmbientColor().set(1);
+            directionalLight.getAmbientColor().set(0.75f);
             directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
             directionalLight.addAffectedSpatial(sceneNode);
             directionalLight.addShadows(4096);
             setLight(directionalLight);
+            System.out.println("B");
 
             sceneCamera.setLocation(new Vector3f(0, 2, 10));
             sceneCamera.setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
@@ -110,6 +114,7 @@ public class ApplicationClient extends Application {
                     "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                     "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
             });
+            System.out.println("C");
 
             // text
             bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
@@ -119,6 +124,7 @@ public class ApplicationClient extends Application {
             guiNode.add(screenStatsText);
 
 
+            System.out.println("D");
             // Ground
             Quad meshGround = new Quad(10, 30);
 
@@ -135,6 +141,7 @@ public class ApplicationClient extends Application {
             geometryGround.setShadowMode(ShadowMode.RECEIVE);
             sceneNode.add(geometryGround);
 
+            System.out.println("E");
             // Inputs
             inputManager.addKeyListener(keyEvent -> {
                 if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
@@ -154,6 +161,7 @@ public class ApplicationClient extends Application {
                     }
                 }
             });
+            System.out.println("F");
             inputManager.addMouseButtonListener(mouseButtonEvent -> {
                 if (mouseButtonEvent.getAction() == GLFW.GLFW_PRESS) {
                     // placeholder
@@ -409,7 +417,7 @@ public class ApplicationClient extends Application {
                         .map(entity -> preloadGame.getData().get(entity, ModelKey.class).name())
                         .collect(Collectors.toSet())) {
                     try (PrintStopwatch sub = new PrintStopwatch("preload " + name)) {
-                        Geometry geometry = (Geometry) loadModel(name);
+                        Geometry geometry = loadModel(name);
                         preloadNode.add(geometry);
                     }
                 }
@@ -438,7 +446,7 @@ public class ApplicationClient extends Application {
     }
 
     private float directionToAngle(Direction direction) {
-        Vector2 vector = direction.toLengthVector(1_000_000);
+        Vector2 vector = direction.kiloVector();
         return (float) Math.atan2(vector.y(), vector.x()) + (float) (Math.PI / 2);
     }
 

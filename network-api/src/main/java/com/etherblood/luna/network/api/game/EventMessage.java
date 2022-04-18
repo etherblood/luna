@@ -1,4 +1,4 @@
-package com.etherblood.luna.network.api;
+package com.etherblood.luna.network.api.game;
 
 import java.util.Arrays;
 import java.util.UUID;

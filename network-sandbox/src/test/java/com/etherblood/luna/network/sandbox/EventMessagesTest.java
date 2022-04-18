@@ -3,9 +3,9 @@ package com.etherblood.luna.network.sandbox;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.actions.data.ActionKey;
-import com.etherblood.luna.network.api.EventMessage;
-import com.etherblood.luna.network.api.EventMessagePart;
-import com.etherblood.luna.network.api.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.EventMessage;
+import com.etherblood.luna.network.api.game.EventMessagePart;
+import com.etherblood.luna.network.api.game.PlaybackBuffer;
 import com.etherblood.luna.network.client.ClientEventMessageBuilder;
 import com.etherblood.luna.network.server.ServerEventMessageBuilder;
 import java.util.Set;
@@ -30,7 +30,9 @@ public class EventMessagesTest {
         EventMessage request = client.build();
 
         server.updateAck(request);
-        server.broadcast(request.parts());
+        for (EventMessagePart part : request.parts()) {
+            server.broadcast(part);
+        }
 
         // then
         EventMessage response = server.build();
@@ -50,9 +52,13 @@ public class EventMessagesTest {
         EventMessage request = client.build();
 
         server.updateAck(request);
-        server.broadcast(request.parts());
+        for (EventMessagePart part : request.parts()) {
+            server.broadcast(part);
+        }
         server.updateAck(request);
-        server.broadcast(request.parts());
+        for (EventMessagePart part : request.parts()) {
+            server.broadcast(part);
+        }
 
         // then
         EventMessage response = server.build();
@@ -75,7 +81,9 @@ public class EventMessagesTest {
         EventMessage request2 = client.build();
 
         server.updateAck(request2);
-        server.broadcast(request2.parts());
+        for (EventMessagePart part : request2.parts()) {
+            server.broadcast(part);
+        }
 
         // then
         EventMessage response = server.build();
@@ -96,7 +104,9 @@ public class EventMessagesTest {
         EventMessage request2 = client.build();
 
         server.updateAck(request2);
-        server.broadcast(request2.parts());
+        for (EventMessagePart part : request2.parts()) {
+            server.broadcast(part);
+        }
 
         // then
         EventMessage response = server.build();
@@ -119,9 +129,13 @@ public class EventMessagesTest {
         EventMessage request2 = client.build();
 
         server.updateAck(request2);
-        server.broadcast(request2.parts());
+        for (EventMessagePart part : request2.parts()) {
+            server.broadcast(part);
+        }
         server.updateAck(request1);
-        server.broadcast(request1.parts());
+        for (EventMessagePart part : request1.parts()) {
+            server.broadcast(part);
+        }
 
         // then
         EventMessage response = server.build();
@@ -141,7 +155,9 @@ public class EventMessagesTest {
         // when
         EventMessage message = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message);
-        server.broadcast(message.parts());
+        for (EventMessagePart part : message.parts()) {
+            server.broadcast(part);
+        }
         EventMessage update = server.build();
         ackAndBuffer(client, clientBuffer, update);
 
@@ -161,7 +177,9 @@ public class EventMessagesTest {
         // when
         EventMessage message = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message);
-        server.broadcast(message.parts());
+        for (EventMessagePart part : message.parts()) {
+            server.broadcast(part);
+        }
         EventMessage update = server.build();
         ackAndBuffer(client, clientBuffer, update);
         ackAndBuffer(client, clientBuffer, update);
@@ -183,11 +201,15 @@ public class EventMessagesTest {
         // when
         EventMessage message1 = new EventMessage(gameId, 0, 0, -1, new EventMessagePart[]{input0});
         server.updateAck(message1);
-        server.broadcast(message1.parts());
+        for (EventMessagePart part : message1.parts()) {
+            server.broadcast(part);
+        }
         EventMessage update0 = server.build();
         EventMessage message = new EventMessage(gameId, 0, 1, -1, new EventMessagePart[]{input1});
         server.updateAck(message);
-        server.broadcast(message.parts());
+        for (EventMessagePart part : message.parts()) {
+            server.broadcast(part);
+        }
         EventMessage update1 = server.build();
         ackAndBuffer(client, clientBuffer, update1);
         ackAndBuffer(client, clientBuffer, update0);

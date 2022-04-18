@@ -53,14 +53,12 @@ public class GameEngine {
         for (GameEvent event : events) {
             if (event.join() != null) {
                 if (event.join().enter()) {
-                    if (data.findByValue(new PlayerId(event.join().playerId())).isEmpty()) {
-                        int player = data.createEntity();
-                        applyTemplate(player, "amara");
-                        data.set(player, new PlayerId(event.join().playerId()));
-                        data.set(player, new ActorName(event.join().playerName()));
-                        data.set(player, new Position(0, 0));
-                        data.set(player, Team.PLAYERS);
-                    }
+                    int player = data.createEntity();
+                    applyTemplate(player, event.join().actorTemplate());
+                    data.set(player, new PlayerId(event.join().playerId()));
+                    data.set(player, new ActorName(event.join().playerName()));
+                    data.set(player, new Position(0, 0));
+                    data.set(player, Team.PLAYERS);
                 } else {
                     for (int entity : data.findByValue(new PlayerId(event.join().playerId()))) {
                         data.set(entity, new PendingDelete(frame));

@@ -19,13 +19,15 @@ import org.lwjgl.glfw.GLFW;
 public class ChatSystem extends LifecycleObject {
 
     private final ClientChatModule chatModule;
+    private final CommandService commandService;
     private final Consumer<ChatMessage> onMessage = this::onChatMessage;
     private final KeyListener onKey = this::onKey;
     private final List<ChatMessage> messages = new CopyOnWriteArrayList<>();
     private BitmapText chatText;
 
-    public ChatSystem(ClientChatModule chatModule) {
+    public ChatSystem(ClientChatModule chatModule, CommandService commandService) {
         this.chatModule = chatModule;
+        this.commandService = commandService;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class ChatSystem extends LifecycleObject {
                         String string = GLFW.glfwGetClipboardString(application.getWindow());
                         if (string != null) {
                             if (string.startsWith("/")) {
-                                // TODO: command magic
+                                commandService.runCommand(string.substring(1));
                             } else {
                                 chatModule.send(new ChatMessageRequest(string));
                             }

@@ -1,12 +1,12 @@
-package com.etherblood.luna.network.api.serialization;
+package com.etherblood.luna.network.api.game.serialization;
 
 import com.destrostudios.gametools.network.shared.serializers.CopySerializer;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.etherblood.luna.engine.GameEvent;
-import com.etherblood.luna.network.api.EventMessage;
-import com.etherblood.luna.network.api.EventMessagePart;
+import com.etherblood.luna.network.api.game.EventMessage;
+import com.etherblood.luna.network.api.game.EventMessagePart;
 import java.util.UUID;
 
 public class EventMessageSerializer extends CopySerializer<EventMessage> {

@@ -5,14 +5,18 @@ import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryonet.Connection;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
-import com.etherblood.luna.network.api.EventMessage;
-import com.etherblood.luna.network.api.EventMessagePart;
-import com.etherblood.luna.network.api.GameModule;
-import com.etherblood.luna.network.api.PlaybackBuffer;
+import com.etherblood.luna.engine.GameRules;
+import com.etherblood.luna.network.api.game.EventMessage;
+import com.etherblood.luna.network.api.game.EventMessagePart;
+import com.etherblood.luna.network.api.game.GameModule;
+import com.etherblood.luna.network.api.game.JoinRequest;
+import com.etherblood.luna.network.api.game.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.StartGameRequest;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
+import java.util.UUID;
 
 public class ClientGameModule extends GameModule {
 
@@ -23,6 +27,16 @@ public class ClientGameModule extends GameModule {
 
     public ClientGameModule(Connection connection) {
         this.connection = connection;
+    }
+
+    public synchronized UUID start(String gameTemplate) {
+        UUID gameId = UUID.randomUUID();
+        connection.sendTCP(new StartGameRequest(gameId, GameRules.getDefault().getId(), gameTemplate));
+        return gameId;
+    }
+
+    public synchronized void join(UUID gameId, String actorTemplate) {
+        connection.sendTCP(new JoinRequest(gameId, actorTemplate));
     }
 
     @Override

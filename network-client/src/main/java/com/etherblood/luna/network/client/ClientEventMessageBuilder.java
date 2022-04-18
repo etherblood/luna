@@ -1,7 +1,7 @@
 package com.etherblood.luna.network.client;
 
-import com.etherblood.luna.network.api.EventMessage;
-import com.etherblood.luna.network.api.EventMessagePart;
+import com.etherblood.luna.network.api.game.EventMessage;
+import com.etherblood.luna.network.api.game.EventMessagePart;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;

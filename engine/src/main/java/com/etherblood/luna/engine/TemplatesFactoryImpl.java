@@ -36,10 +36,27 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
 
     public TemplatesFactoryImpl() {
         templates = new HashMap<>();
-        templates.put("ghost_amara", (GameEngine game, int entity) -> {
+        templates.put("bot_amara", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
             game.applyTemplate(entity, "amara");
             data.set(entity, new SimpleBehavior());
+        });
+        templates.put("bot_ghost", (GameEngine game, int entity) -> {
+            EntityData data = game.getData();
+            game.applyTemplate(entity, "ghost");
+            data.set(entity, new SimpleBehavior());
+        });
+        templates.put("bot_metalon", (GameEngine game, int entity) -> {
+            EntityData data = game.getData();
+            game.applyTemplate(entity, "metalon");
+            data.set(entity, new SimpleBehavior());
+        });
+        templates.put("lobby_room", (GameEngine game, int entity) -> {
+            EntityData data = game.getData();
+            data.set(data.createEntity(), new Obstaclebox(new Rectangle(5_000, -5_000, 10_000, 10_000)));
+            data.set(data.createEntity(), new Obstaclebox(new Rectangle(-15_000, -5_000, 10_000, 10_000)));
+            data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, 5_000, 10_000, 10_000)));
+            data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, -15_000, 10_000, 10_000)));
         });
         templates.put("challenge_room", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
@@ -49,7 +66,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(data.createEntity(), new Obstaclebox(new Rectangle(-5_000, -15_000, 10_000, 10_000)));
 
             int spawner1 = data.createEntity();
-            data.set(spawner1, new Spawner("ghost"));
+            data.set(spawner1, new Spawner("bot_ghost"));
             data.set(spawner1, new Position(0, 15_000));
             data.set(spawner1, Team.OPPONENTS);
             data.set(spawner1, new BaseCooldown(569));
@@ -65,19 +82,19 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(data.createEntity(), new Triggerbox(trigger1, new Rectangle(-5_000, 5_000, 10_000, 10_000)));
 
             int spawner1 = data.createEntity();
-            data.set(spawner1, new Spawner("ghost"));
+            data.set(spawner1, new Spawner("bot_ghost"));
             data.set(spawner1, new Position(-3_000, 14_000));
             data.set(spawner1, new WaitForTrigger(trigger1));
             data.set(spawner1, Team.OPPONENTS);
 
             int spawner2 = data.createEntity();
-            data.set(spawner2, new Spawner("ghost"));
+            data.set(spawner2, new Spawner("bot_ghost"));
             data.set(spawner2, new Position(0, 15_000));
             data.set(spawner2, new WaitForTrigger(trigger1));
             data.set(spawner2, Team.OPPONENTS);
 
             int spawner3 = data.createEntity();
-            data.set(spawner3, new Spawner("ghost"));
+            data.set(spawner3, new Spawner("bot_ghost"));
             data.set(spawner3, new Position(3_000, 14_000));
             data.set(spawner3, new WaitForTrigger(trigger1));
             data.set(spawner3, Team.OPPONENTS);
@@ -87,43 +104,43 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(data.createEntity(), new Triggerbox(trigger2, new Rectangle(-5_000, 15_000, 10_000, 10_000)));
 
             int spawner4 = data.createEntity();
-            data.set(spawner4, new Spawner("ghost"));
+            data.set(spawner4, new Spawner("bot_ghost"));
             data.set(spawner4, new Position(-3_000, 24_000));
             data.set(spawner4, new WaitForTrigger(trigger2));
             data.set(spawner4, Team.OPPONENTS);
 
             int spawner5 = data.createEntity();
-            data.set(spawner5, new Spawner("ghost_amara"));
+            data.set(spawner5, new Spawner("bot_amara"));
             data.set(spawner5, new Position(0, 25_000));
             data.set(spawner5, new WaitForTrigger(trigger2));
             data.set(spawner5, Team.OPPONENTS);
 
             int spawner6 = data.createEntity();
-            data.set(spawner6, new Spawner("ghost"));
+            data.set(spawner6, new Spawner("bot_ghost"));
             data.set(spawner6, new Position(3_000, 24_000));
             data.set(spawner6, new WaitForTrigger(trigger2));
             data.set(spawner6, Team.OPPONENTS);
 
             int spawner7 = data.createEntity();
-            data.set(spawner7, new Spawner("ghost"));
+            data.set(spawner7, new Spawner("bot_ghost"));
             data.set(spawner7, new Position(-3_000, 11_000));
             data.set(spawner7, new WaitForTrigger(trigger2));
             data.set(spawner7, Team.OPPONENTS);
 
             int spawner8 = data.createEntity();
-            data.set(spawner8, new Spawner("ghost"));
+            data.set(spawner8, new Spawner("bot_ghost"));
             data.set(spawner8, new Position(0, 10_000));
             data.set(spawner8, new WaitForTrigger(trigger2));
             data.set(spawner8, Team.OPPONENTS);
 
             int spawner9 = data.createEntity();
-            data.set(spawner9, new Spawner("ghost"));
+            data.set(spawner9, new Spawner("bot_ghost"));
             data.set(spawner9, new Position(3_000, 11_000));
             data.set(spawner9, new WaitForTrigger(trigger2));
             data.set(spawner9, Team.OPPONENTS);
 
             int spawner10 = data.createEntity();
-            data.set(spawner10, new Spawner("metalon"));
+            data.set(spawner10, new Spawner("bot_metalon"));
             data.set(spawner10, new Position(0, -7_000));
             data.set(spawner10, new WaitForTrigger(trigger2));
             data.set(spawner10, Team.OPPONENTS);
@@ -251,7 +268,6 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(entity, Direction.DOWN);
             data.set(entity, new MilliHealth(10_000));
             data.set(entity, new ModelKey("ghost"));
-            data.set(entity, new SimpleBehavior());
         });
         templates.put("metalon", (GameEngine game, int entity) -> {
             EntityData data = game.getData();
@@ -286,7 +302,6 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             data.set(entity, Direction.DOWN);
             data.set(entity, new MilliHealth(30_000));
             data.set(entity, new ModelKey("metalon"));
-            data.set(entity, new SimpleBehavior());
         });
         templates.put("idle_action", (GameEngine game, int entity) -> {
             EntityData data = game.getData();

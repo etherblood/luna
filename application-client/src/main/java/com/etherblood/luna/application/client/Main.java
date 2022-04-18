@@ -4,10 +4,14 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.destrostudios.authtoken.NoValidateJwtService;
 import com.destrostudios.gametools.network.client.ToolsClient;
+import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
 import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
+import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.network.api.NetworkUtil;
+import com.etherblood.luna.network.api.game.GameModule;
+import com.etherblood.luna.network.api.lobby.LobbyInfo;
 import com.etherblood.luna.network.client.ClientGameModule;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
 import com.etherblood.luna.network.client.timestamp.ClientTimestampModule;
@@ -46,7 +50,8 @@ public class Main {
             @Override
             protected void init() {
                 super.init();
-                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class)));
+                CommandService commandService = new CommandService(toolsClient.getModule(ClientGameModule.class), toolsClient.getModule(LobbyClientModule.class));
+                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
             }
         };
         app.start();
@@ -57,8 +62,11 @@ public class Main {
         JwtClientModule jwtModule = new JwtClientModule(client);
         ClientTimestampModule timestampModule = new ClientTimestampModule(client, 40, 250);
         ClientGameModule gameModule = new ClientGameModule(client);
+        LobbyClientModule<Object> lobbyModule = new LobbyClientModule<>(kryo -> {
+            kryo.register(LobbyInfo.class, new RecordSerializer<>());
+        }, client);
         ClientChatModule chatModule = new ClientChatModule(client);
-        return new ToolsClient(client, jwtModule, timestampModule, gameModule, chatModule);
+        return new ToolsClient(client, jwtModule, timestampModule, gameModule, lobbyModule, chatModule);
     }
 
     static GameProxy remoteProxy(ToolsClient toolsClient, String host, String jwt) throws IOException {
@@ -70,6 +78,7 @@ public class Main {
         client.connect(10_000, host, NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 
         toolsClient.getModule(JwtClientModule.class).login(jwt);
+        toolsClient.getModule(ClientGameModule.class).join(GameModule.LOBBY_GAME_ID, "amara");
         return new RemoteGameProxy(
                 toolsClient.getModule(ClientTimestampModule.class),
                 toolsClient.getModule(ClientGameModule.class),

@@ -1,7 +1,7 @@
 package com.etherblood.luna.network.client;
 
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.network.api.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.PlaybackBuffer;
 
 public class ClientGame {
     private GameEngine state;

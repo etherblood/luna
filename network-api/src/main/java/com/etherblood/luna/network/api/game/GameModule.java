@@ -1,4 +1,4 @@
-package com.etherblood.luna.network.api;
+package com.etherblood.luna.network.api.game;
 
 import com.destrostudios.gametools.network.shared.modules.NetworkModule;
 import com.destrostudios.gametools.network.shared.serializers.EnumSerializer;
@@ -48,11 +48,13 @@ import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Movebox;
 import com.etherblood.luna.engine.movement.Obstaclebox;
 import com.etherblood.luna.engine.movement.Speed;
-import com.etherblood.luna.network.api.serialization.EventMessageSerializer;
-import com.etherblood.luna.network.api.serialization.GameEngineSerializer;
+import com.etherblood.luna.network.api.game.serialization.EventMessageSerializer;
+import com.etherblood.luna.network.api.game.serialization.GameEngineSerializer;
 import java.util.UUID;
 
 public abstract class GameModule extends NetworkModule {
+    public static final UUID LOBBY_GAME_ID = new UUID(0, 0);
+
     @Override
     public void initialize(Kryo kryo) {
         kryo.register(GameEngine.class, new GameEngineSerializer());
@@ -60,6 +62,8 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(GameEvent.class, new RecordSerializer<>());
         kryo.register(PlayerInput.class, new RecordSerializer<>());
         kryo.register(UUID.class, new UuidSerializer());
+        kryo.register(JoinRequest.class, new RecordSerializer<>());
+        kryo.register(StartGameRequest.class, new RecordSerializer<>());
 
         kryo.register(ActorInput.class, new RecordSerializer<>());
         kryo.register(Position.class, new RecordSerializer<>());
@@ -104,6 +108,5 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(PlayerId.class, new RecordSerializer<>());
         kryo.register(ActorName.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
-
     }
 }

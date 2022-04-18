@@ -1,4 +1,4 @@
-package com.etherblood.luna.network.api;
+package com.etherblood.luna.network.api.game;
 
 import com.etherblood.luna.engine.GameEvent;
 import java.util.Collections;

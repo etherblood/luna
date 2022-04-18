@@ -1,7 +1,7 @@
 package com.etherblood.luna.network.server;
 
 import com.etherblood.luna.engine.GameEngine;
-import com.etherblood.luna.network.api.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.PlaybackBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

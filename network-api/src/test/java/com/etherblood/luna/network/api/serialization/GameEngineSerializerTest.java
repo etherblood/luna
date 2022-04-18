@@ -9,6 +9,7 @@ import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.movement.Speed;
+import com.etherblood.luna.network.api.game.serialization.GameEngineSerializer;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package com.etherblood.luna.network.server;
 
-import com.etherblood.luna.network.api.EventMessage;
-import com.etherblood.luna.network.api.EventMessagePart;
+import com.etherblood.luna.network.api.game.EventMessage;
+import com.etherblood.luna.network.api.game.EventMessagePart;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,14 +25,13 @@ public class ServerEventMessageBuilder {
         pendingQueue.values().removeIf(x -> x <= message.ack());
     }
 
-    public synchronized void broadcast(EventMessagePart... parts) {
-        for (EventMessagePart part : parts) {
-            if (part.frame() > lockFrame) {
-                pendingQueue.putIfAbsent(part, seq);
-            } else {
-                // drop part, it is likely a late duplicate
-            }
+    public synchronized boolean broadcast(EventMessagePart part) {
+        if (part.frame() > lockFrame) {
+            pendingQueue.putIfAbsent(part, seq);
+            return true;
         }
+        // drop part, it is likely a late duplicate
+        return false;
     }
 
     public synchronized void lockFrame(long lockFrame) {
