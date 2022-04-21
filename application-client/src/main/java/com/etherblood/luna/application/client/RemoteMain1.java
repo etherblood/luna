@@ -25,6 +25,7 @@ public class RemoteMain1 {
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
             }
         };
+        app.getConfig().setEnableValidationLayer(true);
         app.start();
     }
 }
