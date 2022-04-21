@@ -80,7 +80,7 @@
         <dependency>
             <groupId>com.github.destrostudios.ice-tea-engine</groupId>
             <artifactId>ice-tea-engine-core</artifactId>
-            <version>ee121f2c6db2b1fa0712a379aecdbc60320e6c3f</version>
+            <version>22d44793272e830df3c07060f849cb208e46f42f</version>
         </dependency>
         <dependency>
             <groupId>com.etherblood.luna</groupId>
@@ -132,6 +132,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

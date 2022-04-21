@@ -27,35 +27,39 @@ public class CommandService {
         this.lobbyModule = lobbyModule;
     }
 
-    public void runCommand(String rawCommand) {
+    public String runCommand(String rawCommand) {
         if (rawCommand.isBlank()) {
-            return;
+            return null;
         }
         try {
             String[] parts = rawCommand.split(" ");
             switch (parts[0].toLowerCase(Locale.ROOT)) {
                 case "start": {
                     selectedGameId = gameModule.start(parts[1]);
-                    break;
+                    return selectedGameId.toString();
                 }
                 case "spectate": {
                     if (parts.length >= 2) {
                         selectedGameId = UUID.fromString(parts[1]);
                     }
                     gameModule.spectate(selectedGameId);
-                    break;
+                    return selectedGameId.toString();
+                }
+                case "unspectate": {
+                    gameModule.unspectate();
+                    return null;
                 }
                 case "enter": {
                     long approxServerTime = timestampModule.getApproxServerTime();
                     JwtAuthenticationUser user = jwtModule.getOwnAuthentication().user;
                     gameModule.run(approxServerTime, new GameEvent(null, new PlayerJoined(user.id, user.login, parts[1], true)));
-                    break;
+                    return null;
                 }
                 case "leave": {
                     long approxServerTime = timestampModule.getApproxServerTime();
                     JwtAuthenticationUser user = jwtModule.getOwnAuthentication().user;
                     gameModule.run(approxServerTime, new GameEvent(null, new PlayerJoined(user.id, user.login, null, false)));
-                    break;
+                    return null;
                 }
                 case "select": {
                     if (parts.length >= 2) {
@@ -63,15 +67,15 @@ public class CommandService {
                     } else {
                         selectedGameId = GameModule.LOBBY_GAME_ID;
                     }
-                    break;
+                    return selectedGameId.toString();
                 }
                 default: {
-                    System.out.println("Command not found: " + rawCommand);
+                    return "Command not found: " + rawCommand;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to handle command: " + rawCommand);
             e.printStackTrace();
+            return "Failed to handle command: " + rawCommand;
         }
     }
 }

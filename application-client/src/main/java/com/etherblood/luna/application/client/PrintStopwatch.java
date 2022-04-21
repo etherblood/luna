@@ -1,5 +1,8 @@
 package com.etherblood.luna.application.client;
 
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+
 public class PrintStopwatch implements AutoCloseable {
 
     private final String label;
@@ -12,7 +15,8 @@ public class PrintStopwatch implements AutoCloseable {
 
     @Override
     public void close() {
-        System.out.println(label + ": " + humanReadableNanos(System.nanoTime() - startNanos));
+        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out.println(label + ": " + humanReadableNanos(System.nanoTime() - startNanos));
     }
 
     public static String humanReadableNanos(long nanos) {
@@ -24,6 +28,6 @@ public class PrintStopwatch implements AutoCloseable {
         if (count == 3) {
             return nanos + "s";
         }
-        return nanos + ("num".charAt(count) + "") + "s";
+        return nanos + ("nµm".charAt(count) + "") + "s";
     }
 }

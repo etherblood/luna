@@ -87,21 +87,18 @@ public class ApplicationClient extends Application {
     @Override
     protected void init() {
         try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
-            System.out.println("init start");
             super.init();
-            System.out.println("finished super init");
 
             GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
             assetManager.addLocator(new FileLocator("./assets"));
-            System.out.println("A");
 
             DirectionalLight directionalLight = new DirectionalLight();
-            directionalLight.getAmbientColor().set(0.5f);
+            directionalLight.getAmbientColor().set(0.75f, 0.75f, 0.75f, 1);
+            directionalLight.getLightColor().set(0.75f, 0.75f, 0.75f, 1);
             directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
             directionalLight.addAffectedSpatial(sceneNode);
             directionalLight.addShadows(4096);
             setLight(directionalLight);
-            System.out.println("B");
 
             sceneCamera.setLocation(new Vector3f(0, 2, 10));
             sceneCamera.setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
@@ -114,7 +111,6 @@ public class ApplicationClient extends Application {
                     "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                     "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
             });
-            System.out.println("C");
 
             // text
             bitmapFont = assetManager.loadBitmapFont("fonts/Verdana_18.fnt");
@@ -124,7 +120,6 @@ public class ApplicationClient extends Application {
             guiNode.add(screenStatsText);
 
 
-            System.out.println("D");
             // Ground
             Quad meshGround = new Quad(10, 30);
 
@@ -141,7 +136,6 @@ public class ApplicationClient extends Application {
             geometryGround.setShadowMode(ShadowMode.RECEIVE);
             sceneNode.add(geometryGround);
 
-            System.out.println("E");
             // Inputs
             inputManager.addKeyListener(keyEvent -> {
                 if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
@@ -161,12 +155,12 @@ public class ApplicationClient extends Application {
                     }
                 }
             });
-            System.out.println("F");
             inputManager.addMouseButtonListener(mouseButtonEvent -> {
                 if (mouseButtonEvent.getAction() == GLFW.GLFW_PRESS) {
                     // placeholder
                 }
             });
+            guiNode.setRenderBucket(RenderBucketType.GUI);
         }
     }
 

@@ -81,11 +81,16 @@ public class Main {
         client.start();
         client.connect(10_000, host, NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);
 
-        toolsClient.getModule(JwtClientModule.class).login(jwt);
-        toolsClient.getModule(GameClientModule.class).spectate(GameModule.LOBBY_GAME_ID);
+        JwtClientModule jwtModule = toolsClient.getModule(JwtClientModule.class);
+        GameClientModule clientModule = toolsClient.getModule(GameClientModule.class);
+        TimestampClientModule timestampModule = toolsClient.getModule(TimestampClientModule.class);
+
+        jwtModule.login(jwt);
+        clientModule.spectate(GameModule.LOBBY_GAME_ID);
+        
         return new RemoteGameProxy(
-                toolsClient.getModule(TimestampClientModule.class),
-                toolsClient.getModule(GameClientModule.class),
+                timestampModule,
+                clientModule,
                 new NoValidateJwtService().decode(jwt).user);
     }
 

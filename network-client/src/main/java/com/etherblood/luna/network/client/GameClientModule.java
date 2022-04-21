@@ -39,9 +39,14 @@ public class GameClientModule extends GameModule {
 
     public synchronized void spectate(UUID gameId) {
         if (clientGame != null) {
-            connection.sendTCP(new UnspectateGameRequest(clientGame.getState().getId()));
+            unspectate();
         }
         connection.sendTCP(new SpectateGameRequest(gameId));
+    }
+
+    public synchronized void unspectate() {
+        connection.sendTCP(new UnspectateGameRequest(clientGame.getState().getId()));
+        clientGame = null;
     }
 
     @Override
