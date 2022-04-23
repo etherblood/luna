@@ -115,8 +115,8 @@ public class ChatSystem extends LifecycleObject {
     }
 
     @Override
-    public void update(int imageIndex, float tpf) {
-        super.update(imageIndex, tpf);
+    public void update(float tpf) {
+        super.update(tpf);
         String text = messages.stream().map(m -> m.senderName() + ": " + Stream.of(m.message().split("\n")).collect(Collectors.joining(" "))).collect(Collectors.joining("\n"));
         if (text.isBlank()) {
             text = " ";

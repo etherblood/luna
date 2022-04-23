@@ -165,8 +165,8 @@ public class ApplicationClient extends Application {
     }
 
     @Override
-    protected void update(int imageIndex, float tpf) {
-        super.update(imageIndex, tpf);
+    protected void update(float tpf) {
+        super.update(tpf);
         gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         if (snapshot == null) {
