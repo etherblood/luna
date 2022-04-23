@@ -15,7 +15,7 @@ import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.text.EditableText;
-import com.etherblood.luna.application.client.text.EditableTextWrapper;
+import com.etherblood.luna.application.client.text.EditableTextbox;
 import com.etherblood.luna.application.client.text.SelectionText;
 import com.etherblood.luna.network.api.chat.ChatMessage;
 import com.etherblood.luna.network.api.chat.ChatMessageRequest;
@@ -32,6 +32,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.VK10;
 
 public class ChatSystem extends LifecycleObject {
+    // TODO: up/down navigation
+    // TODO: text selection with double/triple click
+    // TODO: text selection with shift click
 
     private final ClientChatModule chatModule;
     private final CommandService commandService;
@@ -45,7 +48,7 @@ public class ChatSystem extends LifecycleObject {
     private BitmapText chatTextNode;
 
     private boolean chatActive = false;
-    private EditableTextWrapper wrapper;
+    private EditableTextbox textbox;
     private EditableText editText;
     private Geometry backgroundQuad;
 
@@ -87,9 +90,10 @@ public class ChatSystem extends LifecycleObject {
         material.setCullMode(VK10.VK_CULL_MODE_NONE);
         material.getParameters().setVector4f("color", new Vector4f(11 / 255f, 104 / 255f, 217 / 255f, 1));
 
-        wrapper = new EditableTextWrapper(application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt"), material);
-        editText = wrapper.getText();
-        wrapper.getNode().setLocalTranslation(new Vector3f(1, 500, 0));
+        textbox = new EditableTextbox(application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt"), material);
+        textbox.setShowSelection(true);
+        editText = textbox.getText();
+        textbox.getNode().setLocalTranslation(new Vector3f(1, 500, 0));
 
 
         Quad meshGround = new Quad(500, 500);
@@ -121,7 +125,7 @@ public class ChatSystem extends LifecycleObject {
             chatTextNode.setText(text);
         }
 
-        wrapper.update();
+        textbox.update();
     }
 
     @Override
@@ -133,7 +137,7 @@ public class ChatSystem extends LifecycleObject {
         application.getInputManager().removeMouseButtonListener(onMouseButton);
         application.getInputManager().removeMousePositionListener(onMouseMove);
         application.getGuiNode().remove(chatTextNode);
-        application.getGuiNode().remove(wrapper.getNode());
+        application.getGuiNode().remove(textbox.getNode());
         application.getGuiNode().remove(backgroundQuad);
     }
 
@@ -150,7 +154,7 @@ public class ChatSystem extends LifecycleObject {
             if (keyEvent.getKey() == chatActivationKey && keyEvent.getAction() == GLFW.GLFW_PRESS) {
                 chatActive = true;
                 application.getGuiNode().add(backgroundQuad);
-                application.getGuiNode().add(wrapper.getNode());
+                application.getGuiNode().add(textbox.getNode());
             }
             return;
         }
@@ -207,16 +211,20 @@ public class ChatSystem extends LifecycleObject {
                     break;
                 case GLFW.GLFW_KEY_ENTER:
                     if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
-                        String inputText = editText.current().text();
-                        if (inputText.startsWith("/")) {
-                            String result = commandService.runCommand(inputText.substring(1));
-                            if (result != null) {
-                                onChatMessage(new ChatMessage(0, "System", System.currentTimeMillis(), result));
+                        if (shift) {
+                            editText.push(editText.current().set("\n"));
+                        } else {
+                            String inputText = editText.current().text();
+                            if (inputText.startsWith("/")) {
+                                String result = commandService.runCommand(inputText.substring(1));
+                                if (result != null) {
+                                    onChatMessage(new ChatMessage(0, "System", System.currentTimeMillis(), result));
+                                }
+                            } else if (!inputText.isEmpty()) {
+                                chatModule.send(new ChatMessageRequest(inputText));
                             }
-                        } else if (!inputText.isEmpty()) {
-                            chatModule.send(new ChatMessageRequest(inputText));
+                            editText.push(SelectionText.empty());
                         }
-                        editText.push(SelectionText.empty());
                     }
                     break;
                 case GLFW.GLFW_KEY_LEFT:
@@ -235,7 +243,7 @@ public class ChatSystem extends LifecycleObject {
                     if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
                         chatActive = false;
                         application.getGuiNode().remove(backgroundQuad);
-                        application.getGuiNode().remove(wrapper.getNode());
+                        application.getGuiNode().remove(textbox.getNode());
                     }
                     break;
             }
@@ -266,9 +274,9 @@ public class ChatSystem extends LifecycleObject {
 
     private void updateSelection() {
         if (selectionStart != null) {
-            Vector3f offset = wrapper.getNode().getLocalTransform().getTranslation();
+            Vector3f offset = textbox.getNode().getLocalTransform().getTranslation();
             Vector2f selectionEnd = application.getInputManager().getCursorPosition();
-            wrapper.setSelection(selectionStart.sub(offset.x(), offset.y(), new Vector2f()), selectionEnd.sub(offset.x(), offset.y(), new Vector2f()));
+            textbox.setSelection(selectionStart.sub(offset.x(), offset.y(), new Vector2f()), selectionEnd.sub(offset.x(), offset.y(), new Vector2f()));
         }
     }
 }

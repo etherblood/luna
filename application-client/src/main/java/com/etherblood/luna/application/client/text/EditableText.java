@@ -4,21 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EditableText {
-    private final int historyLimit = 100;
+    private final int historyLimit;
     private final List<SelectionText> history = new ArrayList<>();
     private int current;
 
     public EditableText(SelectionText initial) {
+        this(initial, 100);
+    }
+
+    public EditableText(SelectionText initial, int historyLimit) {
         history.add(initial);
+        this.historyLimit = historyLimit;
     }
 
     public SelectionText current() {
         return history.get(current);
     }
 
-    public boolean push(SelectionText state) {
-        if (current().equals(state)) {
-            return false;
+    public void push(SelectionText state) {
+        if (current().text().equals(state.text())) {
+            history.set(current, state);
+            return;
         }
         for (int i = history.size() - 1; i > current; i--) {
             history.remove(i);
@@ -29,7 +35,6 @@ public class EditableText {
             history.remove(0);
             current--;
         }
-        return true;
     }
 
     public void undo() {
