@@ -7,6 +7,10 @@ public record SelectionText(
         int tail,
         int head
 ) {
+    public SelectionText(String text) {
+        this(text, text.length(), text.length());
+    }
+
     public SelectionText {
         Objects.requireNonNull(text);
         if (tail < 0 || text.length() < tail) {

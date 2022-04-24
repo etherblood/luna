@@ -37,7 +37,7 @@ public class EditableTextbox {
     private boolean showSelection = false;
     private Vector2f selectionStart = null;
 
-    public EditableTextbox(Consumer<String> commit, BitmapFont font, Material selectionMaterial, Clipboard clipboard) {
+    public EditableTextbox(BitmapFont font, Material selectionMaterial, Clipboard clipboard, Consumer<String> commit) {
         this.commit = commit;
         bitmapText = new BitmapText(font);
         this.clipboard = clipboard;
@@ -214,7 +214,7 @@ public class EditableTextbox {
                 }
                 String preText = line.substring(0, startX);
                 String selectedText = line.substring(startX, endX);
-                quad.setLocalTranslation(new Vector3f(font.getWidth(preText), y * font.getLineHeight(), 0.5f));
+                quad.setLocalTranslation(new Vector3f(font.getWidth(preText), y * font.getLineHeight(), 0.999f));
                 quad.setLocalScale(new Vector3f(Math.max(1, font.getWidth(selectedText)), font.getLineHeight(), 1));
             }
         }
