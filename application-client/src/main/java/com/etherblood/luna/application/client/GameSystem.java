@@ -45,7 +45,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.VK10;
 
 public class GameSystem extends LifecycleObject {
-    
+
     private final float CAMERA_DISTANCE = 10;
     private final float CAMERA_ANGLE = (float) (30 * Math.PI / 180);
 
@@ -56,9 +56,6 @@ public class GameSystem extends LifecycleObject {
     private final GameProxy gameProxy;
     private UUID loadedGame = null;
     private BitmapFont bitmapFont;
-
-    private Shader vertexShaderDefault;
-    private Shader fragShaderDefault;
 
     public GameSystem(GameProxy gameProxy) {
         this.gameProxy = gameProxy;
@@ -83,15 +80,6 @@ public class GameSystem extends LifecycleObject {
             application.getSceneCamera().setLocation(new Vector3f(0, 2, 10));
             application.getSceneCamera().setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
 
-            vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
-                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-            });
-            fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
-                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-            });
-
             // text
             bitmapFont = application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt");
 
@@ -100,8 +88,14 @@ public class GameSystem extends LifecycleObject {
             Quad meshGround = new Quad(10, 10);
 
             Material materialGround = new Material();
-            materialGround.setVertexShader(vertexShaderDefault);
-            materialGround.setFragmentShader(fragShaderDefault);
+            materialGround.setVertexShader(new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
+                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
+                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
+            }));
+            materialGround.setFragmentShader(new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
+                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
+                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
+            }));
             materialGround.getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
 
             geometryGround = new Geometry();
