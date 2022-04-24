@@ -42,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.joml.AxisAngle4f;
@@ -76,7 +77,7 @@ public class ApplicationClient extends Application {
     private Shader fragShaderDefault;
     private final Node debugNode = new Node();
 
-    private boolean loaded = false;
+    private UUID loadedGame = null;
 
     public ApplicationClient(GameProxy gameProxy) {
         config.setClearColor(new Vector4f(0.2f, 0.15f, 0.15f, 1));
@@ -172,12 +173,18 @@ public class ApplicationClient extends Application {
         if (snapshot == null) {
             return;
         }
-        preloadIfRequired(snapshot);
         EntityData data = snapshot.getData();
 
-        // TODO: cleanup spaghetti
+        preloadIfRequired(snapshot);
+        updateCamera(data);
+        updateActorHuds(data);
+        updateDebugHitboxes(data);
+        updateModels(snapshot);
 
-        // camera
+        updateStats();
+    }
+
+    private void updateCamera(EntityData data) {
         List<Integer> players = data.findByValue(new PlayerId(gameProxy.getPlayer().id));
         for (int player : players) {
             Position position = data.get(player, Position.class);
@@ -189,39 +196,44 @@ public class ApplicationClient extends Application {
                 sceneCamera.setLocation(lookFrom);
             }
         }
+    }
 
-        {
-            // status huds
-            Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
-            while (iterator.hasNext()) {
-                StatusHudWrapper wrapper = iterator.next();
-                if (!data.has(wrapper.getEntity(), ActorName.class)
-                        && !data.has(wrapper.getEntity(), MilliHealth.class)) {
-                    guiNode.remove(wrapper.getNode());
-                    iterator.remove();
-                }
-            }
-            List<Integer> entities = new ArrayList<>();
-            entities.addAll(data.list(ActorName.class));
-            entities.addAll(data.list(MilliHealth.class));
-            for (int entity : entities) {
-                if (!statusHuds.containsKey(entity)) {
-                    StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
-                    statusHuds.put(entity, wrapper);
-                    guiNode.add(wrapper.getNode());
-                }
-                Vector2 position = data.get(entity, Position.class).vector();
-                ActorName actorName = data.get(entity, ActorName.class);
-                String name = actorName == null ? null : actorName.name();
-                MilliHealth health = data.get(entity, MilliHealth.class);
-                StatusHudWrapper wrapper = statusHuds.get(entity);
-                wrapper.setName(name);
-                wrapper.setHealth(health == null ? null : health.value());
-                Vector3f screenCoordinates = getScreenCoordinates(convert(position));
-                wrapper.getNode().setLocalTranslation(screenCoordinates);
+    private void updateActorHuds(EntityData data) {
+        Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
+        while (iterator.hasNext()) {
+            StatusHudWrapper wrapper = iterator.next();
+            if (!data.has(wrapper.getEntity(), ActorName.class)
+                    && !data.has(wrapper.getEntity(), MilliHealth.class)) {
+                guiNode.remove(wrapper.getNode());
+                iterator.remove();
             }
         }
+        List<Integer> entities = new ArrayList<>();
+        entities.addAll(data.list(ActorName.class));
+        entities.addAll(data.list(MilliHealth.class));
+        for (int entity : entities) {
+            if (!statusHuds.containsKey(entity)) {
+                StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
+                statusHuds.put(entity, wrapper);
+                guiNode.add(wrapper.getNode());
+            }
+            Vector2 position = data.get(entity, Position.class).vector();
+            ActorName actorName = data.get(entity, ActorName.class);
+            String name = actorName == null ? null : actorName.name();
+            MilliHealth health = data.get(entity, MilliHealth.class);
+            StatusHudWrapper wrapper = statusHuds.get(entity);
+            wrapper.setName(name);
+            wrapper.setHealth(health == null ? null : health.value());
+            Vector3f screenCoordinates = getScreenCoordinates(convert(position));
+            wrapper.getNode().setLocalTranslation(screenCoordinates);
+        }
+    }
 
+    private void updateDebugHitboxes(EntityData data) {
+        if (!debugNode.hasParent(getRootNode())) {
+            // skip update when debug is disabled
+            return;
+        }
         {
             // obstacleboxes
             Iterator<HitboxWrapper> iterator = obstacleboxes.values().iterator();
@@ -327,78 +339,69 @@ public class ApplicationClient extends Application {
                 damageboxes.get(entity).getNode().setLocalTranslation(convert(position));
             }
         }
+    }
 
-        {
-            // models
-            Iterator<ModelWrapper> iterator = models.values().iterator();
-            while (iterator.hasNext()) {
-                ModelWrapper wrapper = iterator.next();
-                if (!data.has(wrapper.getEntity(), ModelKey.class)) {
-                    if (wrapper.getNode().hasParent(sceneNode)) {
-                        sceneNode.remove(wrapper.getNode());
-                    }
-                    iterator.remove();
+    private void updateModels(GameEngine snapshot) {
+        EntityData data = snapshot.getData();
+        Iterator<ModelWrapper> iterator = models.values().iterator();
+        while (iterator.hasNext()) {
+            ModelWrapper wrapper = iterator.next();
+            if (!data.has(wrapper.getEntity(), ModelKey.class)) {
+                if (wrapper.getNode().hasParent(sceneNode)) {
+                    sceneNode.remove(wrapper.getNode());
+                }
+                iterator.remove();
+            }
+        }
+
+        for (int entity : data.list(ModelKey.class)) {
+            String name = data.get(entity, ModelKey.class).name();
+            if (!models.containsKey(entity)) {
+                Geometry model = loadModel(name);
+                models.put(entity, new ModelWrapper(entity, model));
+            }
+            ModelWrapper wrapper = models.get(entity);
+            Position position = data.get(entity, Position.class);
+            if (position != null) {
+                if (!wrapper.getNode().hasParent(sceneNode)) {
+                    sceneNode.add(wrapper.getNode());
+                }
+                Vector2 vector = position.vector();
+                wrapper.getNode().setLocalTranslation(convert(vector));
+            } else {
+                if (wrapper.getNode().hasParent(sceneNode)) {
+                    sceneNode.remove(wrapper.getNode());
                 }
             }
 
-            for (int entity : data.list(ModelKey.class)) {
-                String name = data.get(entity, ModelKey.class).name();
-                if (!models.containsKey(entity)) {
-                    Geometry model = loadModel(name);
-                    models.put(entity, new ModelWrapper(entity, model));
-                }
-                ModelWrapper wrapper = models.get(entity);
-                Position position = data.get(entity, Position.class);
-                if (position != null) {
-                    if (!wrapper.getNode().hasParent(sceneNode)) {
-                        sceneNode.add(wrapper.getNode());
-                    }
-                    Vector2 vector = position.vector();
-                    wrapper.getNode().setLocalTranslation(convert(vector));
+            Direction direction = data.get(entity, Direction.class);
+            if (direction != null) {
+                float angle = directionToAngle(direction);
+                AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
+                wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
+            }
+
+            ActiveAction activeAction = data.get(entity, ActiveAction.class);
+            if (activeAction != null) {
+                String animation = data.get(activeAction.action(), ActionAnimation.class).animationName();
+                float fps = snapshot.getRules().getFramesPerSecond();
+                // - 1 because tick count increases after game update & before render
+                long animationFrames = snapshot.getFrame() - activeAction.startFrame() - 1;
+
+                ActionDuration duration = data.get(activeAction.action(), ActionDuration.class);
+                if (duration != null) {
+                    long targetFrames = duration.frames();
+                    float progress = (float) animationFrames / targetFrames;
+                    wrapper.setAnimationProgress(animation, progress);
                 } else {
-                    if (wrapper.getNode().hasParent(sceneNode)) {
-                        sceneNode.remove(wrapper.getNode());
-                    }
-                }
-
-                Direction direction = data.get(entity, Direction.class);
-                if (direction != null) {
-                    float angle = directionToAngle(direction);
-                    AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
-                    wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
-                }
-
-                ActiveAction activeAction = data.get(entity, ActiveAction.class);
-                if (activeAction != null) {
-                    String animation = data.get(activeAction.action(), ActionAnimation.class).animationName();
-                    float fps = snapshot.getRules().getFramesPerSecond();
-                    // - 1 because tick count increases after game update & before render
-                    long animationFrames = snapshot.getFrame() - activeAction.startFrame() - 1;
-
-                    ActionDuration duration = data.get(activeAction.action(), ActionDuration.class);
-                    if (duration != null) {
-                        long targetFrames = duration.frames();
-                        float progress = (float) animationFrames / targetFrames;
-                        wrapper.setAnimationProgress(animation, progress);
-                    } else {
-                        wrapper.setAnimationTime(animation, animationFrames / fps);
-                    }
+                    wrapper.setAnimationTime(animation, animationFrames / fps);
                 }
             }
         }
-
-        long frameSecond = Math.floorDiv(System.nanoTime(), 1_000_000_000L);
-        if (runningFrameSecond != frameSecond) {
-            frameCount = runningFrameCount;
-            runningFrameCount = 0;
-            runningFrameSecond = frameSecond;
-        }
-        runningFrameCount++;
-        screenStatsText.setText("fps: " + frameCount + "\nping: " + gameProxy.getLatency() + "ms");
     }
 
     private void preloadIfRequired(GameEngine snapshot) {
-        if (!loaded) {
+        if (!snapshot.getId().equals(loadedGame)) {
             try (PrintStopwatch stopwatch = new PrintStopwatch("preload total")) {
                 // very hacky...
                 GameEngine preloadGame = snapshot.getRules().createGame();
@@ -420,9 +423,20 @@ public class ApplicationClient extends Application {
                     preloadRenderDependencies();
                     sceneNode.remove(preloadNode);
                 }
-                loaded = true;
+                loadedGame = snapshot.getId();
             }
         }
+    }
+
+    private void updateStats() {
+        long frameSecond = Math.floorDiv(System.nanoTime(), 1_000_000_000L);
+        if (runningFrameSecond != frameSecond) {
+            frameCount = runningFrameCount;
+            runningFrameCount = 0;
+            runningFrameSecond = frameSecond;
+        }
+        runningFrameCount++;
+        screenStatsText.setText("fps: " + frameCount + "\nping: " + gameProxy.getLatency() + "ms");
     }
 
     private Geometry loadModel(String name) {
