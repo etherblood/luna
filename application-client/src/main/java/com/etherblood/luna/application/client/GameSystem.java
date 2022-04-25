@@ -3,6 +3,7 @@ package com.etherblood.luna.application.client;
 import com.destrostudios.icetea.core.asset.loader.GltfLoaderSettings;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.font.BitmapFont;
+import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.destrostudios.icetea.core.light.DirectionalLight;
 import com.destrostudios.icetea.core.material.Material;
@@ -44,7 +45,7 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.VK10;
 
-public class GameSystem extends LifecycleObject {
+public class GameSystem extends LifecycleObject implements InputLayer {
 
     private final float CAMERA_DISTANCE = 10;
     private final float CAMERA_ANGLE = (float) (30 * Math.PI / 180);
@@ -59,6 +60,11 @@ public class GameSystem extends LifecycleObject {
 
     public GameSystem(GameProxy gameProxy) {
         this.gameProxy = gameProxy;
+    }
+
+    @Override
+    public int orderNumber() {
+        return LayerOrder.GAME;
     }
 
     @Override
@@ -105,16 +111,17 @@ public class GameSystem extends LifecycleObject {
             geometryGround.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / -2), 1, 0, 0)));
             geometryGround.setShadowMode(ShadowMode.RECEIVE);
             application.getSceneNode().add(geometryGround);
-
-            // Inputs
-            application.getInputManager().addKeyListener(keyEvent -> {
-                if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
-                    pressedKeys.remove(keyEvent.getKey());
-                } else {
-                    pressedKeys.add(keyEvent.getKey());
-                }
-            });
         }
+    }
+
+    @Override
+    public boolean consumeKey(KeyEvent keyEvent) {
+        if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
+            pressedKeys.remove(keyEvent.getKey());
+        } else {
+            pressedKeys.add(keyEvent.getKey());
+        }
+        return true;
     }
 
     @Override

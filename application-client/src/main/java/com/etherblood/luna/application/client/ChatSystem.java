@@ -2,13 +2,9 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.input.CharacterEvent;
-import com.destrostudios.icetea.core.input.CharacterListener;
 import com.destrostudios.icetea.core.input.KeyEvent;
-import com.destrostudios.icetea.core.input.KeyListener;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
-import com.destrostudios.icetea.core.input.MouseButtonListener;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
-import com.destrostudios.icetea.core.input.MousePositionListener;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Quad;
@@ -31,25 +27,19 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.VK10;
 
-public class ChatSystem extends LifecycleObject {
+public class ChatSystem extends LifecycleObject implements InputLayer {
 
     public static final int CHAT_LINES = 20;
     private final ClientChatModule chatModule;
     private final CommandService commandService;
     private final Consumer<ChatMessage> onMessage = this::onChatMessage;
-    private final KeyListener onKey = this::onKey;
-    private final CharacterListener onCharacter = this::onCharacter;
-    private final MouseButtonListener onMouseButton = this::onMouseButton;
-    private final MousePositionListener onMouseMove = this::onMouseMove;
 
     private final List<ChatMessage> messages = new CopyOnWriteArrayList<>();
 
-    private boolean chatActive = false;
     private EditableTextbox chatInput;
     private EditableTextbox chatDisplay;
     private Geometry backgroundQuad;
-
-    private EditableTextbox focusedElement;
+    private EditableTextbox focusedElement = null;
 
     public ChatSystem(ClientChatModule chatModule, CommandService commandService) {
         this.chatModule = chatModule;
@@ -57,14 +47,15 @@ public class ChatSystem extends LifecycleObject {
     }
 
     @Override
+    public int orderNumber() {
+        return LayerOrder.CHAT;
+    }
+
+    @Override
     public void init() {
         super.init();
 
         chatModule.subscribe(onMessage);
-        application.getInputManager().addKeyListener(onKey);
-        application.getInputManager().addCharacterListener(onCharacter);
-        application.getInputManager().addMouseButtonListener(onMouseButton);
-        application.getInputManager().addMousePositionListener(onMouseMove);
 
         // Ground
         Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
@@ -118,9 +109,6 @@ public class ChatSystem extends LifecycleObject {
         backgroundQuad.setMesh(meshGround);
         backgroundQuad.setMaterial(materialQuad);
         backgroundQuad.setLocalTranslation(new Vector3f(0, topMargin, 0.1f));
-        chatActive = false;
-
-        focusedElement = chatInput;
     }
 
     @Override
@@ -135,8 +123,8 @@ public class ChatSystem extends LifecycleObject {
             chatDisplay.getText().push(new SelectionText(text));
         }
 
-        chatDisplay.setShowSelection(chatDisplay == focusedElement);
-        chatInput.setShowSelection(chatInput == focusedElement);
+        chatDisplay.setFocus(chatDisplay == focusedElement);
+        chatInput.setFocus(chatInput == focusedElement);
 
         chatInput.update();
         chatDisplay.update();
@@ -146,10 +134,6 @@ public class ChatSystem extends LifecycleObject {
     public void cleanupInternal() {
         super.cleanupInternal();
         chatModule.unsubscribe(onMessage);
-        application.getInputManager().removeKeyListener(onKey);
-        application.getInputManager().removeCharacterListener(onCharacter);
-        application.getInputManager().removeMouseButtonListener(onMouseButton);
-        application.getInputManager().removeMousePositionListener(onMouseMove);
         application.getGuiNode().remove(chatDisplay.getNode());
         application.getGuiNode().remove(chatInput.getNode());
         application.getGuiNode().remove(backgroundQuad);
@@ -162,24 +146,26 @@ public class ChatSystem extends LifecycleObject {
         messages.add(message);
     }
 
-    private void onKey(KeyEvent keyEvent) {
+    @Override
+    public boolean consumeKey(KeyEvent keyEvent) {
         final int chatActivationKey = GLFW.GLFW_KEY_ESCAPE;
-        if (!chatActive) {
+        if (focusedElement == null) {
             if (keyEvent.getKey() == chatActivationKey && keyEvent.getAction() == GLFW.GLFW_PRESS) {
-                chatActive = true;
                 application.getGuiNode().add(backgroundQuad);
                 application.getGuiNode().add(chatInput.getNode());
+                focusedElement = chatInput;
+                return true;
             }
-            return;
+            return false;
         }
 
         if (keyEvent.getAction() == GLFW.GLFW_PRESS || keyEvent.getAction() == GLFW.GLFW_REPEAT) {
             switch (keyEvent.getKey()) {
                 case chatActivationKey:
                     if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
-                        chatActive = false;
                         application.getGuiNode().remove(backgroundQuad);
                         application.getGuiNode().remove(chatInput.getNode());
+                        focusedElement = null;
                     }
                     break;
                 default:
@@ -187,17 +173,21 @@ public class ChatSystem extends LifecycleObject {
                     break;
             }
         }
+        return true;
     }
 
-    private void onCharacter(CharacterEvent event) {
-        if (chatActive) {
+    @Override
+    public boolean consumeCharacter(CharacterEvent event) {
+        if (focusedElement != null) {
             focusedElement.onCharacter(event);
+            return true;
         }
+        return false;
     }
 
-    private void onMouseButton(MouseButtonEvent event) {
-        if (chatActive) {
-            Vector2f cursorPosition = new Vector2f(application.getInputManager().getCursorPosition());
+    @Override
+    public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
+        if (focusedElement != null) {
             if (event.getAction() == GLFW.GLFW_PRESS) {
                 if (cursorPosition.y < chatInput.getNode().getLocalTransform().getTranslation().y) {
                     focusedElement = chatDisplay;
@@ -206,12 +196,17 @@ public class ChatSystem extends LifecycleObject {
                 }
             }
             focusedElement.onMouseButton(event, cursorPosition);
+            return true;
         }
+        return false;
     }
 
-    private void onMouseMove(MousePositionEvent event) {
-        if (chatActive) {
+    @Override
+    public boolean consumeMouseMove(MousePositionEvent event) {
+        if (focusedElement != null) {
             focusedElement.onMouseMove(event);
+            return true;
         }
+        return false;
     }
 }

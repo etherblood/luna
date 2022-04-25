@@ -43,6 +43,7 @@ public class ApplicationClient extends Application {
             guiNode.setRenderBucket(RenderBucketType.GUI);
 
             addSystem(new GameSystem(gameProxy));
+            addSystem(new InputLayersSystem());
         }
     }
 

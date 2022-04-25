@@ -34,7 +34,7 @@ public class EditableTextbox {
     private final Clipboard clipboard;
     private final Supplier<Geometry> quadSupply;
     private final List<Geometry> selectionQuads = new ArrayList<>();
-    private boolean showSelection = false;
+    private boolean focused = false;
     private Vector2f selectionStart = null;
 
     public EditableTextbox(BitmapFont font, Material selectionMaterial, Clipboard clipboard, Consumer<String> commit) {
@@ -162,13 +162,14 @@ public class EditableTextbox {
 
     public void update() {
         SelectionText current = text.current();
-        String nextText = current.text();
-        if (nextText.isBlank()) { // workaround for empty buffer crash
-            nextText = " ";
+        String displayText = current.text();
+        if (displayText.isBlank()) { // workaround for empty buffer crash
+            displayText = " ";
         }
-        bitmapText.setText(nextText);
+        bitmapText.setText(displayText);
 
-        if (showSelection) {
+        if (focused) {
+            // only update selection when it is visible
             BitmapFont font = bitmapText.getFont();
             int min = Math.min(current.tail(), current.head());
             int max = Math.max(current.tail(), current.head());
@@ -218,8 +219,8 @@ public class EditableTextbox {
                 quad.setLocalScale(new Vector3f(Math.max(1, font.getWidth(selectedText)), font.getLineHeight(), 1));
             }
         }
-        if (showSelection != quadNode.hasParent(node)) {
-            if (showSelection) {
+        if (focused != quadNode.hasParent(node)) {
+            if (focused) {
                 node.add(quadNode);
             } else {
                 node.remove(quadNode);
@@ -268,7 +269,7 @@ public class EditableTextbox {
         return i;
     }
 
-    public void setShowSelection(boolean showSelection) {
-        this.showSelection = showSelection;
+    public void setFocus(boolean focused) {
+        this.focused = focused;
     }
 }
