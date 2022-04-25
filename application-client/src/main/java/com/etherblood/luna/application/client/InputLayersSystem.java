@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -96,21 +97,26 @@ public class InputLayersSystem extends LifecycleObject {
     }
 
     private List<InputLayer> layers(Collection<InputLayer> forcedFocus) {
-        if (forcedFocus.isEmpty()) {
-            layers((InputLayer) null);
+        List<InputLayer> layers = layers(x -> forcedFocus.contains(x));
+        if (layers.isEmpty()) {
+            layers = layers(x -> true);
         }
-        return forcedFocus.stream()
-                .sorted(Comparator.comparingInt(InputLayer::orderNumber))
-                .toList();
+        return layers;
     }
 
     private List<InputLayer> layers(InputLayer forcedFocus) {
-        if (forcedFocus != null) {
-            return List.of(forcedFocus);
+        List<InputLayer> layers = layers(x -> x == forcedFocus);
+        if (layers.isEmpty()) {
+            layers = layers(x -> true);
         }
+        return layers;
+    }
+
+    private List<InputLayer> layers(Predicate<InputLayer> predicate) {
         return application.getSystems().stream()
                 .filter(InputLayer.class::isInstance)
                 .map(InputLayer.class::cast)
+                .filter(predicate)
                 .sorted(Comparator.comparingInt(InputLayer::orderNumber))
                 .toList();
     }
