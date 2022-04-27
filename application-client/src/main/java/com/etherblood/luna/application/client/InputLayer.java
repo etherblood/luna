@@ -12,7 +12,7 @@ public interface InputLayer {
         return 0;
     }
 
-    default boolean consumeKey(KeyEvent keyEvent) {
+    default boolean consumeKey(KeyEvent event) {
         return false;
     }
 

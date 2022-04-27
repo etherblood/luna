@@ -10,9 +10,9 @@ import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.shader.Shader;
-import com.etherblood.luna.application.client.text.EditableTextbox;
-import com.etherblood.luna.application.client.text.SelectionText;
-import com.etherblood.luna.application.client.text.WindowClipboard;
+import com.etherblood.luna.application.client.textbox.EditableTextbox;
+import com.etherblood.luna.application.client.textbox.SelectionText;
+import com.etherblood.luna.application.client.textbox.WindowClipboard;
 import com.etherblood.luna.network.api.chat.ChatMessage;
 import com.etherblood.luna.network.api.chat.ChatMessageRequest;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
@@ -56,8 +56,7 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
         super.init();
 
         chatModule.subscribe(onMessage);
-
-        // Ground
+        
         Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
                 "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                 "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
@@ -79,6 +78,7 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
         BitmapFont font = application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt");
         chatDisplay = new EditableTextbox(font, material, clipboard, x -> {
         });
+        chatDisplay.getText().setFreezeText(true);
         int topMargin = 100;
         chatDisplay.getNode().setLocalTranslation(new Vector3f(1, topMargin, 0));
         application.getGuiNode().add(chatDisplay.getNode());
@@ -147,10 +147,10 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    public boolean consumeKey(KeyEvent keyEvent) {
+    public boolean consumeKey(KeyEvent event) {
         final int chatActivationKey = GLFW.GLFW_KEY_ESCAPE;
         if (focusedElement == null) {
-            if (keyEvent.getKey() == chatActivationKey && keyEvent.getAction() == GLFW.GLFW_PRESS) {
+            if (event.getKey() == chatActivationKey && event.getAction() == GLFW.GLFW_PRESS) {
                 application.getGuiNode().add(backgroundQuad);
                 application.getGuiNode().add(chatInput.getNode());
                 focusedElement = chatInput;
@@ -159,17 +159,17 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
             return false;
         }
 
-        if (keyEvent.getAction() == GLFW.GLFW_PRESS || keyEvent.getAction() == GLFW.GLFW_REPEAT) {
-            switch (keyEvent.getKey()) {
+        if (event.getAction() == GLFW.GLFW_PRESS || event.getAction() == GLFW.GLFW_REPEAT) {
+            switch (event.getKey()) {
                 case chatActivationKey:
-                    if (keyEvent.getAction() == GLFW.GLFW_PRESS) {
+                    if (event.getAction() == GLFW.GLFW_PRESS) {
                         application.getGuiNode().remove(backgroundQuad);
                         application.getGuiNode().remove(chatInput.getNode());
                         focusedElement = null;
                     }
                     break;
                 default:
-                    focusedElement.onKey(keyEvent);
+                    focusedElement.onKey(event);
                     break;
             }
         }

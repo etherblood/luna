@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client.text;
+package com.etherblood.luna.application.client.textbox;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -75,7 +75,7 @@ class SelectionTextTest {
     }
 
     static List<Arguments> left() {
-        String text = "This is7, 15A 871 senTence.";// alphanumeric indices: 0-3 5-7 10-12 14-16 17-24
+        String text = "This is7, 15A 871 senTence.";// alphanumeric indices: 0-3 5-8 10-13 14-17 18-26
         return List.of(
                 Arguments.of(new SelectionText(text, 1, 2), false, false, new SelectionText(text, 1, 1)),
                 Arguments.of(new SelectionText(text, 3, 1), false, false, new SelectionText(text, 1, 1)),
@@ -92,6 +92,7 @@ class SelectionTextTest {
                 Arguments.of(new SelectionText(text, 1, 1), false, true, new SelectionText(text, 0, 0)),
                 Arguments.of(new SelectionText(text, 5, 5), false, true, new SelectionText(text, 0, 0)),
                 Arguments.of(new SelectionText(text, 0, 0), false, true, new SelectionText(text, 0, 0)),
+//                Arguments.of(new SelectionText(text, 24, 24), false, true, new SelectionText(text, 21, 21)),// some do, others don't
 
                 Arguments.of(new SelectionText(text, 1, 8), true, true, new SelectionText(text, 1, 5)),
                 Arguments.of(new SelectionText(text, 3, 1), true, true, new SelectionText(text, 3, 0)),

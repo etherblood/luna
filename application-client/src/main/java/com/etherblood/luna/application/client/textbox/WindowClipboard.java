@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client.text;
+package com.etherblood.luna.application.client.textbox;
 
 import org.lwjgl.glfw.GLFW;
 

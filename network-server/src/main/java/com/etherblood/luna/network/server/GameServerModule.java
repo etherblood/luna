@@ -17,6 +17,7 @@ import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
 import com.etherblood.luna.network.api.game.messages.StartGameRequest;
 import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
+import com.etherblood.luna.network.server.lobby.LunaLobbyServerModule;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,14 +33,17 @@ public class GameServerModule extends GameModule {
     private final Object lock = new Object();// TODO: use striped lock instead to lock gameIds
     private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
     private final JwtServerModule jwtModule;
+    private final LunaLobbyServerModule lobbyModule;
 
     private final Map<UUID, ServerGame> games = new ConcurrentHashMap<>();
 
-    public GameServerModule(JwtServerModule jwtModule) {
+    public GameServerModule(JwtServerModule jwtModule, LunaLobbyServerModule lobbyModule) {
         this.jwtModule = jwtModule;
+        this.lobbyModule = lobbyModule;
         GameEngine lobbyGame = new GameEngine(GameModule.LOBBY_GAME_ID, GameRules.getDefault(), System.currentTimeMillis(), 0);
         lobbyGame.applyTemplate(lobbyGame.getData().createEntity(), "lobby_room");
         games.put(GameModule.LOBBY_GAME_ID, new ServerGame(lobbyGame));
+        lobbyModule.listGame(lobbyGame, "lobby_room");
     }
 
     @Override
@@ -107,6 +111,7 @@ public class GameServerModule extends GameModule {
                 GameRules rules = GameRules.get(request.gameRules());
                 GameEngine game = new GameEngine(request.gameId(), rules, System.currentTimeMillis(), new EntityDataImpl(rules.getComponentTypes()), 0);
                 game.applyTemplate(game.getData().createEntity(), request.gameTemplate());
+                lobbyModule.listGame(game, request.gameTemplate());
                 if (games.putIfAbsent(request.gameId(), new ServerGame(game)) == null) {
                     System.out.println("Started " + request.gameTemplate() + " " + request.gameId());
                 }
@@ -137,6 +142,8 @@ public class GameServerModule extends GameModule {
                         builder.lockFrame(buffer.getLockedFrame());
                         connection.sendUDP(builder.build());
                     }
+
+                    lobbyModule.update(state);
                 }
             }
         }

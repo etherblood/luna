@@ -6,14 +6,13 @@ import com.destrostudios.authtoken.NoValidateJwtService;
 import com.destrostudios.gametools.network.client.ToolsClient;
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
 import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
-import com.destrostudios.gametools.network.shared.serializers.RecordSerializer;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.minlog.Log;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.api.game.GameModule;
-import com.etherblood.luna.network.api.lobby.LobbyInfo;
 import com.etherblood.luna.network.client.GameClientModule;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
+import com.etherblood.luna.network.client.lobby.LunaLobbyClientModule;
 import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,7 +25,10 @@ public class Main {
 
     public static void main(String... args) throws IOException {
         try {
-            startApp(args);
+            if (args.length == 0) {
+                throw new IllegalArgumentException("First argument must be a jwt.");
+            }
+            startApp("destrostudios.com", args[0], false);
         } catch (Throwable t) {
             showErrorDialog(t);
             throw t;
@@ -40,13 +42,10 @@ public class Main {
         JOptionPane.showMessageDialog(null, sw.toString(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    private static void startApp(String[] args) throws IOException {
+    public static void startApp(String host, String jwt, boolean debug) throws IOException {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
-        if (args.length == 0) {
-            throw new IllegalArgumentException("First argument must be a jwt.");
-        }
         ToolsClient toolsClient = createToolsClient();
-        ApplicationClient app = new ApplicationClient(Main.remoteProxy(toolsClient, "destrostudios.com", args[0])) {
+        ApplicationClient app = new ApplicationClient(Main.remoteProxy(toolsClient, host, jwt)) {
             @Override
             protected void init() {
                 super.init();
@@ -56,19 +55,19 @@ public class Main {
                         toolsClient.getModule(GameClientModule.class),
                         toolsClient.getModule(LobbyClientModule.class));
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
+                addSystem(new LobbySystem(toolsClient.getModule(LobbyClientModule.class), toolsClient.getModule(TimestampClientModule.class)));
             }
         };
+        app.getConfig().setEnableValidationLayer(debug);
         app.start();
     }
 
     static ToolsClient createToolsClient() {
-        Client client = new Client(10_000, 10_000);
+        Client client = new Client(1_000_000, 1_000_000);
         JwtClientModule jwtModule = new JwtClientModule(client);
         TimestampClientModule timestampModule = new TimestampClientModule(client, 40, 250);
+        LunaLobbyClientModule lobbyModule = new LunaLobbyClientModule(client);
         GameClientModule gameModule = new GameClientModule(client);
-        LobbyClientModule<Object> lobbyModule = new LobbyClientModule<>(kryo -> {
-            kryo.register(LobbyInfo.class, new RecordSerializer<>());
-        }, client);
         ClientChatModule chatModule = new ClientChatModule(client);
         return new ToolsClient(client, jwtModule, timestampModule, gameModule, lobbyModule, chatModule);
     }
@@ -87,7 +86,7 @@ public class Main {
 
         jwtModule.login(jwt);
         clientModule.spectate(GameModule.LOBBY_GAME_ID);
-        
+
         return new RemoteGameProxy(
                 timestampModule,
                 clientModule,

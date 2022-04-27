@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client.text;
+package com.etherblood.luna.application.client.textbox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ public class EditableText {
     private final int historyLimit;
     private final List<SelectionText> history = new ArrayList<>();
     private int current;
+    private boolean freezeText = false;
 
     public EditableText(SelectionText initial) {
         this(initial, 100);
@@ -26,6 +27,9 @@ public class EditableText {
             history.set(current, state);
             return;
         }
+        if (freezeText) {
+            return;
+        }
         for (int i = history.size() - 1; i > current; i--) {
             history.remove(i);
         }
@@ -38,10 +42,24 @@ public class EditableText {
     }
 
     public void undo() {
+        if (freezeText) {
+            return;
+        }
         current = Math.max(0, current - 1);
     }
 
     public void redo() {
+        if (freezeText) {
+            return;
+        }
         current = Math.min(history.size() - 1, current + 1);
+    }
+
+    public boolean isFreezeText() {
+        return freezeText;
+    }
+
+    public void setFreezeText(boolean freezeText) {
+        this.freezeText = freezeText;
     }
 }

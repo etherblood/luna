@@ -115,11 +115,11 @@ public class GameSystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    public boolean consumeKey(KeyEvent keyEvent) {
-        if (keyEvent.getAction() == GLFW.GLFW_RELEASE) {
-            pressedKeys.remove(keyEvent.getKey());
+    public boolean consumeKey(KeyEvent event) {
+        if (event.getAction() == GLFW.GLFW_RELEASE) {
+            pressedKeys.remove(event.getKey());
         } else {
-            pressedKeys.add(keyEvent.getKey());
+            pressedKeys.add(event.getKey());
         }
         return true;
     }
