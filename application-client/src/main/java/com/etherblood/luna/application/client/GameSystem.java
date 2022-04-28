@@ -267,7 +267,7 @@ public class GameSystem extends LifecycleObject implements InputLayer {
                 try (PrintStopwatch sub = new PrintStopwatch("preload render dependencies")) {
                     Node sceneNode = application.getSceneNode();
                     sceneNode.add(preloadNode);
-                    application.preloadRenderDependencies();
+                    application.updateRenderDependencies();
                     sceneNode.remove(preloadNode);
                 }
                 loadedGame = snapshot.getId();
