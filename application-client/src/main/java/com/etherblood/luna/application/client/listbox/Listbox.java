@@ -8,6 +8,7 @@ import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,19 +88,17 @@ public class Listbox<T> {
     }
 
     public void onKey(KeyEvent event) {
-        if (selected != null && event.getAction() == GLFW.GLFW_PRESS) {
+        if (event.getAction() == GLFW.GLFW_PRESS) {
             switch (event.getKey()) {
                 case GLFW.GLFW_KEY_UP:
                     if (selected == null) {
-                        if (!keyToBitmapText.isEmpty()) {
-                            for (T key : keyToBitmapText.keySet()) {
-                                selected = key;
-                            }
+                        for (T key : keyToBitmapText.keySet()) {
+                            selected = key;
                         }
                     } else {
                         List<T> keys = new ArrayList<>(keyToBitmapText.keySet());
                         for (int i = 1; i < keys.size(); i++) {
-                            if (keys.get(i) == selected) {
+                            if (keys.get(i).equals(selected)) {
                                 selected = keys.get(i - 1);
                                 break;
                             }
@@ -108,13 +107,14 @@ public class Listbox<T> {
                     break;
                 case GLFW.GLFW_KEY_DOWN:
                     if (selected == null) {
-                        if (!keyToBitmapText.isEmpty()) {
-                            selected = keyToBitmapText.keySet().iterator().next();
+                        Iterator<T> iterator = keyToBitmapText.keySet().iterator();
+                        if (iterator.hasNext()) {
+                            selected = iterator.next();
                         }
                     } else {
                         List<T> keys = new ArrayList<>(keyToBitmapText.keySet());
                         for (int i = 0; i < keys.size() - 1; i++) {
-                            if (keys.get(i) == selected) {
+                            if (keys.get(i).equals(selected)) {
                                 selected = keys.get(i + 1);
                                 break;
                             }

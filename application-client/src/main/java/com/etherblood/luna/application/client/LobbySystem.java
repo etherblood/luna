@@ -14,6 +14,7 @@ import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.listbox.Listbox;
 import com.etherblood.luna.network.api.lobby.LobbyInfo;
 import com.etherblood.luna.network.api.lobby.Player;
+import com.etherblood.luna.network.client.GameClientModule;
 import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -31,14 +32,17 @@ import org.lwjgl.vulkan.VK10;
 public class LobbySystem extends LifecycleObject implements InputLayer {
 
     private static final UUID START_GAME_ID = UUID.randomUUID();
-    private final LobbyClientModule<LobbyInfo> lobby;
+    public static final String LOBBY_TEMPLATE = "lobby_room";
+    private final LobbyClientModule<LobbyInfo> lobbyModule;
+    private final GameClientModule gameModule;
     private final TimestampClientModule timestamps;
     private Listbox<String> templates;
     private Listbox<UUID> games;
     private Listbox<?> focused;
 
-    public LobbySystem(LobbyClientModule<LobbyInfo> lobby, TimestampClientModule timestamps) {
-        this.lobby = lobby;
+    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps) {
+        this.lobbyModule = lobbyModule;
+        this.gameModule = gameModule;
         this.timestamps = timestamps;
     }
 
@@ -80,14 +84,14 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         g2.setMaterial(material);
         g2.setShadowMode(ShadowMode.OFF);
 
-        lobby.subscribeToGamesList();
+        lobbyModule.subscribeToGamesList();
         templates = new Listbox<>(font, x -> x, g);
-        templates.setList(List.of("lobby_room", "test_room", "challenge_room"));
+        templates.setList(List.of(LOBBY_TEMPLATE, "test_room", "challenge_room"));
         games = new Listbox<>(font, id -> {
             if (id.equals(START_GAME_ID)) {
                 return "new game";
             }
-            LobbyInfo info = lobby.getListedGames().get(id);
+            LobbyInfo info = lobbyModule.getListedGames().get(id);
             return durationToString(Duration.ofMillis(timestamps.getApproxServerTime() - info.startEpochMillis()))
                     + ": "
                     + info.players().stream().map(Player::name).collect(Collectors.joining(", "));
@@ -105,20 +109,20 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     @Override
     protected void cleanupInternal() {
         super.cleanupInternal();
-        lobby.unsubscribeFromGamesList();
+        lobbyModule.unsubscribeFromGamesList();
     }
 
     @Override
     protected void update(float tpf) {
         super.update(tpf);
         String selectedTemplate = templates.getSelected();
-        Map<UUID, LobbyInfo> listedGames = lobby.getListedGames();
+        Map<UUID, LobbyInfo> listedGames = lobbyModule.getListedGames();
         List<UUID> list = listedGames.values().stream()
                 .filter(x -> x.gameTemplate().equals(selectedTemplate))
                 .sorted(Comparator.comparingLong(LobbyInfo::startEpochMillis).thenComparing(x -> x.gameId()))
                 .map(LobbyInfo::gameId)
                 .collect(Collectors.toCollection(ArrayList::new));
-        if (templates.getSelected() != null) {
+        if (templates.getSelected() != null && !templates.getSelected().equals(LOBBY_TEMPLATE)) {
             list.add(START_GAME_ID);
         }
         games.setList(list);
@@ -132,7 +136,11 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         if (focused != null) {
             if (event.getAction() == GLFW.GLFW_PRESS) {
                 switch (event.getKey()) {
-                    case GLFW.GLFW_KEY_LEFT -> focused = templates;
+                    case GLFW.GLFW_KEY_ENTER -> onConfirm();
+                    case GLFW.GLFW_KEY_LEFT -> {
+                        focused = templates;
+                        games.setSelected(null);
+                    }
                     case GLFW.GLFW_KEY_RIGHT -> focused = games;
                     default -> focused.onKey(event);
                 }
@@ -147,6 +155,7 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.getAction() == GLFW.GLFW_PRESS) {
             if (cursorPosition.x < games.getNode().getLocalTransform().getTranslation().x) {
                 focused = templates;
+                games.setSelected(null);
             } else {
                 focused = games;
             }
@@ -154,6 +163,17 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         Vector3f translation = focused.getNode().getLocalTransform().getTranslation();
         focused.onMouseButton(event, cursorPosition.sub(new Vector2f(translation.x, translation.y), new Vector2f()));
         return true;
+    }
+
+    private void onConfirm() {
+        UUID selected = games.getSelected();
+        if (START_GAME_ID.equals(selected)) {
+            selected = gameModule.start(templates.getSelected());
+        }
+        gameModule.spectate(selected);
+
+        // TODO: leave current game, enter specified game as amara
+
     }
 
     private static String durationToString(Duration duration) {

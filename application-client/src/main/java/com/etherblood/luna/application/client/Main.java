@@ -55,7 +55,10 @@ public class Main {
                         toolsClient.getModule(GameClientModule.class),
                         toolsClient.getModule(LobbyClientModule.class));
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
-                addSystem(new LobbySystem(toolsClient.getModule(LobbyClientModule.class), toolsClient.getModule(TimestampClientModule.class)));
+                addSystem(new LobbySystem(
+                        toolsClient.getModule(LobbyClientModule.class),
+                        toolsClient.getModule(GameClientModule.class),
+                        toolsClient.getModule(TimestampClientModule.class)));
             }
         };
         app.getConfig().setEnableValidationLayer(debug);
