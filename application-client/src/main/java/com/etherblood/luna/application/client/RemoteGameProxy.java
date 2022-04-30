@@ -32,8 +32,7 @@ public class RemoteGameProxy implements GameProxy {
     @Override
     public void update(PlayerInput input) {
         timestampModule.run();
-        long approxServerTime = timestampModule.getApproxServerTime();
-        gameModule.run(approxServerTime, new GameEvent(input, null));
+        gameModule.run(new GameEvent(input, null));
     }
 
     @Override

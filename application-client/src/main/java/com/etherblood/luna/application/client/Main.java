@@ -50,15 +50,13 @@ public class Main {
             protected void init() {
                 super.init();
                 CommandService commandService = new CommandService(
-                        toolsClient.getModule(JwtClientModule.class),
-                        toolsClient.getModule(TimestampClientModule.class),
-                        toolsClient.getModule(GameClientModule.class),
-                        toolsClient.getModule(LobbyClientModule.class));
+                        toolsClient.getModule(GameClientModule.class));
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
                 addSystem(new LobbySystem(
                         toolsClient.getModule(LobbyClientModule.class),
                         toolsClient.getModule(GameClientModule.class),
-                        toolsClient.getModule(TimestampClientModule.class)));
+                        toolsClient.getModule(TimestampClientModule.class),
+                        toolsClient.getModule(JwtClientModule.class)));
             }
         };
         app.getConfig().setEnableValidationLayer(debug);
@@ -70,7 +68,7 @@ public class Main {
         JwtClientModule jwtModule = new JwtClientModule(client);
         TimestampClientModule timestampModule = new TimestampClientModule(client, 40, 250);
         LunaLobbyClientModule lobbyModule = new LunaLobbyClientModule(client);
-        GameClientModule gameModule = new GameClientModule(client);
+        GameClientModule gameModule = new GameClientModule(timestampModule, client);
         ClientChatModule chatModule = new ClientChatModule(client);
         return new ToolsClient(client, jwtModule, timestampModule, gameModule, lobbyModule, chatModule);
     }

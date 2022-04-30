@@ -1,6 +1,7 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
+import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
@@ -36,14 +37,16 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private final LobbyClientModule<LobbyInfo> lobbyModule;
     private final GameClientModule gameModule;
     private final TimestampClientModule timestamps;
+    private final JwtClientModule jwtModule;
     private Listbox<String> templates;
     private Listbox<UUID> games;
     private Listbox<?> focused;
 
-    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps) {
+    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps, JwtClientModule jwtModule) {
         this.lobbyModule = lobbyModule;
         this.gameModule = gameModule;
         this.timestamps = timestamps;
+        this.jwtModule = jwtModule;
     }
 
     @Override
@@ -166,33 +169,30 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     }
 
     private void onConfirm() {
+        gameModule.leave();
         UUID selected = games.getSelected();
         if (START_GAME_ID.equals(selected)) {
             selected = gameModule.start(templates.getSelected());
         }
         gameModule.spectate(selected);
-
-        // TODO: leave current game, enter specified game as amara
-
+        gameModule.enter("amara");
     }
 
     private static String durationToString(Duration duration) {
         StringBuilder builder = new StringBuilder();
-        long days = duration.toDaysPart();
+        long days = duration.toDays();
         if (days > 1) {
             builder.append(days);
             builder.append(" days ");
         } else if (days == 1) {
             builder.append("1 day ");
         }
-        int hours = duration.toHoursPart();
-        if (hours > 0 || days > 0) {
-            builder.append(hours);
+        if (duration.toHours() > 0) {
+            builder.append(duration.toHoursPart());
             builder.append(" h ");
         }
-        int minutes = duration.toMinutesPart();
-        if (minutes > 0 || hours > 0 || days > 0) {
-            builder.append(minutes);
+        if (duration.toMinutes() > 0) {
+            builder.append(duration.toMinutesPart());
             builder.append(" min ");
         }
         int seconds = duration.toSecondsPart();

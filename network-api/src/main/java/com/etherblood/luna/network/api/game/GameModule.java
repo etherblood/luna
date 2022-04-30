@@ -48,7 +48,9 @@ import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Movebox;
 import com.etherblood.luna.engine.movement.Obstaclebox;
 import com.etherblood.luna.engine.movement.Speed;
+import com.etherblood.luna.network.api.game.messages.EnterGameRequest;
 import com.etherblood.luna.network.api.game.messages.EventMessage;
+import com.etherblood.luna.network.api.game.messages.LeaveGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
 import com.etherblood.luna.network.api.game.messages.StartGameRequest;
@@ -71,6 +73,8 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(SpectateGameRequest.class, new RecordSerializer<>());
         kryo.register(SpectateGameResponse.class, new RecordSerializer<>());
         kryo.register(UnspectateGameRequest.class, new RecordSerializer<>());
+        kryo.register(EnterGameRequest.class, new RecordSerializer<>());
+        kryo.register(LeaveGameRequest.class, new RecordSerializer<>());
 
         kryo.register(ActorInput.class, new RecordSerializer<>());
         kryo.register(Position.class, new RecordSerializer<>());

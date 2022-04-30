@@ -8,12 +8,15 @@ import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.GameRules;
 import com.etherblood.luna.network.api.game.GameModule;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.messages.EnterGameRequest;
 import com.etherblood.luna.network.api.game.messages.EventMessage;
 import com.etherblood.luna.network.api.game.messages.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.LeaveGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
 import com.etherblood.luna.network.api.game.messages.StartGameRequest;
 import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
+import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -23,11 +26,13 @@ import java.util.UUID;
 public class GameClientModule extends GameModule {
 
     public static final int MILLIS_PER_SECOND = 1000;
+    private final TimestampClientModule timestampModule;
     private final Connection connection;
-    private final int inputDelayFrames = 2;
     private ClientGame clientGame;
+    private UUID spectatedGameId;
 
-    public GameClientModule(Connection connection) {
+    public GameClientModule(TimestampClientModule timestampModule, Connection connection) {
+        this.timestampModule = timestampModule;
         this.connection = connection;
     }
 
@@ -37,16 +42,32 @@ public class GameClientModule extends GameModule {
         return gameId;
     }
 
+    public synchronized void enter(String actorTemplate) {
+        if (spectatedGameId != null) {
+            connection.sendTCP(new EnterGameRequest(spectatedGameId, actorTemplate));
+        }
+    }
+
+    public synchronized void leave() {
+        if (spectatedGameId != null) {
+            connection.sendTCP(new LeaveGameRequest(spectatedGameId));
+        }
+    }
+
     public synchronized void spectate(UUID gameId) {
         if (clientGame != null) {
             unspectate();
         }
         connection.sendTCP(new SpectateGameRequest(gameId));
+        spectatedGameId = gameId;
     }
 
     public synchronized void unspectate() {
-        connection.sendTCP(new UnspectateGameRequest(clientGame.getState().getId()));
-        clientGame = null;
+        if (spectatedGameId != null) {
+            connection.sendTCP(new UnspectateGameRequest(spectatedGameId));
+            clientGame = null;
+            spectatedGameId = null;
+        }
     }
 
     @Override
@@ -72,15 +93,15 @@ public class GameClientModule extends GameModule {
         }
     }
 
-    public synchronized void run(long servertime, GameEvent input) {
+    public synchronized void run(GameEvent input) {
         if (clientGame != null) {
             ClientEventMessageBuilder builder = clientGame.getBuilder();
             GameEngine state = clientGame.getState();
-            long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
+            long nextFrame = (timestampModule.getApproxServerTime() - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
             if (clientGame.getServerFrame() < nextFrame) {
                 do {
                     clientGame.incServerFrame();
-                    builder.enqueueAction(new EventMessagePart(clientGame.getServerFrame() + inputDelayFrames, input));
+                    builder.enqueueAction(new EventMessagePart(clientGame.getServerFrame(), input));
                 } while (clientGame.getServerFrame() < nextFrame);
                 connection.sendUDP(builder.build());
             }

@@ -9,10 +9,13 @@ import com.etherblood.luna.data.EntityDataImpl;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.GameRules;
+import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.network.api.game.GameModule;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
+import com.etherblood.luna.network.api.game.messages.EnterGameRequest;
 import com.etherblood.luna.network.api.game.messages.EventMessage;
 import com.etherblood.luna.network.api.game.messages.EventMessagePart;
+import com.etherblood.luna.network.api.game.messages.LeaveGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameRequest;
 import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
 import com.etherblood.luna.network.api.game.messages.StartGameRequest;
@@ -105,6 +108,24 @@ public class GameServerModule extends GameModule {
                 builders.remove(connection.getID());
                 System.out.println("User " + user.login + " unspectates game " + state.getId());
             }
+        } else if (object instanceof EnterGameRequest request) {
+            synchronized (lock) {
+                // TODO: permission checks?
+                JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
+                ServerGame serverGame = games.get(request.gameId());
+                EventMessagePart part = new EventMessagePart(serverGame.getState().getFrame(), new GameEvent(null, new PlayerJoined(user.id, user.login, request.actorTemplate(), true)));
+                broadcast(serverGame, part);
+                System.out.println("User " + user.login + " enters game " + request.gameId() + " with " + request.actorTemplate());
+            }
+        } else if (object instanceof LeaveGameRequest request) {
+            synchronized (lock) {
+                // TODO: permission checks?
+                JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
+                ServerGame serverGame = games.get(request.gameId());
+                EventMessagePart part = new EventMessagePart(serverGame.getState().getFrame(), new GameEvent(null, new PlayerJoined(user.id, user.login, null, false)));
+                broadcast(serverGame, part);
+                System.out.println("User " + user.login + " leaves game " + request.gameId());
+            }
         } else if (object instanceof StartGameRequest request) {
             synchronized (lock) {
                 // TODO: permission checks?
@@ -116,6 +137,17 @@ public class GameServerModule extends GameModule {
                     System.out.println("Started " + request.gameTemplate() + " " + request.gameId());
                 }
             }
+        }
+    }
+
+    private void broadcast(ServerGame serverGame, EventMessagePart part) {
+        PlaybackBuffer buffer = serverGame.getBuffer();
+        if (buffer.buffer(part.frame(), part.event())) {
+            for (ServerEventMessageBuilder other : serverGame.getBuilders().values()) {
+                other.broadcast(new EventMessagePart(part.frame(), part.event()));
+            }
+        } else {
+            throw new IllegalStateException("broadcast of " + part + " failed.");
         }
     }
 
