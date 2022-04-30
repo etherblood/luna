@@ -56,7 +56,7 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
         super.init();
 
         chatModule.subscribe(onMessage);
-        
+
         Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
                 "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
                 "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
@@ -120,7 +120,9 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
                 .collect(Collectors.joining("\n"));
 
         if (!chatDisplay.getText().current().text().equals(text)) {
+            chatDisplay.getText().setFreezeText(false);
             chatDisplay.getText().push(new SelectionText(text));
+            chatDisplay.getText().setFreezeText(true);
         }
 
         chatDisplay.setFocus(chatDisplay == focusedElement);
@@ -148,32 +150,32 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
 
     @Override
     public boolean consumeKey(KeyEvent event) {
-        final int chatActivationKey = GLFW.GLFW_KEY_ESCAPE;
+        final int chatActivationKey = GLFW.GLFW_KEY_ENTER;
         if (focusedElement == null) {
             if (event.getKey() == chatActivationKey && event.getAction() == GLFW.GLFW_PRESS) {
-                application.getGuiNode().add(backgroundQuad);
-                application.getGuiNode().add(chatInput.getNode());
-                focusedElement = chatInput;
+                attach();
                 return true;
             }
             return false;
         }
 
-        if (event.getAction() == GLFW.GLFW_PRESS || event.getAction() == GLFW.GLFW_REPEAT) {
-            switch (event.getKey()) {
-                case chatActivationKey:
-                    if (event.getAction() == GLFW.GLFW_PRESS) {
-                        application.getGuiNode().remove(backgroundQuad);
-                        application.getGuiNode().remove(chatInput.getNode());
-                        focusedElement = null;
-                    }
-                    break;
-                default:
-                    focusedElement.onKey(event);
-                    break;
-            }
+        focusedElement.onKey(event);
+        if (event.getKey() == chatActivationKey && event.getAction() == GLFW.GLFW_PRESS) {
+            detach();
         }
         return true;
+    }
+
+    private void attach() {
+        application.getGuiNode().add(backgroundQuad);
+        application.getGuiNode().add(chatInput.getNode());
+        focusedElement = chatInput;
+    }
+
+    private void detach() {
+        application.getGuiNode().remove(backgroundQuad);
+        application.getGuiNode().remove(chatInput.getNode());
+        focusedElement = null;
     }
 
     @Override

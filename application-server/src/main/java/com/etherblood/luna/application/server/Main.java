@@ -29,7 +29,7 @@ public class Main {
         LunaLobbyServerModule lobbyModule = new LunaLobbyServerModule(server::getConnections);
         GameServerModule gameModule = new GameServerModule(jwtModule, lobbyModule);
         ServerChatModule chatModule = new ServerChatModule(jwtModule, server::getConnections);
-        ToolsServer toolsServer = new ToolsServer(server, jwtModule, timestampModule, gameModule, lobbyModule, chatModule);
+        ToolsServer toolsServer = new ToolsServer(server, gameModule, jwtModule, timestampModule, lobbyModule, chatModule);
 
         server.start();
         server.bind(NetworkUtil.TCP_PORT, NetworkUtil.UDP_PORT);

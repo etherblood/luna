@@ -57,7 +57,11 @@ public class GameServerModule extends GameModule {
     @Override
     public void disconnected(Connection connection) {
         for (ServerGame serverGame : games.values()) {
-            serverGame.getBuilders().remove(connection.getID());
+            if (serverGame.getBuilders().remove(connection.getID()) != null) {
+                JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
+                EventMessagePart part = new EventMessagePart(serverGame.getState().getFrame(), new GameEvent(null, new PlayerJoined(user.id, user.login, null, false)));
+                broadcast(serverGame, part);
+            }
         }
         connections.remove(connection.getID());
     }

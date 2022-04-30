@@ -21,30 +21,30 @@ public class CommandService {
         try {
             String[] parts = rawCommand.split(" ");
             switch (parts[0].toLowerCase(Locale.ROOT)) {
-                case "start": {
+                case "start" -> {
                     selectedGameId = gameModule.start(parts[1]);
                     return selectedGameId.toString();
                 }
-                case "spectate": {
+                case "spectate" -> {
                     if (parts.length >= 2) {
                         selectedGameId = UUID.fromString(parts[1]);
                     }
                     gameModule.spectate(selectedGameId);
                     return selectedGameId.toString();
                 }
-                case "unspectate": {
+                case "unspectate" -> {
                     gameModule.unspectate();
                     return null;
                 }
-                case "enter": {
+                case "enter" -> {
                     gameModule.enter(parts[1]);
                     return null;
                 }
-                case "leave": {
+                case "leave" -> {
                     gameModule.leave();
                     return null;
                 }
-                case "select": {
+                case "select" -> {
                     if (parts.length >= 2) {
                         selectedGameId = UUID.fromString(parts[1]);
                     } else {
@@ -52,7 +52,10 @@ public class CommandService {
                     }
                     return selectedGameId.toString();
                 }
-                default: {
+                case "selected" -> {
+                    return selectedGameId.toString();
+                }
+                default -> {
                     return "Command not found: " + rawCommand;
                 }
             }

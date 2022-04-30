@@ -55,8 +55,7 @@ public class Main {
                 addSystem(new LobbySystem(
                         toolsClient.getModule(LobbyClientModule.class),
                         toolsClient.getModule(GameClientModule.class),
-                        toolsClient.getModule(TimestampClientModule.class),
-                        toolsClient.getModule(JwtClientModule.class)));
+                        toolsClient.getModule(TimestampClientModule.class)));
             }
         };
         app.getConfig().setEnableValidationLayer(debug);
@@ -70,7 +69,7 @@ public class Main {
         LunaLobbyClientModule lobbyModule = new LunaLobbyClientModule(client);
         GameClientModule gameModule = new GameClientModule(timestampModule, client);
         ClientChatModule chatModule = new ClientChatModule(client);
-        return new ToolsClient(client, jwtModule, timestampModule, gameModule, lobbyModule, chatModule);
+        return new ToolsClient(client, gameModule, jwtModule, timestampModule, lobbyModule, chatModule);
     }
 
     static GameProxy remoteProxy(ToolsClient toolsClient, String host, String jwt) throws IOException {
@@ -87,6 +86,7 @@ public class Main {
 
         jwtModule.login(jwt);
         clientModule.spectate(GameModule.LOBBY_GAME_ID);
+        clientModule.enter("amara");
 
         return new RemoteGameProxy(
                 timestampModule,

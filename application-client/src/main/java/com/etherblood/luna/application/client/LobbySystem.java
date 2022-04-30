@@ -1,7 +1,6 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
-import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
@@ -37,21 +36,23 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private final LobbyClientModule<LobbyInfo> lobbyModule;
     private final GameClientModule gameModule;
     private final TimestampClientModule timestamps;
-    private final JwtClientModule jwtModule;
     private Listbox<String> templates;
     private Listbox<UUID> games;
     private Listbox<?> focused;
 
-    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps, JwtClientModule jwtModule) {
+    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps) {
         this.lobbyModule = lobbyModule;
         this.gameModule = gameModule;
         this.timestamps = timestamps;
-        this.jwtModule = jwtModule;
     }
 
     @Override
     public int orderNumber() {
         return LayerOrder.LOBBY;
+    }
+
+    private boolean isAttached() {
+        return templates.getNode().hasParent(application.getGuiNode());
     }
 
     @Override
@@ -103,16 +104,23 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         templates.getNode().setLocalTranslation(new Vector3f(0, 100, 0));
         games.getNode().setLocalTranslation(new Vector3f(300, 100, 0));
 
+        focused = templates;
+    }
+
+    private void attach() {
         application.getGuiNode().add(templates.getNode());
         application.getGuiNode().add(games.getNode());
-
-        focused = templates;
     }
 
     @Override
     protected void cleanupInternal() {
         super.cleanupInternal();
         lobbyModule.unsubscribeFromGamesList();
+    }
+
+    private void detach() {
+        application.getGuiNode().remove(templates.getNode());
+        application.getGuiNode().remove(games.getNode());
     }
 
     @Override
@@ -136,7 +144,15 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
 
     @Override
     public boolean consumeKey(KeyEvent event) {
-        if (focused != null) {
+        if (event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_ESCAPE) {
+            if (isAttached()) {
+                detach();
+            } else {
+                attach();
+            }
+            return true;
+        }
+        if (isAttached() && focused != null) {
             if (event.getAction() == GLFW.GLFW_PRESS) {
                 switch (event.getKey()) {
                     case GLFW.GLFW_KEY_ENTER -> onConfirm();
@@ -155,6 +171,9 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
 
     @Override
     public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
+        if (!isAttached()) {
+            return false;
+        }
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.getAction() == GLFW.GLFW_PRESS) {
             if (cursorPosition.x < games.getNode().getLocalTransform().getTranslation().x) {
                 focused = templates;
@@ -176,6 +195,7 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         }
         gameModule.spectate(selected);
         gameModule.enter("amara");
+        detach();
     }
 
     private static String durationToString(Duration duration) {
