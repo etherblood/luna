@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameServerModule extends GameModule {
 
     private static final long MILLIS_PER_SECOND = 1000;
+    private final long clientDelayFrames = 2;
     private final Object lock = new Object();// TODO: use striped lock instead to lock gameIds
     private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
     private final JwtServerModule jwtModule;
@@ -78,9 +79,10 @@ public class GameServerModule extends GameModule {
                         builder.updateAck(message);
                         PlaybackBuffer buffer = serverGame.getBuffer();
                         for (EventMessagePart part : message.parts()) {
-                            if (buffer.buffer(part.frame(), part.event())) {
+                            long frame = part.frame() + clientDelayFrames;
+                            if (buffer.buffer(frame, part.event())) {
                                 for (ServerEventMessageBuilder other : builders.values()) {
-                                    other.broadcast(new EventMessagePart(part.frame(), part.event()));
+                                    other.broadcast(new EventMessagePart(frame, part.event()));
                                 }
                             } else {
                                 // this is likely a duplicate of already handled input, do nothing
