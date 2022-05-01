@@ -2,6 +2,7 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
 import com.destrostudios.icetea.core.font.BitmapFont;
+import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
@@ -11,7 +12,8 @@ import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.shader.Shader;
-import com.etherblood.luna.application.client.listbox.Listbox;
+import com.etherblood.luna.application.client.gui.Button;
+import com.etherblood.luna.application.client.gui.Listbox;
 import com.etherblood.luna.network.api.lobby.LobbyInfo;
 import com.etherblood.luna.network.api.lobby.Player;
 import com.etherblood.luna.network.client.GameClientModule;
@@ -36,9 +38,10 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private final LobbyClientModule<LobbyInfo> lobbyModule;
     private final GameClientModule gameModule;
     private final TimestampClientModule timestamps;
+    private Listbox<?> focused;
     private Listbox<String> templates;
     private Listbox<UUID> games;
-    private Listbox<?> focused;
+    private Button confirmButton;
 
     public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps) {
         this.lobbyModule = lobbyModule;
@@ -104,12 +107,28 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         templates.getNode().setLocalTranslation(new Vector3f(0, 100, 0));
         games.getNode().setLocalTranslation(new Vector3f(300, 100, 0));
 
+
+        Material material2 = new Material();
+        material2.setVertexShader(vertexShaderDefault);
+        material2.setFragmentShader(fragShaderDefault);
+        material2.setCullMode(VK10.VK_CULL_MODE_NONE);
+        material2.getParameters().setVector4f("color", new Vector4f(0.5f, 0.5f, 0.5f, 1));
+        material2.setDepthTest(false);
+        material2.setDepthWrite(false);
+        Geometry g3 = new Geometry();
+        g3.setMesh(quad);
+        g3.setMaterial(material2);
+        g3.setShadowMode(ShadowMode.OFF);
+        confirmButton = new Button(g3, new BitmapText(font, "confirm"));
+        confirmButton.setDimensions(new Vector2f(800, 100), new Vector2f(200, 80));
+
         focused = templates;
     }
 
     private void attach() {
         application.getGuiNode().add(templates.getNode());
         application.getGuiNode().add(games.getNode());
+        application.getGuiNode().add(confirmButton.getNode());
     }
 
     @Override
@@ -121,6 +140,7 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private void detach() {
         application.getGuiNode().remove(templates.getNode());
         application.getGuiNode().remove(games.getNode());
+        application.getGuiNode().remove(confirmButton.getNode());
     }
 
     @Override
@@ -175,6 +195,11 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
             return false;
         }
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.getAction() == GLFW.GLFW_PRESS) {
+            if (confirmButton.contains(cursorPosition)) {
+                if (onConfirm()) {
+                    return true;
+                }
+            }
             if (cursorPosition.x < games.getNode().getLocalTransform().getTranslation().x) {
                 focused = templates;
                 games.setSelected(null);
@@ -187,15 +212,19 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         return true;
     }
 
-    private void onConfirm() {
-        gameModule.leave();
-        UUID selected = games.getSelected();
-        if (START_GAME_ID.equals(selected)) {
-            selected = gameModule.start(templates.getSelected());
+    private boolean onConfirm() {
+        UUID selectedGame = games.getSelected();
+        if (games == focused && selectedGame != null) {
+            gameModule.leave();
+            if (START_GAME_ID.equals(selectedGame)) {
+                selectedGame = gameModule.start(templates.getSelected());
+            }
+            gameModule.spectate(selectedGame);
+            gameModule.enter("amara");
+            detach();
+            return true;
         }
-        gameModule.spectate(selected);
-        gameModule.enter("amara");
-        detach();
+        return false;
     }
 
     private static String durationToString(Duration duration) {

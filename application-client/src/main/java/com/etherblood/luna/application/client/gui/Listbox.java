@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client.listbox;
+package com.etherblood.luna.application.client.gui;
 
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;

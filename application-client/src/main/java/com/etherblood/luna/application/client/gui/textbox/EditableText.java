@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client.textbox;
+package com.etherblood.luna.application.client.gui.textbox;
 
 import java.util.ArrayList;
 import java.util.List;
