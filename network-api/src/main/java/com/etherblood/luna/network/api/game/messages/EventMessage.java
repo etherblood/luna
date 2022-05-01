@@ -1,6 +1,7 @@
 package com.etherblood.luna.network.api.game.messages;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 public record EventMessage(
@@ -10,6 +11,14 @@ public record EventMessage(
         long ack,
         EventMessagePart[] parts
 ) {
+    public EventMessage {
+        Objects.requireNonNull(spectateId);
+        Objects.requireNonNull(parts);
+        for (EventMessagePart part : parts) {
+            Objects.requireNonNull(part);
+        }
+    }
+
     @Override
     public String toString() {
         return "EventMessage{" +
