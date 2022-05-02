@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.gui;
 
 public class LayerOrder {
     public static final int LOBBY = 1;

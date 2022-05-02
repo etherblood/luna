@@ -1,16 +1,17 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.gui;
 
 import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
+import com.destrostudios.icetea.core.scene.Node;
 import org.joml.Vector2f;
 
-public interface InputLayer {
+public interface GuiElement {
 
-    default int orderNumber() {
-        return 0;
-    }
+    Node node();
+
+    void update();
 
     default boolean consumeKey(KeyEvent event) {
         return false;
@@ -24,7 +25,11 @@ public interface InputLayer {
         return false;
     }
 
-    default boolean consumeMouseMove(MousePositionEvent event) {
+    default boolean consumeMouseMove(MousePositionEvent event, Vector2f cursorPosition) {
         return false;
     }
+
+    default void onFocus(boolean focus) {
+    }
+
 }

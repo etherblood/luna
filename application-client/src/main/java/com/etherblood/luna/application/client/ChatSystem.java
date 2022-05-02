@@ -10,6 +10,8 @@ import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.shader.Shader;
+import com.etherblood.luna.application.client.gui.InputLayer;
+import com.etherblood.luna.application.client.gui.LayerOrder;
 import com.etherblood.luna.application.client.gui.textbox.EditableTextbox;
 import com.etherblood.luna.application.client.gui.textbox.SelectionText;
 import com.etherblood.luna.application.client.gui.textbox.WindowClipboard;
@@ -120,9 +122,7 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
                 .collect(Collectors.joining("\n"));
 
         if (!chatDisplay.getText().current().text().equals(text)) {
-            chatDisplay.getText().setFreezeText(false);
-            chatDisplay.getText().push(new SelectionText(text));
-            chatDisplay.getText().setFreezeText(true);
+            chatDisplay.setSelectionText(new SelectionText(text));
         }
 
         chatDisplay.setFocus(chatDisplay == focusedElement);

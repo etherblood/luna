@@ -13,6 +13,8 @@ import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
+import com.etherblood.luna.application.client.gui.InputLayer;
+import com.etherblood.luna.application.client.gui.LayerOrder;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActiveAction;
 import com.etherblood.luna.engine.ActorName;

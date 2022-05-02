@@ -7,10 +7,12 @@ import java.util.UUID;
 
 public class CommandService {
 
+    private final Runnable exit;
     private final GameClientModule gameModule;
     private UUID selectedGameId = GameModule.LOBBY_GAME_ID;
 
-    public CommandService(GameClientModule gameModule) {
+    public CommandService(Runnable exit, GameClientModule gameModule) {
+        this.exit = exit;
         this.gameModule = gameModule;
     }
 
@@ -54,6 +56,10 @@ public class CommandService {
                 }
                 case "selected" -> {
                     return selectedGameId.toString();
+                }
+                case "exit" -> {
+                    exit.run();
+                    return "EXIT";
                 }
                 default -> {
                     return "Command not found: " + rawCommand;

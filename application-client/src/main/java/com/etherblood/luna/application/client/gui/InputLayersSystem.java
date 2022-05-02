@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.gui;
 
 import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.CharacterListener;

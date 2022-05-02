@@ -50,7 +50,7 @@ public class Main {
             protected void init() {
                 super.init();
                 CommandService commandService = new CommandService(
-                        toolsClient.getModule(GameClientModule.class));
+                        this::stop, toolsClient.getModule(GameClientModule.class));
                 addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
                 addSystem(new LobbySystem(
                         toolsClient.getModule(LobbyClientModule.class),

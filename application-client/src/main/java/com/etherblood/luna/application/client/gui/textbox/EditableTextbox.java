@@ -236,6 +236,16 @@ public class EditableTextbox {
         return text;
     }
 
+    public void setSelectionText(SelectionText value) {
+        if (text.isFreezeText()) {
+            text.setFreezeText(false);
+            text.push(value);
+            text.setFreezeText(true);
+        } else {
+            text.push(value);
+        }
+    }
+
     private void setSelection(Vector2f mouseTail, Vector2f mouseHead) {
         BitmapFont font = bitmapText.getFont();
         SelectionText current = text.current();
