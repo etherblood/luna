@@ -8,6 +8,7 @@ import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule
 import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.minlog.Log;
+import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.api.game.GameModule;
 import com.etherblood.luna.network.client.GameClientModule;
@@ -51,11 +52,11 @@ public class Main {
                 super.init();
                 CommandService commandService = new CommandService(
                         this::stop, toolsClient.getModule(GameClientModule.class));
-                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService));
+                addSystem(new ChatSystem(toolsClient.getModule(ClientChatModule.class), commandService, getSystem(GuiFactory.class)));
                 addSystem(new LobbySystem(
                         toolsClient.getModule(LobbyClientModule.class),
                         toolsClient.getModule(GameClientModule.class),
-                        toolsClient.getModule(TimestampClientModule.class)));
+                        toolsClient.getModule(TimestampClientModule.class), getSystem(GuiFactory.class)));
             }
         };
         app.getConfig().setEnableValidationLayer(debug);

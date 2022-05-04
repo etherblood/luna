@@ -64,6 +64,7 @@ public class GameClientModule extends GameModule {
 
     public synchronized void unspectate() {
         if (spectatedGameId != null) {
+            leave();
             connection.sendTCP(new UnspectateGameRequest(spectatedGameId));
             clientGame = null;
             spectatedGameId = null;
@@ -79,9 +80,7 @@ public class GameClientModule extends GameModule {
                 GameEngine state = clientGame.getState();
                 builder.updateAck(message);
                 for (EventMessagePart part : message.parts()) {
-                    if (!buffer.buffer(part.frame(), part.event())) {
-                        // drop part, it is a duplicate of an already handled one
-                    }
+                    buffer.buffer(part.frame(), part.event());
                 }
                 for (long frame = state.getFrame(); frame <= message.lockFrame(); frame++) {
                     state.tick(buffer.peek(frame));

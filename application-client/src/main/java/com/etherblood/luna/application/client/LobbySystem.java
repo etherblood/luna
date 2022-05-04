@@ -1,18 +1,11 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
-import com.destrostudios.icetea.core.font.BitmapFont;
-import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
-import com.destrostudios.icetea.core.material.Material;
-import com.destrostudios.icetea.core.mesh.Mesh;
-import com.destrostudios.icetea.core.mesh.Quad;
-import com.destrostudios.icetea.core.render.shadow.ShadowMode;
-import com.destrostudios.icetea.core.scene.Geometry;
-import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.gui.Button;
+import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.InputLayer;
 import com.etherblood.luna.application.client.gui.LayerOrder;
 import com.etherblood.luna.application.client.gui.Listbox;
@@ -29,9 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.vulkan.VK10;
 
 public class LobbySystem extends LifecycleObject implements InputLayer {
 
@@ -40,15 +31,17 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private final LobbyClientModule<LobbyInfo> lobbyModule;
     private final GameClientModule gameModule;
     private final TimestampClientModule timestamps;
+    private final GuiFactory guiFactory;
     private Listbox<?> focused;
     private Listbox<String> templates;
     private Listbox<UUID> games;
     private Button confirmButton;
 
-    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps) {
+    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps, GuiFactory guiFactory) {
         this.lobbyModule = lobbyModule;
         this.gameModule = gameModule;
         this.timestamps = timestamps;
+        this.guiFactory = guiFactory;
     }
 
     @Override
@@ -64,39 +57,10 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     protected void init() {
         super.init();
 
-        BitmapFont font = application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt");
-
-        Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
-                "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-        });
-        Shader fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
-                "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-        });
-
-        Material material = new Material();
-        material.setVertexShader(vertexShaderDefault);
-        material.setFragmentShader(fragShaderDefault);
-        material.setCullMode(VK10.VK_CULL_MODE_NONE);
-        material.getParameters().setVector4f("color", new Vector4f(11 / 255f, 104 / 255f, 217 / 255f, 1));
-        material.setDepthTest(false);
-        material.setDepthWrite(false);
-
-        Mesh quad = new Quad(1, 1);
-        Geometry g = new Geometry();
-        g.setMesh(quad);
-        g.setMaterial(material);
-        g.setShadowMode(ShadowMode.OFF);
-        Geometry g2 = new Geometry();
-        g2.setMesh(quad);
-        g2.setMaterial(material);
-        g2.setShadowMode(ShadowMode.OFF);
-
         lobbyModule.subscribeToGamesList();
-        templates = new Listbox<>(font, x -> x, g);
+        templates = guiFactory.listbox(x -> x);
         templates.setList(List.of(LOBBY_TEMPLATE, "test_room", "challenge_room"));
-        games = new Listbox<>(font, id -> {
+        games = guiFactory.listbox(id -> {
             if (id.equals(START_GAME_ID)) {
                 return "new game";
             }
@@ -104,24 +68,12 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
             return durationToString(Duration.ofMillis(timestamps.getApproxServerTime() - info.startEpochMillis()))
                     + ": "
                     + info.players().stream().map(Player::name).collect(Collectors.joining(", "));
-        },
-                g2);
+        });
         templates.getNode().setLocalTranslation(new Vector3f(0, 100, 0));
         games.getNode().setLocalTranslation(new Vector3f(300, 100, 0));
 
-
-        Material material2 = new Material();
-        material2.setVertexShader(vertexShaderDefault);
-        material2.setFragmentShader(fragShaderDefault);
-        material2.setCullMode(VK10.VK_CULL_MODE_NONE);
-        material2.getParameters().setVector4f("color", new Vector4f(0.5f, 0.5f, 0.5f, 1));
-        material2.setDepthTest(false);
-        material2.setDepthWrite(false);
-        Geometry g3 = new Geometry();
-        g3.setMesh(quad);
-        g3.setMaterial(material2);
-        g3.setShadowMode(ShadowMode.OFF);
-        confirmButton = new Button(g3, new BitmapText(font, "confirm"));
+        confirmButton = guiFactory.button();
+        confirmButton.setText("confirm");
         confirmButton.setDimensions(new Vector2f(800, 100), new Vector2f(200, 80));
 
         focused = templates;
@@ -217,7 +169,6 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private boolean onConfirm() {
         UUID selectedGame = games.getSelected();
         if (games == focused && selectedGame != null) {
-            gameModule.leave();
             if (START_GAME_ID.equals(selectedGame)) {
                 selectedGame = gameModule.start(templates.getSelected());
             }

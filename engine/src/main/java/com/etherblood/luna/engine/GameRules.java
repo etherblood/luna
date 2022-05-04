@@ -71,6 +71,7 @@ public class GameRules {
                             ModelKey.class,
                             PendingDelete.class,
                             PendingDeleteOwner.class,
+                            CascadeDelete.class,
                             Team.class,
                             SimpleBehavior.class,
                             DeleteSelfAfterDamageTrigger.class,

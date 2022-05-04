@@ -5,6 +5,7 @@ import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
+import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.InputLayersSystem;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -27,6 +28,10 @@ public class ApplicationClient extends Application {
         this.gameProxy = gameProxy;
     }
 
+    public <T> T getSystem(Class<T> type) {
+        return getSystems().stream().filter(type::isInstance).map(type::cast).findAny().orElse(null);
+    }
+
     @Override
     protected void init() {
         try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
@@ -43,7 +48,9 @@ public class ApplicationClient extends Application {
 
             guiNode.setRenderBucket(RenderBucketType.GUI);
 
-            addSystem(new GameSystem(gameProxy));
+            GuiFactory guiFactory = new GuiFactory();
+            addSystem(guiFactory);
+            addSystem(new GameSystem(gameProxy, guiFactory));
             addSystem(new InputLayersSystem());
         }
     }

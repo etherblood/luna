@@ -80,13 +80,7 @@ public class GameServerModule extends GameModule {
                         PlaybackBuffer buffer = serverGame.getBuffer();
                         for (EventMessagePart part : message.parts()) {
                             long frame = part.frame() + clientDelayFrames;
-                            if (buffer.buffer(frame, part.event())) {
-                                for (ServerEventMessageBuilder other : builders.values()) {
-                                    other.broadcast(new EventMessagePart(frame, part.event()));
-                                }
-                            } else {
-                                // this is likely a duplicate of already handled input, do nothing
-                            }
+                            buffer.buffer(frame, part.event());
                         }
                     }
                 }
@@ -148,11 +142,7 @@ public class GameServerModule extends GameModule {
 
     private void broadcast(ServerGame serverGame, EventMessagePart part) {
         PlaybackBuffer buffer = serverGame.getBuffer();
-        if (buffer.buffer(part.frame(), part.event())) {
-            for (ServerEventMessageBuilder other : serverGame.getBuilders().values()) {
-                other.broadcast(new EventMessagePart(part.frame(), part.event()));
-            }
-        } else {
+        if (!buffer.buffer(part.frame(), part.event())) {
             throw new IllegalStateException("broadcast of " + part + " failed.");
         }
     }
@@ -172,6 +162,12 @@ public class GameServerModule extends GameModule {
                         Set<GameEvent> events = buffer.peek(frame);
                         buffer.lockFrame(frame);
                         state.tick(events);
+
+                        for (ServerEventMessageBuilder builder : builders.values()) {
+                            for (GameEvent event : events) {
+                                builder.broadcast(new EventMessagePart(frame, event));
+                            }
+                        }
                     } while (state.getFrame() < nextFrame);
 
                     for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {

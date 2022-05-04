@@ -12,7 +12,7 @@ public class Button {
     private final Node node = new Node();
     private final Geometry background;
     private final BitmapText bitmapText;
-    private Vector4f hitbox;
+    private Vector4f hitbox = new Vector4f(0, 0, 100, 100);
 
     public Button(Geometry background, BitmapText bitmapText) {
         this.background = background;

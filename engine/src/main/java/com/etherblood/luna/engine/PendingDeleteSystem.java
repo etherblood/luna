@@ -14,14 +14,21 @@ public class PendingDeleteSystem implements GameSystem {
         }
 
         for (int entity : data.findByValue(new PendingDelete(game.getFrame()))) {
-            for (Class<?> component : data.getRegisteredClasses()) {
-                data.remove(entity, component);
-            }
+            deleteRecursively(data, entity);
         }
         for (int entity : data.list(PendingDelete.class)) {
             if (data.get(entity, PendingDelete.class).frame() < game.getFrame()) {
                 throw new AssertionError("Entity alive after PendingDelete frame.");
             }
+        }
+    }
+
+    private void deleteRecursively(EntityData data, int entity) {
+        for (Class<?> component : data.getRegisteredClasses()) {
+            data.remove(entity, component);
+        }
+        for (int other : data.findByValue(new CascadeDelete(entity))) {
+            deleteRecursively(data, other);
         }
     }
 }

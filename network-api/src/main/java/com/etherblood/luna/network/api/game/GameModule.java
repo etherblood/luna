@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.etherblood.luna.engine.ActiveAction;
 import com.etherblood.luna.engine.ActorInput;
 import com.etherblood.luna.engine.ActorName;
+import com.etherblood.luna.engine.CascadeDelete;
 import com.etherblood.luna.engine.Circle;
 import com.etherblood.luna.engine.Direction;
 import com.etherblood.luna.engine.GameEngine;
@@ -89,6 +90,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(ModelKey.class, new RecordSerializer<>());
         kryo.register(PendingDelete.class, new RecordSerializer<>());
         kryo.register(PendingDeleteOwner.class, new RecordSerializer<>());
+        kryo.register(CascadeDelete.class, new RecordSerializer<>());
         kryo.register(Team.class, new RecordSerializer<>());
         kryo.register(SimpleBehavior.class, new RecordSerializer<>());
         kryo.register(DeleteSelfAfterDamageTrigger.class, new RecordSerializer<>());

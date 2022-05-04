@@ -282,4 +282,8 @@ public class EditableTextbox {
     public void setFocus(boolean focused) {
         this.focused = focused;
     }
+
+    public BitmapText getBitmapText() {
+        return bitmapText;
+    }
 }

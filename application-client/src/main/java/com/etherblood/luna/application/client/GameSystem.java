@@ -2,17 +2,14 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.icetea.core.asset.loader.GltfLoaderSettings;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
-import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.destrostudios.icetea.core.light.DirectionalLight;
-import com.destrostudios.icetea.core.material.Material;
-import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
-import com.destrostudios.icetea.core.shader.Shader;
+import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.InputLayer;
 import com.etherblood.luna.application.client.gui.LayerOrder;
 import com.etherblood.luna.data.EntityData;
@@ -57,11 +54,12 @@ public class GameSystem extends LifecycleObject implements InputLayer {
     private final Map<Integer, StatusHudWrapper> statusHuds = new HashMap<>();
     private Geometry geometryGround;
     private final GameProxy gameProxy;
+    private final GuiFactory guiFactory;
     private UUID loadedGame = null;
-    private BitmapFont bitmapFont;
 
-    public GameSystem(GameProxy gameProxy) {
+    public GameSystem(GameProxy gameProxy, GuiFactory guiFactory) {
         this.gameProxy = gameProxy;
+        this.guiFactory = guiFactory;
     }
 
     @Override
@@ -88,27 +86,11 @@ public class GameSystem extends LifecycleObject implements InputLayer {
             application.getSceneCamera().setLocation(new Vector3f(0, 2, 10));
             application.getSceneCamera().setRotation(new Quaternionf(new AxisAngle4f(CAMERA_ANGLE, 1, 0, 0)));
 
-            // text
-            bitmapFont = application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt");
-
 
             // Ground
-            Quad meshGround = new Quad(10, 10);
-
-            Material materialGround = new Material();
-            materialGround.setVertexShader(new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
-                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-            }));
-            materialGround.setFragmentShader(new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
-                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
-                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
-            }));
-            materialGround.getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
-
-            geometryGround = new Geometry();
-            geometryGround.setMesh(meshGround);
-            geometryGround.setMaterial(materialGround);
+            geometryGround = guiFactory.backgroundQuad();// hacky hack (:
+            geometryGround.getMaterial().getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
+            geometryGround.setLocalScale(new Vector3f(10, 10, 1));
             geometryGround.move(new Vector3f(-5, 0, 5));
             geometryGround.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / -2), 1, 0, 0)));
             geometryGround.setShadowMode(ShadowMode.RECEIVE);
@@ -172,7 +154,7 @@ public class GameSystem extends LifecycleObject implements InputLayer {
         entities.addAll(data.list(MilliHealth.class));
         for (int entity : entities) {
             if (!statusHuds.containsKey(entity)) {
-                StatusHudWrapper wrapper = new StatusHudWrapper(entity, bitmapFont);
+                StatusHudWrapper wrapper = new StatusHudWrapper(entity, guiFactory.bitmapFont());
                 statusHuds.put(entity, wrapper);
                 guiNode.add(wrapper.getNode());
             }

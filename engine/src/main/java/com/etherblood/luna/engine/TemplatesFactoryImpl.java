@@ -154,6 +154,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(idleAction, new ActionOf(entity));
                 data.set(idleAction, ActionKey.IDLE);
                 data.set(idleAction, new ActionAnimation("idle"));
+                data.set(idleAction, new CascadeDelete(entity));
             }
 
             {
@@ -163,6 +164,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(walkAction, ActionKey.WALK);
                 data.set(walkAction, new ActionSpeed(1100 / fps));
                 data.set(walkAction, new ActionAnimation("walk"));
+                data.set(walkAction, new CascadeDelete(entity));
             }
 
             {
@@ -173,6 +175,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(dashAction, new ActionSpeed(5000 / fps));
                 data.set(dashAction, new ActionDuration(48));
                 data.set(dashAction, new ActionAnimation("dash"));
+                data.set(dashAction, new CascadeDelete(entity));
             }
 
             {
@@ -181,6 +184,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(gazeOfDarknessAction, new ActionOf(entity));
                 data.set(gazeOfDarknessAction, ActionKey.ATTACK1);
                 data.set(gazeOfDarknessAction, new ActionAnimation("attack1"));
+                data.set(gazeOfDarknessAction, new CascadeDelete(entity));
             }
 
             {
@@ -189,6 +193,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(bladeOfChaosAction, new ActionOf(entity));
                 data.set(bladeOfChaosAction, ActionKey.ATTACK2);
                 data.set(bladeOfChaosAction, new ActionAnimation("attack2"));
+                data.set(bladeOfChaosAction, new CascadeDelete(entity));
             }
 
             {
@@ -197,6 +202,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(waveOfQuickHealingAction, new ActionOf(entity));
                 data.set(waveOfQuickHealingAction, ActionKey.ATTACK3);
                 data.set(waveOfQuickHealingAction, new ActionAnimation("agonizing"));
+                data.set(waveOfQuickHealingAction, new CascadeDelete(entity));
             }
 
             {
@@ -207,6 +213,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(fallenAction, new ActionAnimation("death"));
                 data.set(fallenAction, new ActionDuration(179));
                 data.set(fallenAction, new ActionEvent(179, "suicide"));
+                data.set(fallenAction, new CascadeDelete(entity));
             }
 
 
@@ -225,6 +232,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(idleAction, new ActionOf(entity));
                 data.set(idleAction, ActionKey.IDLE);
                 data.set(idleAction, new ActionAnimation("idle"));
+                data.set(idleAction, new CascadeDelete(entity));
             }
 
             {
@@ -234,6 +242,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(walkAction, ActionKey.WALK);
                 data.set(walkAction, new ActionSpeed(50));
                 data.set(walkAction, new ActionAnimation("fly_forward"));
+                data.set(walkAction, new CascadeDelete(entity));
             }
 
             {
@@ -242,6 +251,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(ghostMeleeAction, new ActionOf(entity));
                 data.set(ghostMeleeAction, ActionKey.ATTACK1);
                 data.set(ghostMeleeAction, new ActionAnimation("melee_attack"));
+                data.set(ghostMeleeAction, new CascadeDelete(entity));
             }
 
             {
@@ -250,6 +260,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(ghostSpellAction, new ActionOf(entity));
                 data.set(ghostSpellAction, ActionKey.ATTACK2);
                 data.set(ghostSpellAction, new ActionAnimation("cast_spell"));
+                data.set(ghostSpellAction, new CascadeDelete(entity));
             }
 
             {
@@ -260,6 +271,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(fallenAction, new ActionAnimation("die"));
                 data.set(fallenAction, new ActionDuration(100));
                 data.set(fallenAction, new ActionEvent(100, "suicide"));
+                data.set(fallenAction, new CascadeDelete(entity));
             }
 
             data.set(entity, new Movebox(new Rectangle(-250, -250, 500, 500)));
@@ -277,6 +289,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(idleAction, new ActionOf(entity));
                 data.set(idleAction, ActionKey.IDLE);
                 data.set(idleAction, new ActionAnimation("idle"));
+                data.set(idleAction, new CascadeDelete(entity));
             }
 
             {
@@ -286,6 +299,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(walkAction, ActionKey.WALK);
                 data.set(walkAction, new ActionSpeed(100));
                 data.set(walkAction, new ActionAnimation("run"));
+                data.set(walkAction, new CascadeDelete(entity));
             }
 
             {
@@ -294,6 +308,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(metalonMeleeAction, new ActionOf(entity));
                 data.set(metalonMeleeAction, ActionKey.ATTACK1);
                 data.set(metalonMeleeAction, new ActionAnimation("smash"));
+                data.set(metalonMeleeAction, new CascadeDelete(entity));
             }
 
             {
@@ -304,6 +319,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(fallenAction, new ActionAnimation("die"));
                 data.set(fallenAction, new ActionDuration(120));
                 data.set(fallenAction, new ActionEvent(120, "suicide"));
+                data.set(fallenAction, new CascadeDelete(entity));
             }
 
             data.set(entity, new Movebox(new Rectangle(-750, -750, 1500, 1500)));
