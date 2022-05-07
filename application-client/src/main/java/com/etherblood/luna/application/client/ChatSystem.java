@@ -1,12 +1,11 @@
 package com.etherblood.luna.application.client;
 
-import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.KeyEvent;
-import com.destrostudios.icetea.core.input.MouseButtonEvent;
-import com.destrostudios.icetea.core.input.MousePositionEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
-import com.destrostudios.icetea.core.scene.Geometry;
+import com.etherblood.luna.application.client.gui.BoundingRectangle;
+import com.etherblood.luna.application.client.gui.GuiContainer;
 import com.etherblood.luna.application.client.gui.GuiFactory;
+import com.etherblood.luna.application.client.gui.GuiManager;
 import com.etherblood.luna.application.client.gui.InputLayer;
 import com.etherblood.luna.application.client.gui.LayerOrder;
 import com.etherblood.luna.application.client.gui.textbox.EditableTextbox;
@@ -18,9 +17,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 public class ChatSystem extends LifecycleObject implements InputLayer {
@@ -28,19 +24,20 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
     public static final int CHAT_LINES = 20;
     private final ClientChatModule chatModule;
     private final CommandService commandService;
+    private final GuiManager guiManager;
     private final GuiFactory guiFactory;
+    private GuiContainer container;
     private final Consumer<ChatMessage> onMessage = this::onChatMessage;
 
     private final List<ChatMessage> messages = new CopyOnWriteArrayList<>();
 
     private EditableTextbox chatInput;
     private EditableTextbox chatDisplay;
-    private Geometry backgroundQuad;
-    private EditableTextbox focusedElement = null;
 
-    public ChatSystem(ClientChatModule chatModule, CommandService commandService, GuiFactory guiFactory) {
+    public ChatSystem(ClientChatModule chatModule, CommandService commandService, GuiManager guiManager, GuiFactory guiFactory) {
         this.chatModule = chatModule;
         this.commandService = commandService;
+        this.guiManager = guiManager;
         this.guiFactory = guiFactory;
     }
 
@@ -55,14 +52,12 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
 
         chatModule.subscribe(onMessage);
 
-        chatDisplay = guiFactory.editableTextbox(x -> {
+        chatDisplay = guiFactory.editableTextbox(new BoundingRectangle(0, 0, 300, CHAT_LINES * guiFactory.bitmapFont().getLineHeight()), x -> {
         });
         chatDisplay.getText().setFreezeText(true);
-        int topMargin = 100;
-        chatDisplay.getNode().setLocalTranslation(new Vector3f(1, topMargin, 0));
-        application.getGuiNode().add(chatDisplay.getNode());
+        application.getGuiNode().add(chatDisplay.node());
 
-        chatInput = guiFactory.editableTextbox(inputText -> {
+        chatInput = guiFactory.editableTextbox(new BoundingRectangle(0, CHAT_LINES * guiFactory.bitmapFont().getLineHeight(), 300, guiFactory.bitmapFont().getLineHeight()), inputText -> {
             if (inputText.startsWith("/")) {
                 String result = commandService.runCommand(inputText.substring(1));
                 if (result != null) {
@@ -71,39 +66,34 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
             } else if (!inputText.isEmpty()) {
                 chatModule.send(new ChatMessageRequest(inputText));
             }
+            detach();
         });
-        chatInput.getNode().setLocalTranslation(new Vector3f(1, topMargin + CHAT_LINES * chatInput.getBitmapText().getFont().getLineHeight(), 0));
 
-        backgroundQuad = guiFactory.backgroundQuad();
-        backgroundQuad.setLocalTranslation(new Vector3f(0, topMargin, 0.1f));
+        container = guiFactory.container(new BoundingRectangle(0, 100, 300, (CHAT_LINES + 1) * guiFactory.bitmapFont().getLineHeight()));
+        container.add(chatDisplay);
+        container.add(chatInput);
     }
 
     @Override
     public void update(float tpf) {
         super.update(tpf);
+        if (!isAttached()) {
+            return;
+        }
         String text = messages.stream()
-                .map(m -> m.senderName() + ": " + Stream.of(m.message().split("\n"))
-                        .collect(Collectors.joining(" ")))
+                .map(m -> m.senderName() + ": " + String.join(" ", m.message().split("\n")))
                 .collect(Collectors.joining("\n"));
 
         if (!chatDisplay.getText().current().text().equals(text)) {
             chatDisplay.setSelectionText(new SelectionText(text));
         }
-
-        chatDisplay.setFocus(chatDisplay == focusedElement);
-        chatInput.setFocus(chatInput == focusedElement);
-
-        chatInput.update();
-        chatDisplay.update();
     }
 
     @Override
     public void cleanupInternal() {
         super.cleanupInternal();
         chatModule.unsubscribe(onMessage);
-        application.getGuiNode().remove(chatDisplay.getNode());
-        application.getGuiNode().remove(chatInput.getNode());
-        application.getGuiNode().remove(backgroundQuad);
+        guiManager.getRootContainer().remove(container);
     }
 
     private void onChatMessage(ChatMessage message) {
@@ -116,64 +106,29 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
     @Override
     public boolean consumeKey(KeyEvent event) {
         final int chatActivationKey = GLFW.GLFW_KEY_ENTER;
-        if (focusedElement == null) {
-            if (event.getKey() == chatActivationKey && event.getAction() == GLFW.GLFW_PRESS) {
-                attach();
-                return true;
-            }
-            return false;
-        }
-
-        focusedElement.onKey(event);
         if (event.getKey() == chatActivationKey && event.getAction() == GLFW.GLFW_PRESS) {
-            detach();
+            if (isAttached()) {
+                detach();
+            } else {
+                attach();
+            }
+            return true;
         }
-        return true;
+        return container.isFocused();
+    }
+
+    private boolean isAttached() {
+        return guiManager.getRootContainer().getChilds().contains(container);
     }
 
     private void attach() {
-        application.getGuiNode().add(backgroundQuad);
-        application.getGuiNode().add(chatInput.getNode());
-        focusedElement = chatInput;
+        guiManager.getRootContainer().add(container);
+        guiManager.getRootContainer().setFocusedChild(container);
+        container.setFocusedChild(chatInput);
     }
 
     private void detach() {
-        application.getGuiNode().remove(backgroundQuad);
-        application.getGuiNode().remove(chatInput.getNode());
-        focusedElement = null;
+        guiManager.getRootContainer().remove(container);
     }
 
-    @Override
-    public boolean consumeCharacter(CharacterEvent event) {
-        if (focusedElement != null) {
-            focusedElement.onCharacter(event);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
-        if (focusedElement != null) {
-            if (event.getAction() == GLFW.GLFW_PRESS) {
-                if (cursorPosition.y < chatInput.getNode().getLocalTransform().getTranslation().y) {
-                    focusedElement = chatDisplay;
-                } else {
-                    focusedElement = chatInput;
-                }
-            }
-            focusedElement.onMouseButton(event, cursorPosition);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean consumeMouseMove(MousePositionEvent event) {
-        if (focusedElement != null) {
-            focusedElement.onMouseMove(event);
-            return true;
-        }
-        return false;
-    }
 }

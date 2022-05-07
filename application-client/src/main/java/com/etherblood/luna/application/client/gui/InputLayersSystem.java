@@ -59,8 +59,9 @@ public class InputLayersSystem extends LifecycleObject {
 
     private void onCharacter(CharacterEvent event) {
         // TODO: how to handle focus?
-        for (InputLayer layer : layers(keyFocus.values())) {
-            if (layer.consumeCharacter(event)) {
+        String character = Character.toString(event.getCodepoint());
+        for (InputLayer layer : layers(x -> true)) {
+            if (layer.consumeCharacter(event, character)) {
                 return;
             }
         }

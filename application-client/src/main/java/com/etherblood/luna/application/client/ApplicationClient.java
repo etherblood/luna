@@ -6,6 +6,7 @@ import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.etherblood.luna.application.client.gui.GuiFactory;
+import com.etherblood.luna.application.client.gui.GuiManager;
 import com.etherblood.luna.application.client.gui.InputLayersSystem;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -50,6 +51,7 @@ public class ApplicationClient extends Application {
 
             GuiFactory guiFactory = new GuiFactory();
             addSystem(guiFactory);
+            addSystem(new GuiManager(guiFactory));
             addSystem(new GameSystem(gameProxy, guiFactory));
             addSystem(new InputLayersSystem());
         }

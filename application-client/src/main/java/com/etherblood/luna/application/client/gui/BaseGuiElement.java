@@ -10,10 +10,21 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class BaseGuiElement implements GuiElement {
+
+    public static final float MAX_Z = 0.99f;
     protected final Node node = new Node();
-    protected Spatial background;
-    protected final Vector2f size = new Vector2f(100, 100);
+    protected final Spatial background;
     protected boolean focused = false;
+    protected BoundingRectangle bounds;
+
+    public BaseGuiElement(Spatial background, BoundingRectangle bounds) {
+        this.background = background;
+        if (background != null) {
+            background.setLocalTranslation(new Vector3f(0, 0, 0));
+            node().add(background);
+        }
+        updateNodesBounds(bounds);
+    }
 
     @Override
     public Node node() {
@@ -21,29 +32,29 @@ public class BaseGuiElement implements GuiElement {
     }
 
     @Override
-    public void update() {
-//        node.setLocalTranslation(new Vector3f(bounds.minX, bounds.minY, 1));
-        background.setLocalScale(new Vector3f(size.x, size.y, 1));
-    }
-
-    @Override
     public boolean consumeKey(KeyEvent event) {
+        if (!focused) {
+            throw new IllegalStateException("Only focused elements must receive key events.");
+        }
         return false;
     }
 
     @Override
-    public boolean consumeCharacter(CharacterEvent event) {
+    public boolean consumeCharacter(CharacterEvent event, String character) {
+        if (!focused) {
+            throw new IllegalStateException("Only focused elements must receive character events.");
+        }
         return false;
     }
 
     @Override
     public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
-        return background != null && contains(cursorPosition);
+        return false;
     }
 
     @Override
     public boolean consumeMouseMove(MousePositionEvent event, Vector2f cursorPosition) {
-        return background != null && contains(cursorPosition);
+        return false;
     }
 
     @Override
@@ -51,8 +62,41 @@ public class BaseGuiElement implements GuiElement {
         focused = focus;
     }
 
-    protected boolean contains(Vector2f v) {
-        return 0 <= v.x && v.x < size.x
-                && 0 <= v.y && v.y < size.y;
+    public void cleanup() {
+        node.cleanup();
+        if (background != null) {
+            background.cleanup();
+        }
+    }
+
+    public Spatial getBackground() {
+        return background;
+    }
+
+    protected void setBounds(BoundingRectangle newBounds) {
+        updateNodesBounds(newBounds);
+    }
+
+    private void updateNodesBounds(BoundingRectangle newBounds) {
+        if (bounds != null && bounds.equals(newBounds)) {
+            return;
+        }
+        bounds = newBounds;
+        Vector3f translation = new Vector3f(bounds.x(), bounds.y(), 0);
+        node.setLocalTranslation(translation);
+        if (background != null) {
+            Vector3f scale = new Vector3f(bounds.width(), bounds.height(), 1);
+            background.setLocalScale(scale);
+        }
+    }
+
+    @Override
+    public BoundingRectangle bounds() {
+        return bounds;
+    }
+
+    @Override
+    public boolean isFocused() {
+        return focused;
     }
 }

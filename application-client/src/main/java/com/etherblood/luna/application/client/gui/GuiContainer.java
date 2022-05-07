@@ -4,25 +4,26 @@ import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
+import com.destrostudios.icetea.core.scene.Spatial;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 
 public class GuiContainer extends BaseGuiElement {
 
     private final List<GuiElement> childs = new ArrayList<>();
     private GuiElement focusedChild = null;
 
-    public void add(GuiElement child) {
-        add(childs.size(), child);
+    public GuiContainer(Spatial background, BoundingRectangle bounds) {
+        super(background, bounds);
     }
 
-    public void add(int index, GuiElement child) {
-        childs.add(index, child);
-        node.add(child.node());
-        updateChildTransforms();
+    public void add(GuiElement child) {
+        childs.add(0, child);
+        node().add(child.node());
+        updateChildsZ();
     }
 
     public void remove(GuiElement child) {
@@ -30,30 +31,23 @@ public class GuiContainer extends BaseGuiElement {
             setFocusedChild(null);
         }
         childs.remove(child);
-        if (child.node().hasParent(node)) {
-            node.remove(child.node());
-        }
-        updateChildTransforms();
+        node().remove(child.node());
+        updateChildsZ();
     }
 
-    private void updateChildTransforms() {
-        for (int i = 0; i < childs.size(); i++) {
-            GuiElement other = childs.get(i);
+    private void updateChildsZ() {
+        List<GuiElement> children = getChilds();
+        for (int i = 0; i < children.size(); i++) {
+            GuiElement other = children.get(i);
             Vector3f translation = other.node().getLocalTransform().getTranslation();
-            other.node().setLocalTranslation(new Vector3f(translation).setComponent(2, (float) i / childs.size()));
-            other.node().setLocalScale(new Vector3f(1, 1, 1f / childs.size()));
+            float z = BaseGuiElement.MAX_Z - (i + 1) * BaseGuiElement.MAX_Z / children.size();
+            other.node().setLocalTranslation(new Vector3f(translation).setComponent(2, z));
+            other.node().setLocalScale(new Vector3f(1, 1, BaseGuiElement.MAX_Z / children.size()));
         }
     }
 
     public List<GuiElement> getChilds() {
-        return Collections.unmodifiableList(childs);
-    }
-
-    @Override
-    public void update() {
-        for (GuiElement child : childs) {
-            child.update();
-        }
+        return childs;
     }
 
     @Override
@@ -63,29 +57,30 @@ public class GuiContainer extends BaseGuiElement {
     }
 
     @Override
-    public boolean consumeCharacter(CharacterEvent event) {
-        return (focusedChild != null && focusedChild.consumeCharacter(event)) || super.consumeCharacter(event);
+    public boolean consumeCharacter(CharacterEvent event, String character) {
+        return (focusedChild != null && focusedChild.consumeCharacter(event, character)) || super.consumeCharacter(event, character);
     }
 
     @Override
     public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
-        for (GuiElement child : childs) {
-            Vector3f childTranslation = child.node().getLocalTransform().getTranslation();
-            Vector2f childCursor = new Vector2f(cursorPosition.x - childTranslation.x, cursorPosition.y - childTranslation.y);
-            if (child.consumeMouseButton(event, childCursor)) {
-                setFocusedChild(child);
-                return true;
+        Vector2f childCursor = cursorPosition.sub(bounds.x(), bounds.y(), new Vector2f());
+        if (event.getAction() == GLFW.GLFW_PRESS && event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            GuiElement nextChild = null;
+            for (GuiElement child : childs) {
+                if (child.bounds().contains(childCursor)) {
+                    nextChild = child;
+                    break;
+                }
             }
+            setFocusedChild(nextChild);
         }
-        setFocusedChild(null);
-        return super.consumeMouseButton(event, cursorPosition);
+        return focusedChild != null && focusedChild.consumeMouseButton(event, childCursor) || super.consumeMouseButton(event, cursorPosition);
     }
 
     @Override
     public boolean consumeMouseMove(MousePositionEvent event, Vector2f cursorPosition) {
-        for (GuiElement child : childs) {
-            Vector3f childTranslation = child.node().getLocalTransform().getTranslation();
-            Vector2f childCursor = new Vector2f(cursorPosition.x - childTranslation.x, cursorPosition.y - childTranslation.y);
+        Vector2f childCursor = cursorPosition.sub(bounds.x(), bounds.y(), new Vector2f());
+        for (GuiElement child : getChilds()) {
             if (child.consumeMouseMove(event, childCursor)) {
                 return true;
             }
@@ -98,18 +93,19 @@ public class GuiContainer extends BaseGuiElement {
     }
 
     public void setFocusedChild(GuiElement child) {
-        if (!focused
-                || !childs.contains(child)
-                || focusedChild == child) {
+        if (child != null && !getChilds().contains(child)) {
+            throw new IllegalArgumentException("Can't focus element that is not child of this container.");
+        }
+        if (focusedChild == child) {
             return;
         }
         if (focusedChild != null) {
             focusedChild.onFocus(false);
         }
-        if (child != null) {
-            child.onFocus(true);
-        }
         focusedChild = child;
+        if (focusedChild != null) {
+            focusedChild.onFocus(true);
+        }
     }
 
     @Override

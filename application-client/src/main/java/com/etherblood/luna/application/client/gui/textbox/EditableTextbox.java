@@ -6,12 +6,11 @@ import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
-import com.destrostudios.icetea.core.material.Material;
-import com.destrostudios.icetea.core.mesh.Mesh;
-import com.destrostudios.icetea.core.mesh.Quad;
-import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
+import com.destrostudios.icetea.core.scene.Spatial;
+import com.etherblood.luna.application.client.gui.BaseGuiElement;
+import com.etherblood.luna.application.client.gui.BoundingRectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,13 +19,12 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-public class EditableTextbox {
+public class EditableTextbox extends BaseGuiElement {
     // TODO: up/down navigation
     // TODO: text selection with double/triple click
     // TODO: text selection with shift click
 
     private final EditableText text = new EditableText(SelectionText.empty());
-    private final Node node = new Node();
     private final Node quadNode = new Node();
 
     private final Consumer<String> commit;
@@ -34,27 +32,20 @@ public class EditableTextbox {
     private final Clipboard clipboard;
     private final Supplier<Geometry> quadSupply;
     private final List<Geometry> selectionQuads = new ArrayList<>();
-    private boolean focused = false;
     private Vector2f selectionStart = null;
 
-    public EditableTextbox(BitmapFont font, Material selectionMaterial, Clipboard clipboard, Consumer<String> commit) {
+    public EditableTextbox(Spatial background, BoundingRectangle bounds, BitmapFont font, Supplier<Geometry> selectionQuadSupply, Clipboard clipboard, Consumer<String> commit) {
+        super(background, bounds);
         this.commit = commit;
-        bitmapText = new BitmapText(font);
+        bitmapText = new BitmapText(font, " ");
         this.clipboard = clipboard;
-        bitmapText.setLocalTranslation(new Vector3f(0, 0, 1));
+        bitmapText.setLocalTranslation(new Vector3f(0, 0, BaseGuiElement.MAX_Z));
         node.add(bitmapText);
-
-        Mesh quad = new Quad(1, 1);
-        quadSupply = () -> {
-            Geometry g = new Geometry();
-            g.setMesh(quad);
-            g.setMaterial(selectionMaterial);
-            g.setShadowMode(ShadowMode.OFF);
-            return g;
-        };
+        quadSupply = selectionQuadSupply;
     }
 
-    public void onKey(KeyEvent keyEvent) {
+    @Override
+    public boolean consumeKey(KeyEvent keyEvent) {
         if (keyEvent.getAction() == GLFW.GLFW_PRESS || keyEvent.getAction() == GLFW.GLFW_REPEAT) {
             boolean shift = (keyEvent.getModifiers() & GLFW.GLFW_MOD_SHIFT) != 0;
             boolean ctrl = (keyEvent.getModifiers() & GLFW.GLFW_MOD_CONTROL) != 0;
@@ -129,38 +120,51 @@ public class EditableTextbox {
                     text.push(text.current().fullRight(shift));
                     break;
             }
+            update();
+            return true;
         }
+        return false;
     }
 
-    public void onCharacter(CharacterEvent event) {
-        text.push(text.current().set(Character.toString(event.getCodepoint())));
+    @Override
+    public boolean consumeCharacter(CharacterEvent event, String character) {
+        text.push(text.current().set(character));
+        update();
+        return true;
     }
 
-    public void onMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
+    @Override
+    public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
+        Vector2f localCursor = cursorPosition.sub(bounds.x(), bounds.y(), new Vector2f());
         if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             if (event.getAction() == GLFW.GLFW_PRESS) {
-                selectionStart = cursorPosition;
-                updateSelection(cursorPosition);
+                selectionStart = localCursor;
+                updateSelection(localCursor);
             } else if (event.getAction() == GLFW.GLFW_RELEASE) {
-                updateSelection(cursorPosition);
+                updateSelection(localCursor);
                 selectionStart = null;
             }
+            return true;
         }
+        return false;
     }
 
-    public void onMouseMove(MousePositionEvent event) {
-        updateSelection(new Vector2f((float) event.getX(), (float) event.getY()));
+    @Override
+    public boolean consumeMouseMove(MousePositionEvent event, Vector2f cursorPosition) {
+        updateSelection(cursorPosition.sub(bounds.x(), bounds.y(), new Vector2f()));
+        return false;
     }
 
     private void updateSelection(Vector2f cursorPosition) {
         if (selectionStart != null) {
-            Vector3f offset = getNode().getLocalTransform().getTranslation();
-            Vector2f selectionEnd = cursorPosition;
-            setSelection(selectionStart.sub(offset.x(), offset.y(), new Vector2f()), selectionEnd.sub(offset.x(), offset.y(), new Vector2f()));
+            Vector3f offset = node().getLocalTransform().getTranslation();
+            Vector2f start = selectionStart.sub(offset.x(), offset.y(), new Vector2f());
+            Vector2f end = cursorPosition.sub(offset.x(), offset.y(), new Vector2f());
+            setSelection(start, end);
         }
     }
 
-    public void update() {
+    private void update() {
         SelectionText current = text.current();
         String displayText = current.text();
         if (displayText.isBlank()) { // workaround for empty buffer crash
@@ -215,21 +219,17 @@ public class EditableTextbox {
                 }
                 String preText = line.substring(0, startX);
                 String selectedText = line.substring(startX, endX);
-                quad.setLocalTranslation(new Vector3f(font.getWidth(preText), y * font.getLineHeight(), 0.999f));
+                quad.setLocalTranslation(new Vector3f(font.getWidth(preText), y * font.getLineHeight(), 0.5f));
                 quad.setLocalScale(new Vector3f(Math.max(1, font.getWidth(selectedText)), font.getLineHeight(), 1));
             }
         }
-        if (focused != quadNode.hasParent(node)) {
+        if (focused != quadNode.hasParent(node())) {
             if (focused) {
-                node.add(quadNode);
+                node().add(quadNode);
             } else {
-                node.remove(quadNode);
+                node().remove(quadNode);
             }
         }
-    }
-
-    public Node getNode() {
-        return node;
     }
 
     public EditableText getText() {
@@ -244,6 +244,7 @@ public class EditableTextbox {
         } else {
             text.push(value);
         }
+        update();
     }
 
     private void setSelection(Vector2f mouseTail, Vector2f mouseHead) {
@@ -269,6 +270,7 @@ public class EditableTextbox {
         }
 
         text.push(current.select(tail, head));
+        update();
     }
 
     private static int toCursorIndexX(BitmapFont font, String text, float x) {
@@ -279,11 +281,13 @@ public class EditableTextbox {
         return i;
     }
 
-    public void setFocus(boolean focused) {
-        this.focused = focused;
-    }
-
     public BitmapText getBitmapText() {
         return bitmapText;
+    }
+
+    @Override
+    public void onFocus(boolean focus) {
+        super.onFocus(focus);
+        update();
     }
 }

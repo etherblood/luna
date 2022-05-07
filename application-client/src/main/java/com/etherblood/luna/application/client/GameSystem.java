@@ -5,10 +5,13 @@ import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.destrostudios.icetea.core.light.DirectionalLight;
+import com.destrostudios.icetea.core.material.Material;
+import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
+import com.destrostudios.icetea.core.shader.Shader;
 import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.InputLayer;
 import com.etherblood.luna.application.client.gui.LayerOrder;
@@ -88,8 +91,23 @@ public class GameSystem extends LifecycleObject implements InputLayer {
 
 
             // Ground
-            geometryGround = guiFactory.backgroundQuad();// hacky hack (:
-            geometryGround.getMaterial().getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
+            Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
+                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
+                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
+            });
+            Shader fragShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.frag", new String[]{
+                    "com/destrostudios/icetea/core/shaders/nodes/light.glsllib",
+                    "com/destrostudios/icetea/core/shaders/nodes/shadow.glsllib"
+            });
+
+            Material groundMaterial = new Material();
+            groundMaterial.setVertexShader(vertexShaderDefault);
+            groundMaterial.setFragmentShader(fragShaderDefault);
+            groundMaterial.getParameters().setVector4f("color", new Vector4f(0.2f, 0.2f, 0.2f, 1));
+
+            geometryGround = new Geometry();// hacky hack (:
+            geometryGround.setMesh(new Quad(1, 1));
+            geometryGround.setMaterial(groundMaterial);
             geometryGround.setLocalScale(new Vector3f(10, 10, 1));
             geometryGround.move(new Vector3f(-5, 0, 5));
             geometryGround.rotate(new Quaternionf(new AxisAngle4f((float) (Math.PI / -2), 1, 0, 0)));
@@ -166,7 +184,7 @@ public class GameSystem extends LifecycleObject implements InputLayer {
             wrapper.setName(name);
             wrapper.setHealth(health == null ? null : health.value());
             Vector3f screenCoordinates = application.getScreenCoordinates(convert(position));
-            wrapper.getNode().setLocalTranslation(screenCoordinates);
+            wrapper.getNode().setLocalTranslation(screenCoordinates.setComponent(2, 0));
         }
     }
 

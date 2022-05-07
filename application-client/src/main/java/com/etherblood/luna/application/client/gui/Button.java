@@ -1,28 +1,28 @@
 package com.etherblood.luna.application.client.gui;
 
 import com.destrostudios.icetea.core.font.BitmapText;
-import com.destrostudios.icetea.core.scene.Geometry;
-import com.destrostudios.icetea.core.scene.Node;
+import com.destrostudios.icetea.core.input.MouseButtonEvent;
+import com.destrostudios.icetea.core.scene.Spatial;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFW;
 
-public class Button {
+public class Button extends BaseGuiElement {
 
-    private final Node node = new Node();
-    private final Geometry background;
     private final BitmapText bitmapText;
-    private Vector4f hitbox = new Vector4f(0, 0, 100, 100);
+    private final Runnable confirm;
 
-    public Button(Geometry background, BitmapText bitmapText) {
-        this.background = background;
+    public Button(Spatial background, BoundingRectangle bounds, BitmapText bitmapText, Runnable confirm) {
+        super(background, bounds);
         this.bitmapText = bitmapText;
-        node.add(background);
-        node.add(bitmapText);
+        this.confirm = confirm;
+        node().add(bitmapText);
+        update();
     }
 
-    public void setDimensions(Vector2f position, Vector2f size) {
-        hitbox = new Vector4f(position.x, position.y, position.x + size.x, position.y + size.y);
+    @Override
+    public void setBounds(BoundingRectangle bounds) {
+        super.setBounds(bounds);
         update();
     }
 
@@ -35,22 +35,24 @@ public class Button {
     }
 
     private void update() {
-        Vector2f position = new Vector2f(hitbox.x, hitbox.y);
-        Vector2f size = new Vector2f(hitbox.z - hitbox.x, hitbox.w - hitbox.y);
-        background.setLocalTranslation(new Vector3f(position.x, position.y, 0));
-        background.setLocalScale(new Vector3f(size.x, size.y, 1));
-        bitmapText.setLocalTranslation(new Vector3f(
-                position.x + (size.x - bitmapText.getTextWidth()) / 2,
-                position.y + (size.y - bitmapText.getTextHeight()) / 2,
-                0.001f));
+        Vector2f size = new Vector2f(bounds.width(), bounds.height());
+        Vector3f translation = new Vector3f(
+                (size.x - bitmapText.getTextWidth()) / 2,
+                (size.y - bitmapText.getTextHeight()) / 2,
+                BaseGuiElement.MAX_Z);
+        if (!translation.equals(bitmapText.getLocalTransform().getTranslation(), 1e-6f)) {
+            bitmapText.setLocalTranslation(translation);
+        }
     }
 
-    public boolean contains(Vector2f position) {
-        return hitbox.x <= position.x && position.x < hitbox.z
-                && hitbox.y <= position.y && position.y < hitbox.w;
-    }
-
-    public Node getNode() {
-        return node;
+    @Override
+    public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
+        if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (event.getAction() == GLFW.GLFW_RELEASE && bounds().contains(cursorPosition)) {
+                confirm.run();
+            }
+            return true;
+        }
+        return super.consumeMouseButton(event, cursorPosition);
     }
 }

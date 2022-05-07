@@ -2,10 +2,12 @@ package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
 import com.destrostudios.icetea.core.input.KeyEvent;
-import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
+import com.etherblood.luna.application.client.gui.BoundingRectangle;
 import com.etherblood.luna.application.client.gui.Button;
+import com.etherblood.luna.application.client.gui.GuiContainer;
 import com.etherblood.luna.application.client.gui.GuiFactory;
+import com.etherblood.luna.application.client.gui.GuiManager;
 import com.etherblood.luna.application.client.gui.InputLayer;
 import com.etherblood.luna.application.client.gui.LayerOrder;
 import com.etherblood.luna.application.client.gui.Listbox;
@@ -20,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 public class LobbySystem extends LifecycleObject implements InputLayer {
@@ -31,16 +31,18 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     private final LobbyClientModule<LobbyInfo> lobbyModule;
     private final GameClientModule gameModule;
     private final TimestampClientModule timestamps;
+    private final GuiManager guiManager;
     private final GuiFactory guiFactory;
-    private Listbox<?> focused;
+    private GuiContainer container;
     private Listbox<String> templates;
     private Listbox<UUID> games;
     private Button confirmButton;
 
-    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps, GuiFactory guiFactory) {
+    public LobbySystem(LobbyClientModule<LobbyInfo> lobbyModule, GameClientModule gameModule, TimestampClientModule timestamps, GuiManager guiManager, GuiFactory guiFactory) {
         this.lobbyModule = lobbyModule;
         this.gameModule = gameModule;
         this.timestamps = timestamps;
+        this.guiManager = guiManager;
         this.guiFactory = guiFactory;
     }
 
@@ -50,7 +52,7 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     }
 
     private boolean isAttached() {
-        return templates.getNode().hasParent(application.getGuiNode());
+        return guiManager.getRootContainer().getChilds().contains(container);
     }
 
     @Override
@@ -58,9 +60,9 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
         super.init();
 
         lobbyModule.subscribeToGamesList();
-        templates = guiFactory.listbox(x -> x);
+        templates = guiFactory.listbox(new BoundingRectangle(0, 0, 300, 600), x -> x);
         templates.setList(List.of(LOBBY_TEMPLATE, "test_room", "challenge_room"));
-        games = guiFactory.listbox(id -> {
+        games = guiFactory.listbox(new BoundingRectangle(300, 0, 300, 600), id -> {
             if (id.equals(START_GAME_ID)) {
                 return "new game";
             }
@@ -69,20 +71,21 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
                     + ": "
                     + info.players().stream().map(Player::name).collect(Collectors.joining(", "));
         });
-        templates.getNode().setLocalTranslation(new Vector3f(0, 100, 0));
-        games.getNode().setLocalTranslation(new Vector3f(300, 100, 0));
 
-        confirmButton = guiFactory.button();
+        confirmButton = guiFactory.button(new BoundingRectangle(600, 0, 200, 80), this::onConfirm);
         confirmButton.setText("confirm");
-        confirmButton.setDimensions(new Vector2f(800, 100), new Vector2f(200, 80));
 
-        focused = templates;
+        container = guiFactory.container(new BoundingRectangle(300, 100, 800, 600));
+        container.add(templates);
+        container.add(games);
+        container.add(confirmButton);
+
+        container.setFocusedChild(templates);
     }
 
     private void attach() {
-        application.getGuiNode().add(templates.getNode());
-        application.getGuiNode().add(games.getNode());
-        application.getGuiNode().add(confirmButton.getNode());
+        guiManager.getRootContainer().add(container);
+        guiManager.getRootContainer().setFocusedChild(container);
     }
 
     @Override
@@ -92,14 +95,15 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     }
 
     private void detach() {
-        application.getGuiNode().remove(templates.getNode());
-        application.getGuiNode().remove(games.getNode());
-        application.getGuiNode().remove(confirmButton.getNode());
+        guiManager.getRootContainer().remove(container);
     }
 
     @Override
     protected void update(float tpf) {
         super.update(tpf);
+        if (!isAttached()) {
+            return;
+        }
         String selectedTemplate = templates.getSelected();
         Map<UUID, LobbyInfo> listedGames = lobbyModule.getListedGames();
         List<UUID> list = listedGames.values().stream()
@@ -111,9 +115,6 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
             list.add(START_GAME_ID);
         }
         games.setList(list);
-
-        templates.update();
-        games.update();
     }
 
     @Override
@@ -124,51 +125,20 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
             } else {
                 attach();
             }
-            return true;
         }
-        if (isAttached() && focused != null) {
+        if (isAttached() && container.getFocusedChild() != null) {
             if (event.getAction() == GLFW.GLFW_PRESS) {
                 switch (event.getKey()) {
                     case GLFW.GLFW_KEY_ENTER -> onConfirm();
-                    case GLFW.GLFW_KEY_LEFT -> {
-                        focused = templates;
-                        games.setSelected(null);
-                    }
-                    case GLFW.GLFW_KEY_RIGHT -> focused = games;
-                    default -> focused.onKey(event);
                 }
             }
-            return true;
         }
-        return false;
-    }
-
-    @Override
-    public boolean consumeMouseButton(MouseButtonEvent event, Vector2f cursorPosition) {
-        if (!isAttached()) {
-            return false;
-        }
-        if (event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.getAction() == GLFW.GLFW_PRESS) {
-            if (confirmButton.contains(cursorPosition)) {
-                if (onConfirm()) {
-                    return true;
-                }
-            }
-            if (cursorPosition.x < games.getNode().getLocalTransform().getTranslation().x) {
-                focused = templates;
-                games.setSelected(null);
-            } else {
-                focused = games;
-            }
-        }
-        Vector3f translation = focused.getNode().getLocalTransform().getTranslation();
-        focused.onMouseButton(event, cursorPosition.sub(new Vector2f(translation.x, translation.y), new Vector2f()));
-        return true;
+        return container.isFocused();
     }
 
     private boolean onConfirm() {
         UUID selectedGame = games.getSelected();
-        if (games == focused && selectedGame != null) {
+        if (selectedGame != null) {
             if (START_GAME_ID.equals(selectedGame)) {
                 selectedGame = gameModule.start(templates.getSelected());
             }

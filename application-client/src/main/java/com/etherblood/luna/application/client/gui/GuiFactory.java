@@ -49,7 +49,7 @@ public class GuiFactory extends LifecycleObject {
         font = application.getAssetManager().loadBitmapFont("fonts/Verdana_18.fnt");
 
         backgroundMaterial = new Material(selectionMaterial, CloneContext.cloneOnlyMaterials());
-        backgroundMaterial.getParameters().setVector4f("color", new Vector4f(0.5f, 0.5f, 0.5f, 1));
+        backgroundMaterial.getParameters().setVector4f("color", new Vector4f(0.5f, 0.5f, 0.5f, 0.75f));
     }
 
     @Override
@@ -60,16 +60,24 @@ public class GuiFactory extends LifecycleObject {
         backgroundMaterial.cleanup();
     }
 
-    public EditableTextbox editableTextbox(Consumer<String> commit) {
-        return new EditableTextbox(font, selectionMaterial, clipboard, commit);
+    public GuiContainer container(BoundingRectangle bounds) {
+        return new GuiContainer(null, bounds);
     }
 
-    public <T> Listbox<T> listbox(Function<T, String> toText) {
-        return new Listbox<>(font, toText, selectionQuad());
+    public GuiContainer filledContainer(BoundingRectangle bounds) {
+        return new GuiContainer(backgroundQuad(), bounds);
     }
 
-    public Button button() {
-        return new Button(backgroundQuad(), bitmapText());
+    public EditableTextbox editableTextbox(BoundingRectangle bounds, Consumer<String> commit) {
+        return new EditableTextbox(backgroundQuad(), bounds, font, this::selectionQuad, clipboard, commit);
+    }
+
+    public <T> Listbox<T> listbox(BoundingRectangle bounds, Function<T, String> toText) {
+        return new Listbox<>(backgroundQuad(), bounds, font, toText, selectionQuad());
+    }
+
+    public Button button(BoundingRectangle bounds, Runnable confirm) {
+        return new Button(backgroundQuad(), bounds, bitmapText(), confirm);
     }
 
     public Geometry selectionQuad() {
@@ -91,6 +99,6 @@ public class GuiFactory extends LifecycleObject {
     }
 
     public BitmapText bitmapText() {
-        return new BitmapText(font);
+        return new BitmapText(font, "UNINITIALIZED");
     }
 }

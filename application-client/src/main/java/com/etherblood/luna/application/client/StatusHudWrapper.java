@@ -14,8 +14,8 @@ public class StatusHudWrapper {
 
     public StatusHudWrapper(int entity, BitmapFont font) {
         this.entity = entity;
-        nameNode = new BitmapText(font);
-        healthNode = new BitmapText(font);
+        nameNode = new BitmapText(font, "NAME");
+        healthNode = new BitmapText(font, "HEALTH");
 
         node = new Node();
         node.add(nameNode);
