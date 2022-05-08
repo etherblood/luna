@@ -217,6 +217,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             }
 
 
+            data.set(entity, new ActorName("Amara"));
             data.set(entity, new Movebox(new Rectangle(-250, -250, 500, 500)));
             data.set(entity, new Hitbox(new Circle(0, 0, 250)));
             data.set(entity, new ActiveAction(idleAction, game.getFrame()));
@@ -274,6 +275,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(fallenAction, new CascadeDelete(entity));
             }
 
+            data.set(entity, new ActorName("Ghost"));
             data.set(entity, new Movebox(new Rectangle(-250, -250, 500, 500)));
             data.set(entity, new Hitbox(new Circle(0, 0, 250)));
             data.set(entity, new ActiveAction(idleAction, game.getFrame()));
@@ -322,6 +324,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 data.set(fallenAction, new CascadeDelete(entity));
             }
 
+            data.set(entity, new ActorName("Metalon"));
             data.set(entity, new Movebox(new Rectangle(-750, -750, 1500, 1500)));
             data.set(entity, new Hitbox(new Circle(0, 0, 750)));
             data.set(entity, new ActiveAction(idleAction, game.getFrame()));
