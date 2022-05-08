@@ -6,6 +6,7 @@ import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
 import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 public class GuiManager extends LifecycleObject implements InputLayer {
@@ -24,6 +25,8 @@ public class GuiManager extends LifecycleObject implements InputLayer {
         GLFW.glfwGetWindowSize(application.getWindow(), width, height);
         rootContainer = factory.container(new BoundingRectangle(0, 0, width[0], height[0]));
         rootContainer.onFocus(true);
+        rootContainer.node().setLocalScale(new Vector3f(1, 1, 0.5f));
+        rootContainer.node().setLocalTranslation(new Vector3f(0, 0, 0.25f));
         application.getGuiNode().add(rootContainer.node());
     }
 
