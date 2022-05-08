@@ -74,15 +74,27 @@ public record Fraction(long numerator, long denominator) implements Comparable<F
     }
 
     public int floorToInt() {
-        return (int) (Math.floorDiv(numerator, denominator));
+        return (int) floorToLong();
+    }
+
+    public long floorToLong() {
+        return Math.floorDiv(numerator, denominator);
     }
 
     public int ceilToInt() {
-        return (int) (MathUtil.ceilDiv(numerator, denominator));
+        return (int) ceilToLong();
+    }
+
+    public long ceilToLong() {
+        return MathUtil.ceilDiv(numerator, denominator);
     }
 
     public int upToInt() {
         return numerator >= 0 ? ceilToInt() : floorToInt();
+    }
+
+    public long toLong() {
+        return numerator / denominator;
     }
 }
 
