@@ -1,7 +1,7 @@
 package com.etherblood.luna.application.client;
 
+import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.input.KeyEvent;
-import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.etherblood.luna.application.client.gui.BoundingRectangle;
 import com.etherblood.luna.application.client.gui.GuiContainer;
 import com.etherblood.luna.application.client.gui.GuiFactory;
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.lwjgl.glfw.GLFW;
 
-public class ChatSystem extends LifecycleObject implements InputLayer {
+public class ChatSystem extends AppSystem implements InputLayer {
 
     public static final int CHAT_LINES = 20;
     private final ClientChatModule chatModule;
@@ -47,8 +47,8 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    public void init() {
-        super.init();
+    public void onAttached() {
+        super.onAttached();
 
         chatModule.subscribe(onMessage);
 
@@ -90,8 +90,8 @@ public class ChatSystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    public void cleanupInternal() {
-        super.cleanupInternal();
+    public void onDetached() {
+        super.onDetached();
         chatModule.unsubscribe(onMessage);
         guiManager.getRootContainer().remove(container);
     }

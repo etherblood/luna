@@ -63,9 +63,9 @@ public class BaseGuiElement implements GuiElement {
     }
 
     public void cleanup() {
-        node.cleanup();
+        node.cleanupNativeState();
         if (background != null) {
-            background.cleanup();
+            background.cleanupNativeState();
         }
     }
 

@@ -1,5 +1,6 @@
 package com.etherblood.luna.application.client.gui;
 
+import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.CharacterListener;
 import com.destrostudios.icetea.core.input.KeyEvent;
@@ -8,7 +9,6 @@ import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.input.MouseButtonListener;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
 import com.destrostudios.icetea.core.input.MousePositionListener;
-import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
-public class InputLayersSystem extends LifecycleObject {
+public class InputLayersSystem extends AppSystem {
 
     private final KeyListener onKey = this::onKey;
     private final CharacterListener onCharacter = this::onCharacter;
@@ -29,8 +29,8 @@ public class InputLayersSystem extends LifecycleObject {
     private final Map<Integer, InputLayer> mouseFocus = new HashMap<>();
 
     @Override
-    protected void init() {
-        super.init();
+    public void onAttached() {
+        super.onAttached();
         application.getInputManager().addKeyListener(onKey);
         application.getInputManager().addCharacterListener(onCharacter);
         application.getInputManager().addMouseButtonListener(onMouseButton);
@@ -38,8 +38,8 @@ public class InputLayersSystem extends LifecycleObject {
     }
 
     @Override
-    protected void cleanupInternal() {
-        super.cleanupInternal();
+    public void onDetached() {
+        super.onDetached();
         application.getInputManager().removeKeyListener(onKey);
         application.getInputManager().removeCharacterListener(onCharacter);
         application.getInputManager().removeMouseButtonListener(onMouseButton);

@@ -1,8 +1,8 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
+import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.input.KeyEvent;
-import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.etherblood.luna.application.client.gui.BoundingRectangle;
 import com.etherblood.luna.application.client.gui.Button;
 import com.etherblood.luna.application.client.gui.GuiContainer;
@@ -24,7 +24,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.lwjgl.glfw.GLFW;
 
-public class LobbySystem extends LifecycleObject implements InputLayer {
+public class LobbySystem extends AppSystem implements InputLayer {
 
     private static final UUID START_GAME_ID = UUID.randomUUID();
     public static final String LOBBY_TEMPLATE = "lobby_room";
@@ -56,8 +56,8 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void init() {
-        super.init();
+    public void onAttached() {
+        super.onAttached();
 
         lobbyModule.subscribeToGamesList();
         templates = guiFactory.listbox(new BoundingRectangle(0, 0, 300, 600), x -> x);
@@ -89,8 +89,8 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void cleanupInternal() {
-        super.cleanupInternal();
+    public void onDetached() {
+        super.onDetached();
         lobbyModule.unsubscribeFromGamesList();
     }
 
@@ -99,7 +99,7 @@ public class LobbySystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void update(float tpf) {
+    public void update(float tpf) {
         super.update(tpf);
         if (!isAttached()) {
             return;

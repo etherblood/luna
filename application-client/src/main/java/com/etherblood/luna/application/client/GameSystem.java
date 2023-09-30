@@ -1,13 +1,14 @@
 package com.etherblood.luna.application.client;
 
+import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.asset.loader.GltfLoaderSettings;
 import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.input.KeyEvent;
-import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.destrostudios.icetea.core.light.DirectionalLight;
 import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
+import com.destrostudios.icetea.core.render.shadow.ShadowConfig;
 import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
@@ -47,7 +48,7 @@ import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.vulkan.VK10;
 
-public class GameSystem extends LifecycleObject implements InputLayer {
+public class GameSystem extends AppSystem implements InputLayer {
 
     private final float CAMERA_DISTANCE = 10;
     private final float CAMERA_ANGLE = (float) (30 * Math.PI / 180);
@@ -71,9 +72,9 @@ public class GameSystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void init() {
+    public void onAttached() {
         try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
-            super.init();
+            super.onAttached();
 
             GLFW.glfwSetWindowTitle(application.getWindow(), gameProxy.getPlayer().login);
             application.getAssetManager().addLocator(new FileLocator("./assets"));
@@ -83,7 +84,7 @@ public class GameSystem extends LifecycleObject implements InputLayer {
             directionalLight.getLightColor().set(0.75f, 0.75f, 0.75f, 1);
             directionalLight.setDirection(new Vector3f(0, -1, 0).normalize());
             directionalLight.addAffectedSpatial(application.getSceneNode());
-            directionalLight.addShadows(4096);
+            directionalLight.addShadows(new ShadowConfig());
             application.setLight(directionalLight);
 
             application.getSceneCamera().setLocation(new Vector3f(0, 2, 10));
@@ -127,7 +128,7 @@ public class GameSystem extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void update(float tpf) {
+    public void update(float tpf) {
         super.update(tpf);
         gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
         GameEngine snapshot = gameProxy.getEngineSnapshot();
@@ -269,7 +270,7 @@ public class GameSystem extends LifecycleObject implements InputLayer {
                 try (PrintStopwatch sub = new PrintStopwatch("update render dependencies")) {
                     Node sceneNode = application.getSceneNode();
                     sceneNode.add(preloadNode);
-                    application.updateRenderDependencies();
+                    application.updateInternalState();
                     sceneNode.remove(preloadNode);
                 }
                 loadedGame = snapshot.getId();
