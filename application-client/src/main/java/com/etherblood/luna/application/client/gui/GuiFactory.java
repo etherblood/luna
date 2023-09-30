@@ -1,9 +1,9 @@
 package com.etherblood.luna.application.client.gui;
 
+import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.clone.CloneContext;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
-import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import com.destrostudios.icetea.core.material.Material;
 import com.destrostudios.icetea.core.mesh.Quad;
 import com.destrostudios.icetea.core.scene.Geometry;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 import org.joml.Vector4f;
 import org.lwjgl.vulkan.VK10;
 
-public class GuiFactory extends LifecycleObject {
+public class GuiFactory extends AppSystem {
 
     private final Quad unitQuad = new Quad(1, 1);
     private Clipboard clipboard;
@@ -25,8 +25,8 @@ public class GuiFactory extends LifecycleObject {
     private BitmapFont font;
 
     @Override
-    protected void init() {
-        super.init();
+    public void onAttached() {
+        super.onAttached();
 
         clipboard = new WindowClipboard(application.getWindow());
         Shader vertexShaderDefault = new Shader("com/destrostudios/icetea/core/shaders/default.vert", new String[]{
@@ -53,11 +53,11 @@ public class GuiFactory extends LifecycleObject {
     }
 
     @Override
-    protected void cleanupInternal() {
-        super.cleanupInternal();
+    public void onDetached() {
+        super.onDetached();
 
-        selectionMaterial.cleanup();
-        backgroundMaterial.cleanup();
+        selectionMaterial.cleanupNative();
+        backgroundMaterial.cleanupNative();
     }
 
     public GuiContainer container(BoundingRectangle bounds) {

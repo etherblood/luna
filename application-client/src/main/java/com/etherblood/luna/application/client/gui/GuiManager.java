@@ -1,15 +1,15 @@
 package com.etherblood.luna.application.client.gui;
 
+import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.input.CharacterEvent;
 import com.destrostudios.icetea.core.input.KeyEvent;
 import com.destrostudios.icetea.core.input.MouseButtonEvent;
 import com.destrostudios.icetea.core.input.MousePositionEvent;
-import com.destrostudios.icetea.core.lifecycle.LifecycleObject;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-public class GuiManager extends LifecycleObject implements InputLayer {
+public class GuiManager extends AppSystem implements InputLayer {
     private final GuiFactory factory;
     private GuiContainer rootContainer;
 
@@ -18,8 +18,8 @@ public class GuiManager extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void init() {
-        super.init();
+    public void onAttached() {
+        super.onAttached();
         int[] width = new int[1];
         int[] height = new int[1];
         GLFW.glfwGetWindowSize(application.getWindow(), width, height);
@@ -31,14 +31,14 @@ public class GuiManager extends LifecycleObject implements InputLayer {
     }
 
     @Override
-    protected void cleanupInternal() {
-        super.cleanupInternal();
+    public void onDetached() {
+        super.onDetached();
         application.getGuiNode().remove(rootContainer.node());
         rootContainer.cleanup();
     }
 
     @Override
-    protected void update(float tpf) {
+    public void update(float tpf) {
         super.update(tpf);
         int[] width = new int[1];
         int[] height = new int[1];
