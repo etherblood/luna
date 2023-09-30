@@ -267,7 +267,7 @@ public class GameSystem extends AppSystem implements InputLayer {
                         preloadNode.add(geometry);
                     }
                 }
-                try (PrintStopwatch sub = new PrintStopwatch("update render dependencies")) {
+                try (PrintStopwatch sub = new PrintStopwatch("update internal state")) {
                     Node sceneNode = application.getSceneNode();
                     sceneNode.add(preloadNode);
                     application.updateInternalState();
