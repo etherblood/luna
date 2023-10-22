@@ -13,10 +13,11 @@ curl https://destrostudios.com:8080/apps/10/updateFiles
 echo updated client files
 
 cd ${SERVER}
-bash stop.sh
+pm2 stop luna 2> /dev/null
 echo stopped server
 cp ${GIT}/application-server/target/application-server-*[!s].jar ${SERVER}/luna.jar
 rsync -rc --delete ${GIT}/application-server/target/libs ${SERVER}/
+mv ${GIT}/releng/ecosystem.config.js ${SERVER}/ecosystem.config.js
 echo updated server files
-bash start.sh
+pm2 start
 echo started server
