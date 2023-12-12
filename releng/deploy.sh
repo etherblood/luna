@@ -9,7 +9,7 @@ rsync -rc --delete ${GIT}/application-client/target/assets ${CLIENT}/
 rsync -rc --delete ${GIT}/application-client/target/libs ${CLIENT}/
 cp ${GIT}/releng/background.png /var/www/destrostudios/launcher/images/background_10.png
 cp ${GIT}/releng/tile.png /var/www/destrostudios/launcher/images/tile_10.png
-curl https://destrostudios.com:8080/apps/10/updateFiles
+curl -X POST https://destrostudios.com:8080/apps/10/updateFiles
 echo updated client files
 
 cd ${SERVER}
