@@ -6,7 +6,7 @@ pipeline {
         ansiColor('xterm')
     }
     parameters {
-        string(name: 'VERSION', defaultValue: 'master')
+        string(name: 'VERSION', defaultValue: 'main')
     }
     stages {
         stage('Checkout') {
