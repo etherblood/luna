@@ -1,0 +1,8 @@
+name: luna
+services:
+  app:
+    build:
+      dockerfile: app.Dockerfile
+    ports:
+      - "12134:12134/tcp"
+      - "12135:12135/udp"
