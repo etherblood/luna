@@ -16,12 +16,13 @@ import com.etherblood.luna.network.client.GameClientModule;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
 import com.etherblood.luna.network.client.lobby.LunaLobbyClientModule;
 import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.Map;
-import javax.swing.JOptionPane;
 
 public class Main {
 
@@ -105,7 +106,7 @@ public class Main {
                 new NoValidateJwtService().decode(jwt).user);
     }
 
-    static String getTestJwt(long playerId) {
+    public static String getTestJwt(long playerId) {
         Map<String, ?> user = Map.of("id", playerId, "login", "player " + playerId);
         return JWT.create()
                 .withIssuedAt(new Date())

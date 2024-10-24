@@ -17,16 +17,17 @@
         <module>network-client</module>
         <module>application-server</module>
         <module>network-sandbox</module>
+        <module>sandbox</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>23</maven.compiler.source>
+        <maven.compiler.target>23</maven.compiler.target>
 
         <version.luna>0.1.0</version.luna>
-        <version.game-tools>169148796235c281a561545c0a7465cea5f0cce5</version.game-tools>
-        <version.auth-token>c7a6c8b4b9d79dac73aec617de4225e17c010405</version.auth-token>
+        <version.game-tools>cc02ca8ca6b2fddcde26ccb9ee10c2be724ec88a</version.game-tools>
+        <version.auth-token>0aa5a6624ecb80691c1b7859b06c6c1353ca6e6d</version.auth-token>
         <version.maven-jar-plugin>3.1.2</version.maven-jar-plugin>
     </properties>
     <repositories>
