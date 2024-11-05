@@ -2,16 +2,16 @@ package com.etherblood.luna.engine;
 
 public record Direction(Vector2 kiloVector) {
 
-    public static final int THOUSAND_SQRT_HALFS = 707;
+    public static final int SQRT_HALF_MILLIS = 707;// Math.round(1000 * Math.sqrt(0.5))
 
     public static Direction UP = new Direction(new Vector2(0, 1000));
-    public static Direction UP_RIGHT = new Direction(new Vector2(THOUSAND_SQRT_HALFS, THOUSAND_SQRT_HALFS));
+    public static Direction UP_RIGHT = new Direction(new Vector2(SQRT_HALF_MILLIS, SQRT_HALF_MILLIS));
     public static Direction RIGHT = new Direction(new Vector2(1000, 0));
-    public static Direction DOWN_RIGHT = new Direction(new Vector2(THOUSAND_SQRT_HALFS, -THOUSAND_SQRT_HALFS));
+    public static Direction DOWN_RIGHT = new Direction(new Vector2(SQRT_HALF_MILLIS, -SQRT_HALF_MILLIS));
     public static Direction DOWN = new Direction(new Vector2(0, -1000));
-    public static Direction DOWN_LEFT = new Direction(new Vector2(-THOUSAND_SQRT_HALFS, -THOUSAND_SQRT_HALFS));
+    public static Direction DOWN_LEFT = new Direction(new Vector2(-SQRT_HALF_MILLIS, -SQRT_HALF_MILLIS));
     public static Direction LEFT = new Direction(new Vector2(-1000, 0));
-    public static Direction UP_LEFT = new Direction(new Vector2(-THOUSAND_SQRT_HALFS, THOUSAND_SQRT_HALFS));
+    public static Direction UP_LEFT = new Direction(new Vector2(-SQRT_HALF_MILLIS, SQRT_HALF_MILLIS));
 
     public Vector2 toLengthVector(long length) {
         return kiloVector.mult(length).floorDiv(1000);

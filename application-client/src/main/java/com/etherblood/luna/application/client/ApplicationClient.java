@@ -35,7 +35,7 @@ public class ApplicationClient extends Application {
 
     @Override
     protected void init() {
-        try (PrintStopwatch stopwatch = new PrintStopwatch("init")) {
+        try (PrintStopwatch stopwatch = new PrintStopwatch(getClass().getSimpleName() + ".init()")) {
             super.init();
             GLFW.glfwSetWindowTitle(getWindow(), gameProxy.getPlayer().login);
             assetManager.addLocator(new FileLocator("./assets"));

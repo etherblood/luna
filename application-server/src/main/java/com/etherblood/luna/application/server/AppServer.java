@@ -6,6 +6,7 @@ import com.destrostudios.gametools.network.server.modules.jwt.JwtServerModule;
 import com.esotericsoftware.kryonet.Server;
 import com.etherblood.luna.engine.GameLoop;
 import com.etherblood.luna.network.api.NetworkUtil;
+import com.etherblood.luna.network.api.StatsSerialization;
 import com.etherblood.luna.network.server.GameServerModule;
 import com.etherblood.luna.network.server.chat.ServerChatModule;
 import com.etherblood.luna.network.server.lobby.LunaLobbyServerModule;
@@ -17,10 +18,14 @@ public class AppServer {
     private final int fps = 60;
     private final Server server;
     private final GameServerModule gameModule;
+    private final StatsSerialization serialization;
     private GameLoop loop;
+    private long lastSerializationLog = -1;
+    private final long serializationLogIntervalMillis = 60_000;
 
     public AppServer(JwtService jwtService) {
-        server = new Server(1_000_000, 1_000_000);
+        serialization = new StatsSerialization();
+        server = new Server(1_000_000, 1_000_000, serialization);
         JwtServerModule jwtModule = new JwtServerModule(jwtService, server::getConnections);
         TimestampServerModule timestampModule = new TimestampServerModule();
         LunaLobbyServerModule lobbyModule = new LunaLobbyServerModule(server::getConnections);
@@ -38,8 +43,15 @@ public class AppServer {
     }
 
     public void run() {
-        int fps = 60;
-        loop = new GameLoop(fps, gameModule::update);
+        loop = new GameLoop(fps, () -> {
+            gameModule.update();
+            long current = System.currentTimeMillis() / serializationLogIntervalMillis;
+            if (current > lastSerializationLog) {
+                System.out.println("reads: " + serialization.reads);
+                System.out.println("writes: " + serialization.writes);
+                lastSerializationLog = current;
+            }
+        });
         loop.run();
     }
 
