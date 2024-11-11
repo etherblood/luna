@@ -2,9 +2,9 @@ package com.etherblood.luna.application.client;
 
 import java.io.IOException;
 
-public class RemoteMain2 {
+public class LocalhostMain1 {
 
     public static void main(String... args) throws IOException {
-        Main.startApp("localhost", Main.getTestJwt(2), true);
+        Main.startApp("localhost", Main.getTestJwt(1), true);
     }
 }

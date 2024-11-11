@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.game;
 
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
@@ -6,13 +6,13 @@ import com.destrostudios.icetea.core.scene.Node;
 import com.etherblood.luna.engine.MathUtil;
 import org.joml.Vector3f;
 
-public class StatusHudWrapper {
+public class SceneStatusHud {
     private final int entity;
     private final Node node;
     private final BitmapText nameNode;
     private final BitmapText healthNode;
 
-    public StatusHudWrapper(int entity, BitmapFont font) {
+    public SceneStatusHud(int entity, BitmapFont font) {
         this.entity = entity;
         nameNode = new BitmapText(font, "NAME");
         healthNode = new BitmapText(font, "HEALTH");

@@ -21,6 +21,7 @@ import com.etherblood.luna.network.api.game.messages.SpectateGameResponse;
 import com.etherblood.luna.network.api.game.messages.StartGameRequest;
 import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
 import com.etherblood.luna.network.server.lobby.LunaLobbyServerModule;
+
 import java.io.ByteArrayOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +35,7 @@ public class GameServerModule extends GameModule {
 
     private static final long MILLIS_PER_SECOND = 1000;
     private final long clientDelayFrames = 2;
-    private final Object lock = new Object();// TODO: use striped lock instead to lock gameIds
+    private final StripedLock locking = new StripedLock(128);
     private final Map<Integer, Connection> connections = new ConcurrentHashMap<>();
     private final JwtServerModule jwtModule;
     private final LunaLobbyServerModule lobbyModule;
@@ -70,7 +71,7 @@ public class GameServerModule extends GameModule {
     @Override
     public void received(Connection connection, Object object) {
         if (object instanceof EventMessage message) {
-            synchronized (lock) {
+            locking.runSynchronized(message.spectateId(), () -> {
                 for (ServerGame serverGame : games.values()) {
                     // TODO: permission checks?
                     Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
@@ -84,9 +85,9 @@ public class GameServerModule extends GameModule {
                         }
                     }
                 }
-            }
+            });
         } else if (object instanceof SpectateGameRequest request) {
-            synchronized (lock) {
+            locking.runSynchronized(request.gameId(), () -> {
                 // TODO: permission checks?
                 JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
                 ServerGame serverGame = games.get(request.gameId());
@@ -97,9 +98,9 @@ public class GameServerModule extends GameModule {
                 UUID spectateId = UUID.randomUUID();
                 builders.put(connection.getID(), new ServerEventMessageBuilder(spectateId));
                 connection.sendTCP(new SpectateGameResponse(spectateId, state));
-            }
+            });
         } else if (object instanceof UnspectateGameRequest request) {
-            synchronized (lock) {
+            locking.runSynchronized(request.gameId(), () -> {
                 // TODO: permission checks?
                 JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
                 ServerGame serverGame = games.get(request.gameId());
@@ -107,27 +108,27 @@ public class GameServerModule extends GameModule {
                 Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
                 builders.remove(connection.getID());
                 System.out.println("User " + user.login + " unspectates game " + state.getId());
-            }
+            });
         } else if (object instanceof EnterGameRequest request) {
-            synchronized (lock) {
+            locking.runSynchronized(request.gameId(), () -> {
                 // TODO: permission checks?
                 JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
                 ServerGame serverGame = games.get(request.gameId());
                 EventMessagePart part = new EventMessagePart(serverGame.getState().getFrame(), new GameEvent(null, new PlayerJoined(user.id, user.login, request.actorTemplate(), true)));
                 broadcast(serverGame, part);
                 System.out.println("User " + user.login + " enters game " + request.gameId() + " with " + request.actorTemplate());
-            }
+            });
         } else if (object instanceof LeaveGameRequest request) {
-            synchronized (lock) {
+            locking.runSynchronized(request.gameId(), () -> {
                 // TODO: permission checks?
                 JwtAuthenticationUser user = jwtModule.getUser(connection.getID());
                 ServerGame serverGame = games.get(request.gameId());
                 EventMessagePart part = new EventMessagePart(serverGame.getState().getFrame(), new GameEvent(null, new PlayerJoined(user.id, user.login, null, false)));
                 broadcast(serverGame, part);
                 System.out.println("User " + user.login + " leaves game " + request.gameId());
-            }
+            });
         } else if (object instanceof StartGameRequest request) {
-            synchronized (lock) {
+            locking.runSynchronized(request.gameId(), () -> {
                 // TODO: permission checks?
                 GameRules rules = GameRules.get(request.gameRules());
                 GameEngine game = new GameEngine(request.gameId(), rules, System.currentTimeMillis(), new EntityDataImpl(rules.getComponentTypes()), 0);
@@ -136,7 +137,7 @@ public class GameServerModule extends GameModule {
                 if (games.putIfAbsent(request.gameId(), new ServerGame(game)) == null) {
                     System.out.println("Started " + request.gameTemplate() + " " + request.gameId());
                 }
-            }
+            });
         }
     }
 
@@ -148,39 +149,38 @@ public class GameServerModule extends GameModule {
     }
 
     public void update() {
-        synchronized (lock) {
-            for (ServerGame serverGame : games.values()) {
-                GameEngine state = serverGame.getState();
-                PlaybackBuffer buffer = serverGame.getBuffer();
-                Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
+        games.values().parallelStream().forEach(serverGame
+                -> locking.runSynchronized(serverGame.getState().getId(), () -> {
+            GameEngine state = serverGame.getState();
+            PlaybackBuffer buffer = serverGame.getBuffer();
+            Map<Integer, ServerEventMessageBuilder> builders = serverGame.getBuilders();
 
-                long servertime = System.currentTimeMillis();
-                long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
-                if (state.getFrame() < nextFrame) {
-                    do {
-                        long frame = state.getFrame();
-                        Set<GameEvent> events = buffer.peek(frame);
-                        buffer.lockFrame(frame);
-                        state.tick(events);
+            long servertime = System.currentTimeMillis();
+            long nextFrame = (servertime - state.getStartEpochMillis()) * state.getRules().getFramesPerSecond() / MILLIS_PER_SECOND;
+            if (state.getFrame() < nextFrame) {
+                do {
+                    long frame = state.getFrame();
+                    Set<GameEvent> events = buffer.peek(frame);
+                    buffer.lockFrame(frame);
+                    state.tick(events);
 
-                        for (ServerEventMessageBuilder builder : builders.values()) {
-                            for (GameEvent event : events) {
-                                builder.broadcast(new EventMessagePart(frame, event));
-                            }
+                    for (ServerEventMessageBuilder builder : builders.values()) {
+                        for (GameEvent event : events) {
+                            builder.broadcast(new EventMessagePart(frame, event));
                         }
-                    } while (state.getFrame() < nextFrame);
-
-                    for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
-                        Connection connection = connections.get(entry.getKey());
-                        ServerEventMessageBuilder builder = entry.getValue();
-                        builder.lockFrame(buffer.getLockedFrame());
-                        connection.sendUDP(builder.build());
                     }
+                } while (state.getFrame() < nextFrame);
 
-                    lobbyModule.update(state);
+                for (Map.Entry<Integer, ServerEventMessageBuilder> entry : builders.entrySet()) {
+                    Connection connection = connections.get(entry.getKey());
+                    ServerEventMessageBuilder builder = entry.getValue();
+                    builder.lockFrame(buffer.getLockedFrame());
+                    connection.sendUDP(builder.build());
                 }
+
+                lobbyModule.update(state);
             }
-        }
+        }));
     }
 
     private Kryo getKryo() {

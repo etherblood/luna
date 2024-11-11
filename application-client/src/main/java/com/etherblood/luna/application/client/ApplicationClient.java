@@ -5,6 +5,8 @@ import com.destrostudios.icetea.core.asset.locator.FileLocator;
 import com.destrostudios.icetea.core.font.BitmapFont;
 import com.destrostudios.icetea.core.font.BitmapText;
 import com.destrostudios.icetea.core.render.bucket.RenderBucketType;
+import com.etherblood.luna.application.client.game.GameProxy;
+import com.etherblood.luna.application.client.game.GameSystem;
 import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.GuiManager;
 import com.etherblood.luna.application.client.gui.InputLayersSystem;

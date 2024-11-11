@@ -13,8 +13,9 @@ import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.network.api.game.messages.EventMessage;
 import com.etherblood.luna.network.api.game.messages.EventMessagePart;
 import com.etherblood.luna.network.api.game.messages.serialization.EventMessageSerializer;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

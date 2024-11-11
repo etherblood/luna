@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.lobby;
 
 import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.input.KeyEvent;
@@ -13,11 +13,12 @@ import com.etherblood.luna.application.client.gui.textbox.SelectionText;
 import com.etherblood.luna.network.api.chat.ChatMessage;
 import com.etherblood.luna.network.api.chat.ChatMessageRequest;
 import com.etherblood.luna.network.client.chat.ClientChatModule;
+import org.lwjgl.glfw.GLFW;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.lwjgl.glfw.GLFW;
 
 public class ChatSystem extends AppSystem implements InputLayer {
 

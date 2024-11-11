@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.game;
 
 import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.engine.GameEngine;

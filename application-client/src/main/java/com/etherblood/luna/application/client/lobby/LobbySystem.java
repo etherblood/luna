@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.lobby;
 
 import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule;
 import com.destrostudios.icetea.core.AppSystem;
@@ -15,6 +15,8 @@ import com.etherblood.luna.network.api.lobby.LobbyInfo;
 import com.etherblood.luna.network.api.lobby.Player;
 import com.etherblood.luna.network.client.GameClientModule;
 import com.etherblood.luna.network.client.timestamp.TimestampClientModule;
+import org.lwjgl.glfw.GLFW;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.lwjgl.glfw.GLFW;
 
 public class LobbySystem extends AppSystem implements InputLayer {
 

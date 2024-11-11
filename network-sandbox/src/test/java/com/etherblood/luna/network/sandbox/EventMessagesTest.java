@@ -8,9 +8,10 @@ import com.etherblood.luna.network.api.game.messages.EventMessage;
 import com.etherblood.luna.network.api.game.messages.EventMessagePart;
 import com.etherblood.luna.network.client.ClientEventMessageBuilder;
 import com.etherblood.luna.network.server.ServerEventMessageBuilder;
+import org.junit.jupiter.api.Test;
+
 import java.util.Set;
 import java.util.UUID;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

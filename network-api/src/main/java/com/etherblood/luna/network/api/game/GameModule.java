@@ -58,6 +58,7 @@ import com.etherblood.luna.network.api.game.messages.StartGameRequest;
 import com.etherblood.luna.network.api.game.messages.UnspectateGameRequest;
 import com.etherblood.luna.network.api.game.messages.serialization.EventMessageSerializer;
 import com.etherblood.luna.network.api.game.messages.serialization.GameEngineSerializer;
+
 import java.util.UUID;
 
 public abstract class GameModule extends NetworkModule {

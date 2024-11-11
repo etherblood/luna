@@ -1,4 +1,4 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.game;
 
 import com.destrostudios.icetea.core.AppSystem;
 import com.destrostudios.icetea.core.asset.loader.GltfLoaderSettings;
@@ -13,6 +13,7 @@ import com.destrostudios.icetea.core.render.shadow.ShadowMode;
 import com.destrostudios.icetea.core.scene.Geometry;
 import com.destrostudios.icetea.core.scene.Node;
 import com.destrostudios.icetea.core.shader.Shader;
+import com.etherblood.luna.application.client.PrintStopwatch;
 import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.InputLayer;
 import com.etherblood.luna.application.client.gui.LayerOrder;
@@ -30,6 +31,13 @@ import com.etherblood.luna.engine.actions.data.ActionAnimation;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.damage.MilliHealth;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.vulkan.VK10;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,12 +49,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.vulkan.VK10;
 
 public class GameSystem extends AppSystem implements InputLayer {
 
@@ -54,8 +56,9 @@ public class GameSystem extends AppSystem implements InputLayer {
     private final float CAMERA_ANGLE = (float) (30 * Math.PI / 180);
 
     private final Set<Integer> pressedKeys = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private final Map<Integer, ModelWrapper> models = new HashMap<>();
-    private final Map<Integer, StatusHudWrapper> statusHuds = new HashMap<>();
+    //    private final Set<Integer> pressedKeyDeltas = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Map<Integer, SceneModel> models = new HashMap<>();
+    private final Map<Integer, SceneStatusHud> statusHuds = new HashMap<>();
     private Geometry geometryGround;
     private final GameProxy gameProxy;
     private final GuiFactory guiFactory;
@@ -124,12 +127,21 @@ public class GameSystem extends AppSystem implements InputLayer {
         } else {
             pressedKeys.add(event.getKey());
         }
+//        if (event.getAction() == GLFW.GLFW_RELEASE || event.getAction() == GLFW.GLFW_PRESS) {
+//            if (pressedKeyDeltas.contains(event.getKey())) {
+//                pressedKeyDeltas.remove(event.getKey());
+//            } else {
+//                pressedKeyDeltas.add(event.getKey());
+//            }
+//        }
         return true;
     }
 
     @Override
     public void update(float tpf) {
         super.update(tpf);
+//        gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeyDeltas));
+//        pressedKeyDeltas.clear();
         gameProxy.update(toInput(gameProxy.getPlayer().id, pressedKeys));
         GameEngine snapshot = gameProxy.getEngineSnapshot();
         if (snapshot == null) {
@@ -159,9 +171,9 @@ public class GameSystem extends AppSystem implements InputLayer {
 
     private void updateActorHuds(EntityData data) {
         Node guiNode = application.getGuiNode();
-        Iterator<StatusHudWrapper> iterator = statusHuds.values().iterator();
+        Iterator<SceneStatusHud> iterator = statusHuds.values().iterator();
         while (iterator.hasNext()) {
-            StatusHudWrapper wrapper = iterator.next();
+            SceneStatusHud wrapper = iterator.next();
             if (!data.has(wrapper.getEntity(), ActorName.class)
                     && !data.has(wrapper.getEntity(), MilliHealth.class)) {
                 guiNode.remove(wrapper.getNode());
@@ -173,7 +185,7 @@ public class GameSystem extends AppSystem implements InputLayer {
         entities.addAll(data.list(MilliHealth.class));
         for (int entity : entities) {
             if (!statusHuds.containsKey(entity)) {
-                StatusHudWrapper wrapper = new StatusHudWrapper(entity, guiFactory.bitmapFont());
+                SceneStatusHud wrapper = new SceneStatusHud(entity, guiFactory.bitmapFont());
                 statusHuds.put(entity, wrapper);
                 guiNode.add(wrapper.getNode());
             }
@@ -181,7 +193,7 @@ public class GameSystem extends AppSystem implements InputLayer {
             ActorName actorName = data.get(entity, ActorName.class);
             String name = actorName == null ? null : actorName.name();
             MilliHealth health = data.get(entity, MilliHealth.class);
-            StatusHudWrapper wrapper = statusHuds.get(entity);
+            SceneStatusHud wrapper = statusHuds.get(entity);
             wrapper.setName(name);
             wrapper.setHealth(health == null ? null : health.value());
             Vector3f screenCoordinates = application.getScreenCoordinates(convert(position));
@@ -192,12 +204,12 @@ public class GameSystem extends AppSystem implements InputLayer {
     private void updateModels(GameEngine snapshot) {
         Node sceneNode = application.getSceneNode();
         EntityData data = snapshot.getData();
-        Iterator<ModelWrapper> iterator = models.values().iterator();
+        Iterator<SceneModel> iterator = models.values().iterator();
         while (iterator.hasNext()) {
-            ModelWrapper wrapper = iterator.next();
-            if (!data.has(wrapper.getEntity(), ModelKey.class)) {
-                if (wrapper.getNode().hasParent(sceneNode)) {
-                    sceneNode.remove(wrapper.getNode());
+            SceneModel model = iterator.next();
+            if (!data.has(model.entity(), ModelKey.class)) {
+                if (model.node().hasParent(sceneNode)) {
+                    sceneNode.remove(model.node());
                 }
                 iterator.remove();
             }
@@ -207,19 +219,19 @@ public class GameSystem extends AppSystem implements InputLayer {
             String name = data.get(entity, ModelKey.class).name();
             if (!models.containsKey(entity)) {
                 Geometry model = loadModel(name);
-                models.put(entity, new ModelWrapper(entity, model));
+                models.put(entity, new SceneModel(entity, model));
             }
-            ModelWrapper wrapper = models.get(entity);
+            SceneModel model = models.get(entity);
             Position position = data.get(entity, Position.class);
             if (position != null) {
-                if (!wrapper.getNode().hasParent(sceneNode)) {
-                    sceneNode.add(wrapper.getNode());
+                if (!model.node().hasParent(sceneNode)) {
+                    sceneNode.add(model.node());
                 }
                 Vector2 vector = position.vector();
-                wrapper.getNode().setLocalTranslation(convert(vector));
+                model.node().setLocalTranslation(convert(vector));
             } else {
-                if (wrapper.getNode().hasParent(sceneNode)) {
-                    sceneNode.remove(wrapper.getNode());
+                if (model.node().hasParent(sceneNode)) {
+                    sceneNode.remove(model.node());
                 }
             }
 
@@ -227,7 +239,7 @@ public class GameSystem extends AppSystem implements InputLayer {
             if (direction != null) {
                 float angle = directionToAngle(direction);
                 AxisAngle4f axisAngle = new AxisAngle4f(angle, 0, 1, 0);
-                wrapper.getNode().setLocalRotation(new Quaternionf(axisAngle));
+                model.node().setLocalRotation(new Quaternionf(axisAngle));
             }
 
             ActiveAction activeAction = data.get(entity, ActiveAction.class);
@@ -241,9 +253,9 @@ public class GameSystem extends AppSystem implements InputLayer {
                 if (duration != null) {
                     long targetFrames = duration.frames();
                     float progress = (float) animationFrames / targetFrames;
-                    wrapper.setAnimationProgress(animation, progress);
+                    model.setAnimationProgress(animation, progress);
                 } else {
-                    wrapper.setAnimationTime(animation, animationFrames / fps);
+                    model.setAnimationTime(animation, animationFrames / fps);
                 }
             }
         }

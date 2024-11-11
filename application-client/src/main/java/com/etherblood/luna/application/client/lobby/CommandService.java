@@ -1,7 +1,8 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.lobby;
 
 import com.etherblood.luna.network.api.game.GameModule;
 import com.etherblood.luna.network.client.GameClientModule;
+
 import java.util.Locale;
 import java.util.UUID;
 

@@ -1,5 +1,6 @@
 package com.etherblood.luna.application.server;
 
+import com.destrostudios.authtoken.NoValidateJwtService;
 import com.esotericsoftware.minlog.Log;
 
 import java.io.IOException;
@@ -12,5 +13,7 @@ public class Main {
         Log.info(new Date().toString());// time reference for kryo logs
         System.err.println("WARNING: Using jwt service without validation.");
 
+        AppServer server = new AppServer(new NoValidateJwtService());
+        server.start();
     }
 }

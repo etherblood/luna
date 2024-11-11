@@ -1,9 +1,10 @@
-package com.etherblood.luna.application.client;
+package com.etherblood.luna.application.client.game;
 
 import com.destrostudios.authtoken.JwtAuthenticationUser;
 import com.etherblood.luna.engine.GameEngine;
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
+
 import java.util.Set;
 
 public class LocalGameProxy implements GameProxy {

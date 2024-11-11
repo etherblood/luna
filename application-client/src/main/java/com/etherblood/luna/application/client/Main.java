@@ -8,8 +8,13 @@ import com.destrostudios.gametools.network.client.modules.game.LobbyClientModule
 import com.destrostudios.gametools.network.client.modules.jwt.JwtClientModule;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.minlog.Log;
+import com.etherblood.luna.application.client.game.GameProxy;
+import com.etherblood.luna.application.client.game.RemoteGameProxy;
 import com.etherblood.luna.application.client.gui.GuiFactory;
 import com.etherblood.luna.application.client.gui.GuiManager;
+import com.etherblood.luna.application.client.lobby.ChatSystem;
+import com.etherblood.luna.application.client.lobby.CommandService;
+import com.etherblood.luna.application.client.lobby.LobbySystem;
 import com.etherblood.luna.network.api.NetworkUtil;
 import com.etherblood.luna.network.api.game.GameModule;
 import com.etherblood.luna.network.client.GameClientModule;
@@ -45,7 +50,7 @@ public class Main {
         JOptionPane.showMessageDialog(null, sw.toString(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void startApp(String host, String jwt, boolean debug) throws IOException {
+    public static ApplicationClient startApp(String host, String jwt, boolean debug) throws IOException {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
         if (debug) {
             System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG");
@@ -74,6 +79,7 @@ public class Main {
         };
         app.getConfig().setEnableValidationLayer(debug);
         app.start();
+        return app;
     }
 
     static ToolsClient createToolsClient() {

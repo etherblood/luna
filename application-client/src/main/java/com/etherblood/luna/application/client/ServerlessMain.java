@@ -1,6 +1,8 @@
 package com.etherblood.luna.application.client;
 
 import com.destrostudios.authtoken.JwtAuthenticationUser;
+import com.etherblood.luna.application.client.game.GameProxy;
+import com.etherblood.luna.application.client.game.LocalGameProxy;
 import com.etherblood.luna.data.EntityData;
 import com.etherblood.luna.engine.ActorName;
 import com.etherblood.luna.engine.GameEngine;
@@ -9,7 +11,7 @@ import com.etherblood.luna.engine.PlayerId;
 import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Team;
 
-public class LocalMain {
+public class ServerlessMain {
 
     public static void main(String... args) {
         System.setProperty("org.slf4j.simpleLogger.logFile", "System.out");
