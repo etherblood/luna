@@ -10,8 +10,8 @@ import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Team;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.data.ActionEvent;
-import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.actions.data.ActionOf;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.damage.MilliHealth;
 
@@ -33,24 +33,24 @@ public class SimpleBehaviorSystem implements GameSystem {
                 Vector2 delta = otherPosition.vector().sub(position.vector());
                 Direction direction = Direction.of(delta.x(), delta.y());
 
-                Integer meleeAction = getAction(data, entity, ActionKey.ATTACK1);
-                Integer rangeAction = getAction(data, entity, ActionKey.ATTACK2);
-                Integer dashAction = getAction(data, entity, ActionKey.DASH);
+                Integer meleeAction = getAction(data, entity, ActionType.ATTACK1);
+                Integer rangeAction = getAction(data, entity, ActionType.ATTACK2);
+                Integer dashAction = getAction(data, entity, ActionType.DASH);
 
                 int meleeRange = 1000;
                 int rangedRange = 5000;
                 int dashRange = 4000;
                 if (meleeAction != null && !data.has(meleeAction, ActiveCooldown.class) && delta.squaredLength() < meleeRange * meleeRange) {
-                    data.set(entity, new ActorInput(direction, ActionKey.ATTACK1));
+                    data.set(entity, new ActorInput(direction, ActionType.ATTACK1));
                 } else if (rangeAction != null && !data.has(rangeAction, ActiveCooldown.class) && delta.squaredLength() < rangedRange * rangedRange) {
-                    data.set(entity, new ActorInput(direction, ActionKey.ATTACK2));
+                    data.set(entity, new ActorInput(direction, ActionType.ATTACK2));
                 } else if (dashAction != null && !data.has(dashAction, ActiveCooldown.class) && delta.squaredLength() > dashRange * dashRange) {
-                    data.set(entity, new ActorInput(direction, ActionKey.DASH));
+                    data.set(entity, new ActorInput(direction, ActionType.DASH));
                 } else {
-                    data.set(entity, new ActorInput(direction, ActionKey.WALK));
+                    data.set(entity, new ActorInput(direction, ActionType.WALK));
                 }
             } else {
-                data.set(entity, new ActorInput(null, ActionKey.IDLE));
+                data.set(entity, new ActorInput(null, ActionType.IDLE));
             }
         }
     }
@@ -81,9 +81,9 @@ public class SimpleBehaviorSystem implements GameSystem {
         return best;
     }
 
-    private Integer getAction(EntityData data, int actor, ActionKey key) {
+    private Integer getAction(EntityData data, int actor, ActionType key) {
         for (int action : data.findByValue(new ActionOf(actor))) {
-            if (data.get(action, ActionKey.class) == key) {
+            if (data.get(action, ActionType.class) == key) {
                 return action;
             }
         }

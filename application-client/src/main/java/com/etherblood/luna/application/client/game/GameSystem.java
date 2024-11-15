@@ -29,7 +29,7 @@ import com.etherblood.luna.engine.Position;
 import com.etherblood.luna.engine.Vector2;
 import com.etherblood.luna.engine.actions.data.ActionAnimation;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
-import com.etherblood.luna.engine.actions.data.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
@@ -342,28 +342,28 @@ public class GameSystem extends AppSystem implements InputLayer {
             x--;
         }
         Direction direction = Direction.eightDirOf(x, y);
-        ActionKey action = ActionKey.IDLE;
+        ActionType action = ActionType.IDLE;
         if (direction != null) {
-            action = ActionKey.WALK;
+            action = ActionType.WALK;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_X)
                 || keyCodes.contains(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            action = ActionKey.DASH;
+            action = ActionType.DASH;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_1)
                 || keyCodes.contains(GLFW.GLFW_KEY_Q)
                 || keyCodes.contains(GLFW.GLFW_KEY_A)) {
-            action = ActionKey.ATTACK1;
+            action = ActionType.ATTACK1;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_2)
                 || keyCodes.contains(GLFW.GLFW_KEY_W)
                 || keyCodes.contains(GLFW.GLFW_KEY_S)) {
-            action = ActionKey.ATTACK2;
+            action = ActionType.ATTACK2;
         }
         if (keyCodes.contains(GLFW.GLFW_KEY_3)
                 || keyCodes.contains(GLFW.GLFW_KEY_E)
                 || keyCodes.contains(GLFW.GLFW_KEY_D)) {
-            action = ActionKey.ATTACK3;
+            action = ActionType.ATTACK3;
         }
         return new PlayerInput(player, direction, action);
     }

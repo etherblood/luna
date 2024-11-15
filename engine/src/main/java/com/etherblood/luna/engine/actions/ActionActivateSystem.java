@@ -11,15 +11,17 @@ import com.etherblood.luna.engine.PendingDelete;
 import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
 import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
-import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.damage.MilliHealth;
 import com.etherblood.luna.engine.movement.Speed;
+
+import java.util.Objects;
 
 public class ActionActivateSystem implements GameSystem {
 
@@ -28,7 +30,8 @@ public class ActionActivateSystem implements GameSystem {
         EntityData data = game.getData();
         for (int entity : data.list(ActiveAction.class)) {
             ActiveAction state = data.get(entity, ActiveAction.class);
-            int idleAction = getAction(data, entity, ActionKey.IDLE);// assume IDLE always exists
+            int idleAction = Objects.requireNonNull(getAction(data, entity, ActionType.IDLE),
+                    "No valid idle action available.");
             int activeAction = state.action();
 
             // handle ended actions
@@ -42,19 +45,19 @@ public class ActionActivateSystem implements GameSystem {
 
             // fall
             MilliHealth health = data.get(entity, MilliHealth.class);
-            Integer fallenAction = getAction(data, entity, ActionKey.FALLEN);
+            Integer fallenAction = getAction(data, entity, ActionType.FALLEN);
             if (health != null && health.value() <= 0 && fallenAction != null) {
                 Direction direction = input == null ? null : input.direction();
                 // TODO: this is hacky, improve?
                 // overwrite user input with FALLEN action
-                input = new ActorInput(direction, ActionKey.FALLEN);
+                input = new ActorInput(direction, ActionType.FALLEN);
             }
 
             Integer inputAction = input != null ? getAction(data, entity, input.action()) : null;
             if (inputAction != null) {
                 // fall back to walk/idle if inputAction is on cooldown
                 if (data.has(inputAction, ActiveCooldown.class)) {
-                    Integer walkAction = getAction(data, entity, ActionKey.WALK);
+                    Integer walkAction = getAction(data, entity, ActionType.WALK);
                     if (input.direction() != null && walkAction != null) {
                         inputAction = walkAction;
                     } else {
@@ -121,9 +124,9 @@ public class ActionActivateSystem implements GameSystem {
         return strengthLevel >= resistLevel;
     }
 
-    private Integer getAction(EntityData data, int actor, ActionKey key) {
+    private Integer getAction(EntityData data, int actor, ActionType key) {
         for (int action : data.findByValue(new ActionOf(actor))) {
-            if (data.get(action, ActionKey.class) == key) {
+            if (data.get(action, ActionType.class) == key) {
                 return action;
             }
         }

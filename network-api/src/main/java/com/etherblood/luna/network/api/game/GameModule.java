@@ -29,11 +29,11 @@ import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionEvent;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
 import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
-import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
@@ -116,7 +116,7 @@ public abstract class GameModule extends NetworkModule {
         kryo.register(Rectangle.class, new RecordSerializer<>());
         kryo.register(Circle.class, new RecordSerializer<>());
         kryo.register(Vector2.class, new RecordSerializer<>());
-        kryo.register(ActionKey.class, new EnumSerializer<>(ActionKey.class));
+        kryo.register(ActionType.class, new EnumSerializer<>(ActionType.class));
         kryo.register(Direction.class, new RecordSerializer<>());
 
         kryo.register(PlayerId.class, new RecordSerializer<>());

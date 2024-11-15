@@ -2,7 +2,7 @@ package com.etherblood.luna.network.sandbox;
 
 import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
-import com.etherblood.luna.engine.actions.data.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.network.api.game.PlaybackBuffer;
 import com.etherblood.luna.network.api.game.messages.EventMessage;
 import com.etherblood.luna.network.api.game.messages.EventMessagePart;
@@ -24,7 +24,7 @@ public class EventMessagesTest {
         UUID spectateId = UUID.randomUUID();
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -46,7 +46,7 @@ public class EventMessagesTest {
         UUID spectateId = UUID.randomUUID();
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -72,8 +72,8 @@ public class EventMessagesTest {
         UUID spectateId = UUID.randomUUID();
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
-        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
+        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionType.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -97,7 +97,7 @@ public class EventMessagesTest {
         UUID spectateId = UUID.randomUUID();
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -120,8 +120,8 @@ public class EventMessagesTest {
         UUID spectateId = UUID.randomUUID();
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
-        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
+        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionType.IDLE), null));
 
         // when
         client.enqueueAction(input0);
@@ -151,7 +151,7 @@ public class EventMessagesTest {
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
 
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
 
         // when
         EventMessage message = new EventMessage(spectateId, 0, 0, -1, new EventMessagePart[]{input0});
@@ -173,7 +173,7 @@ public class EventMessagesTest {
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
 
         // when
         EventMessage message = new EventMessage(spectateId, 0, 0, -1, new EventMessagePart[]{input0});
@@ -196,8 +196,8 @@ public class EventMessagesTest {
         ServerEventMessageBuilder server = new ServerEventMessageBuilder(spectateId);
         ClientEventMessageBuilder client = new ClientEventMessageBuilder(spectateId);
         PlaybackBuffer clientBuffer = new PlaybackBuffer();
-        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionKey.IDLE), null));
-        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionKey.IDLE), null));
+        EventMessagePart input0 = new EventMessagePart(0, new GameEvent(new PlayerInput(0, null, ActionType.IDLE), null));
+        EventMessagePart input1 = new EventMessagePart(1, new GameEvent(new PlayerInput(1, null, ActionType.IDLE), null));
 
         // when
         EventMessage message1 = new EventMessage(spectateId, 0, 0, -1, new EventMessagePart[]{input0});

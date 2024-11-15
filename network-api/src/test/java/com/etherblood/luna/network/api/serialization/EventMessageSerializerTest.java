@@ -9,7 +9,7 @@ import com.etherblood.luna.engine.GameEvent;
 import com.etherblood.luna.engine.PlayerInput;
 import com.etherblood.luna.engine.PlayerJoined;
 import com.etherblood.luna.engine.Vector2;
-import com.etherblood.luna.engine.actions.data.ActionKey;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.network.api.game.messages.EventMessage;
 import com.etherblood.luna.network.api.game.messages.EventMessagePart;
 import com.etherblood.luna.network.api.game.messages.serialization.EventMessageSerializer;
@@ -31,13 +31,13 @@ public class EventMessageSerializerTest {
         kryo.register(GameEvent.class, new RecordSerializer<>());
         kryo.register(PlayerJoined.class, new RecordSerializer<>());
         kryo.register(PlayerInput.class, new RecordSerializer<>());
-        kryo.register(ActionKey.class, new EnumSerializer(ActionKey.class));
+        kryo.register(ActionType.class, new EnumSerializer(ActionType.class));
         kryo.register(Direction.class, new RecordSerializer<>());
         kryo.register(Vector2.class, new RecordSerializer<>());
 
         EventMessage message = new EventMessage(UUID.randomUUID(), 9, 15, 25, new EventMessagePart[]{
                 new EventMessagePart(19, new GameEvent(null, null)),
-                new EventMessagePart(20, new GameEvent(new PlayerInput(13, Direction.DOWN_LEFT, ActionKey.DASH), null))
+                new EventMessagePart(20, new GameEvent(new PlayerInput(13, Direction.DOWN_LEFT, ActionType.DASH), null))
         });
 
         EventMessage copy = kryo.copy(message);

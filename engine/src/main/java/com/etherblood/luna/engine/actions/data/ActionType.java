@@ -1,6 +1,6 @@
 package com.etherblood.luna.engine.actions.data;
 
-public enum ActionKey {
+public enum ActionType {
     IDLE,
     WALK,
     DASH,

@@ -6,11 +6,11 @@ import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionEvent;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
 import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
-import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
 import com.etherblood.luna.engine.behaviors.SimpleBehavior;
@@ -153,7 +153,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             {
                 apply(game, idleAction, "idle_action");
                 data.set(idleAction, new ActionOf(entity));
-                data.set(idleAction, ActionKey.IDLE);
+                data.set(idleAction, ActionType.IDLE);
                 data.set(idleAction, new ActionAnimation("idle"));
                 data.set(idleAction, new CascadeDelete(entity));
             }
@@ -162,7 +162,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int walkAction = data.createEntity();
                 apply(game, walkAction, "walk_action");
                 data.set(walkAction, new ActionOf(entity));
-                data.set(walkAction, ActionKey.WALK);
+                data.set(walkAction, ActionType.WALK);
                 data.set(walkAction, new ActionSpeed(1100 / fps));
                 data.set(walkAction, new ActionAnimation("walk"));
                 data.set(walkAction, new CascadeDelete(entity));
@@ -172,7 +172,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int dashAction = data.createEntity();
                 apply(game, dashAction, "dash_action");
                 data.set(dashAction, new ActionOf(entity));
-                data.set(dashAction, ActionKey.DASH);
+                data.set(dashAction, ActionType.DASH);
                 data.set(dashAction, new ActionSpeed(5000 / fps));
                 data.set(dashAction, new ActionDuration(48));
                 data.set(dashAction, new ActionAnimation("dash"));
@@ -183,7 +183,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int gazeOfDarknessAction = data.createEntity();
                 apply(game, gazeOfDarknessAction, "gaze_of_darkness_action");
                 data.set(gazeOfDarknessAction, new ActionOf(entity));
-                data.set(gazeOfDarknessAction, ActionKey.ATTACK1);
+                data.set(gazeOfDarknessAction, ActionType.ATTACK1);
                 data.set(gazeOfDarknessAction, new ActionAnimation("attack1"));
                 data.set(gazeOfDarknessAction, new CascadeDelete(entity));
             }
@@ -192,7 +192,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int bladeOfChaosAction = data.createEntity();
                 apply(game, bladeOfChaosAction, "blade_of_chaos_action");
                 data.set(bladeOfChaosAction, new ActionOf(entity));
-                data.set(bladeOfChaosAction, ActionKey.ATTACK2);
+                data.set(bladeOfChaosAction, ActionType.ATTACK2);
                 data.set(bladeOfChaosAction, new ActionAnimation("attack2"));
                 data.set(bladeOfChaosAction, new CascadeDelete(entity));
             }
@@ -201,7 +201,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int waveOfQuickHealingAction = data.createEntity();
                 apply(game, waveOfQuickHealingAction, "wave_of_quick_healing_action");
                 data.set(waveOfQuickHealingAction, new ActionOf(entity));
-                data.set(waveOfQuickHealingAction, ActionKey.ATTACK3);
+                data.set(waveOfQuickHealingAction, ActionType.ATTACK3);
                 data.set(waveOfQuickHealingAction, new ActionAnimation("agonizing"));
                 data.set(waveOfQuickHealingAction, new CascadeDelete(entity));
             }
@@ -210,7 +210,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int fallenAction = data.createEntity();
                 apply(game, fallenAction, "fallen_action");
                 data.set(fallenAction, new ActionOf(entity));
-                data.set(fallenAction, ActionKey.FALLEN);
+                data.set(fallenAction, ActionType.FALLEN);
                 data.set(fallenAction, new ActionAnimation("death"));
                 data.set(fallenAction, new ActionDuration(179));
                 data.set(fallenAction, new ActionEvent(179, "suicide"));
@@ -232,7 +232,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             {
                 apply(game, idleAction, "idle_action");
                 data.set(idleAction, new ActionOf(entity));
-                data.set(idleAction, ActionKey.IDLE);
+                data.set(idleAction, ActionType.IDLE);
                 data.set(idleAction, new ActionAnimation("idle"));
                 data.set(idleAction, new CascadeDelete(entity));
             }
@@ -241,7 +241,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int walkAction = data.createEntity();
                 apply(game, walkAction, "walk_action");
                 data.set(walkAction, new ActionOf(entity));
-                data.set(walkAction, ActionKey.WALK);
+                data.set(walkAction, ActionType.WALK);
                 data.set(walkAction, new ActionSpeed(50));
                 data.set(walkAction, new ActionAnimation("fly_forward"));
                 data.set(walkAction, new CascadeDelete(entity));
@@ -251,7 +251,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int ghostMeleeAction = data.createEntity();
                 apply(game, ghostMeleeAction, "ghost_melee_action");
                 data.set(ghostMeleeAction, new ActionOf(entity));
-                data.set(ghostMeleeAction, ActionKey.ATTACK1);
+                data.set(ghostMeleeAction, ActionType.ATTACK1);
                 data.set(ghostMeleeAction, new ActionAnimation("melee_attack"));
                 data.set(ghostMeleeAction, new CascadeDelete(entity));
             }
@@ -260,7 +260,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int ghostSpellAction = data.createEntity();
                 apply(game, ghostSpellAction, "ghost_spell_action");
                 data.set(ghostSpellAction, new ActionOf(entity));
-                data.set(ghostSpellAction, ActionKey.ATTACK2);
+                data.set(ghostSpellAction, ActionType.ATTACK2);
                 data.set(ghostSpellAction, new ActionAnimation("cast_spell"));
                 data.set(ghostSpellAction, new CascadeDelete(entity));
             }
@@ -269,7 +269,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int fallenAction = data.createEntity();
                 apply(game, fallenAction, "fallen_action");
                 data.set(fallenAction, new ActionOf(entity));
-                data.set(fallenAction, ActionKey.FALLEN);
+                data.set(fallenAction, ActionType.FALLEN);
                 data.set(fallenAction, new ActionAnimation("die"));
                 data.set(fallenAction, new ActionDuration(100));
                 data.set(fallenAction, new ActionEvent(100, "suicide"));
@@ -290,7 +290,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
             {
                 apply(game, idleAction, "idle_action");
                 data.set(idleAction, new ActionOf(entity));
-                data.set(idleAction, ActionKey.IDLE);
+                data.set(idleAction, ActionType.IDLE);
                 data.set(idleAction, new ActionAnimation("idle"));
                 data.set(idleAction, new CascadeDelete(entity));
             }
@@ -299,7 +299,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int walkAction = data.createEntity();
                 apply(game, walkAction, "walk_action");
                 data.set(walkAction, new ActionOf(entity));
-                data.set(walkAction, ActionKey.WALK);
+                data.set(walkAction, ActionType.WALK);
                 data.set(walkAction, new ActionSpeed(100));
                 data.set(walkAction, new ActionAnimation("run"));
                 data.set(walkAction, new CascadeDelete(entity));
@@ -309,7 +309,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int metalonMeleeAction = data.createEntity();
                 apply(game, metalonMeleeAction, "metalon_smash_action");
                 data.set(metalonMeleeAction, new ActionOf(entity));
-                data.set(metalonMeleeAction, ActionKey.ATTACK1);
+                data.set(metalonMeleeAction, ActionType.ATTACK1);
                 data.set(metalonMeleeAction, new ActionAnimation("smash"));
                 data.set(metalonMeleeAction, new CascadeDelete(entity));
             }
@@ -318,7 +318,7 @@ public class TemplatesFactoryImpl implements TemplatesFactory {
                 int fallenAction = data.createEntity();
                 apply(game, fallenAction, "fallen_action");
                 data.set(fallenAction, new ActionOf(entity));
-                data.set(fallenAction, ActionKey.FALLEN);
+                data.set(fallenAction, ActionType.FALLEN);
                 data.set(fallenAction, new ActionAnimation("die"));
                 data.set(fallenAction, new ActionDuration(120));
                 data.set(fallenAction, new ActionEvent(120, "suicide"));

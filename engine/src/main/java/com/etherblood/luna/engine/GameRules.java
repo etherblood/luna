@@ -8,11 +8,11 @@ import com.etherblood.luna.engine.actions.data.ActionDuration;
 import com.etherblood.luna.engine.actions.data.ActionEvent;
 import com.etherblood.luna.engine.actions.data.ActionInterruptResist;
 import com.etherblood.luna.engine.actions.data.ActionInterruptStrength;
-import com.etherblood.luna.engine.actions.data.ActionKey;
 import com.etherblood.luna.engine.actions.data.ActionOf;
 import com.etherblood.luna.engine.actions.data.ActionRange;
 import com.etherblood.luna.engine.actions.data.ActionSpeed;
 import com.etherblood.luna.engine.actions.data.ActionTurnable;
+import com.etherblood.luna.engine.actions.data.ActionType;
 import com.etherblood.luna.engine.actions.data.ActiveCooldown;
 import com.etherblood.luna.engine.actions.data.BaseCooldown;
 import com.etherblood.luna.engine.actions.data.DeleteAfterActorAction;
@@ -82,7 +82,7 @@ public class GameRules {
                             WaitForTrigger.class,
                             Triggerbox.class,
 
-                            ActionKey.class,
+                            ActionType.class,
                             ActionAnimation.class,
                             BaseCooldown.class,
                             ActionDuration.class,
