@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:23-jre-alpine
 WORKDIR /home
 COPY target/application-server-0.1.0.jar ./
 COPY target/libs libs
