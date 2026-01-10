@@ -14,7 +14,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'destrostudios/maven-java-22'
+                    image 'destrostudios/maven-java-23'
                     reuseNode true
                 }
             }
